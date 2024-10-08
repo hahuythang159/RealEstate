@@ -108,7 +108,7 @@ public class UsersController : ControllerBase
 
     // GET: api/users/5
     [HttpGet("{id}")]
-    [Authorize] // Chỉ cho phép người dùng đã xác thực truy cập
+    [Authorize] 
     public async Task<ActionResult<User>> GetUser(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
@@ -122,38 +122,43 @@ public class UsersController : ControllerBase
 
     // PUT: api/users/5
     [HttpPut("{id}")]
-    [Authorize] // Chỉ cho phép người dùng đã xác thực truy cập
-    public async Task<IActionResult> PutUser(Guid id, User user)
+    public async Task<IActionResult> PutUser(Guid id, [FromBody] User updatedUser)
     {
-        if (id != user.Id)
-        {
-            return BadRequest();
-        }
+        Console.WriteLine("Yêu cầu cập nhật người dùng đã đến.");
+        Console.WriteLine($"Cập nhật người dùng có ID: {id}");
 
-        _context.Entry(user).State = EntityState.Modified;
+        var existingUser = await _context.Users.FindAsync(id);
+        if (existingUser == null)
+        {
+            Console.WriteLine("Người dùng không tồn tại.");
+            return NotFound(new { message = "Người dùng không tồn tại." });
+        }
 
         try
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!UserExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
+            existingUser.UserName = updatedUser.UserName;
+            existingUser.Email = updatedUser.Email;
+            existingUser.PhoneNumber = updatedUser.PhoneNumber;
+            existingUser.Role = updatedUser.Role;
+            existingUser.IsActive = updatedUser.IsActive;
 
-        return NoContent();
+            // Không cần gán EntityState ở đây nếu bạn đang thay đổi thuộc tính
+            await _context.SaveChangesAsync();
+
+            Console.WriteLine("Người dùng đã được cập nhật thành công.");
+            return Ok(new { message = "Người dùng đã được chỉnh sửa thành công!" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi cập nhật người dùng: {ex.Message}");
+            return StatusCode(500, "Có lỗi xảy ra trong quá trình cập nhật.");
+        }
     }
+
 
     // DELETE: api/users/5
     [HttpDelete("{id}")]
-    //[Authorize] // Chỉ cho phép người dùng đã xác thực truy cập
+    //[Authorize] 
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var user = await _context.Users.FindAsync(id);

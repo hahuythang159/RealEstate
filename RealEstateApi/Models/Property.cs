@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 public class Property
 {
@@ -24,16 +25,19 @@ public class Property
     [Required]
     [ForeignKey("Province")]
     public int ProvinceId { get; set; }  // Liên kết với tỉnh
+    [JsonIgnore]
     public virtual Province Province { get; set; }
 
     [Required]
     [ForeignKey("District")]
     public int DistrictId { get; set; }  // Liên kết với huyện
+    [JsonIgnore]
     public virtual District District { get; set; }
 
     [Required]
     [ForeignKey("Ward")]
     public int WardId { get; set; }  // Liên kết với xã
+    [JsonIgnore]
     public virtual Ward Ward { get; set; }
 
     [Required]

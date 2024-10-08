@@ -4,22 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-using System.Net.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-using Newtonsoft.Json;
 
 [Route("api/[controller]")]
 [ApiController]
 public class PropertiesController : ControllerBase
 {
     private readonly RealEstateContext _context;
-    private readonly HttpClient _httpClient;
 
-    public PropertiesController(RealEstateContext context, HttpClient httpClient)
+    public PropertiesController(RealEstateContext context)
     {
         _context = context;
-        _httpClient = httpClient;
     }
 
     // GET: api/properties
@@ -55,88 +51,82 @@ public class PropertiesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Property>> PostProperty(Property property)
     {
-        // Kiểm tra dữ liệu có hợp lệ không
-        if (!ModelState.IsValid)
+        try
         {
-            // Log các lỗi trong ModelState
-            LogModelStateErrors(ModelState);
-            return BadRequest(ModelState);
-        }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Title = "One or more validation errors occurred.",
+                    Status = 400,
+                    Errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
+            }
 
-        // Kiểm tra OwnerId có tồn tại không
-        var owner = await _context.Users.FindAsync(property.OwnerId);
-        if (owner == null)
+            var owner = await _context.Users.FindAsync(property.OwnerId);
+            if (owner == null)
+            {
+                return BadRequest("Owner not found.");
+            }
+
+            // Thêm property vào database
+            _context.Properties.Add(property);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
+        }
+        catch (Exception ex)
         {
-            return BadRequest("Owner not found.");
+            return StatusCode(500, new { message = "Internal server error: " + ex.Message });
         }
-
-        // Lưu Province, District, và Ward từ API
-        await SaveProvinceDistrictWard(property);
-
-        // Thêm property vào database
-        _context.Properties.Add(property);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
     }
 
-    private async Task SaveProvinceDistrictWard(Property property)
-    {
-        property.Province = new Province
-        {
-            Id = property.ProvinceId,
-            Name = await GetProvinceName(property.ProvinceId)
-        };
 
-        property.District = new District
-        {
-            Id = property.DistrictId,
-            Name = await GetDistrictName(property.DistrictId),
-            ProvinceId = property.ProvinceId
-        };
-
-        property.Ward = new Ward
-        {
-            Id = property.WardId,
-            Name = await GetWardName(property.WardId),
-            DistrictId = property.DistrictId
-        };
-    }
-
-    // Lấy tên tỉnh từ API
+    // Cập nhật GetProvinceName, GetDistrictName, GetWardName
     private async Task<string> GetProvinceName(int provinceId)
     {
-        var response = await _httpClient.GetAsync($"https://provinces.open-api.vn/api/provinces/{provinceId}");
-        if (response.IsSuccessStatusCode)
-        {
-            var provinceData = JsonConvert.DeserializeObject<Province>(await response.Content.ReadAsStringAsync());
-            return provinceData?.Name ?? "Unknown Province";
-        }
-        return "Unknown Province"; // Hoặc xử lý lỗi
+        var province = await _context.Provinces.FindAsync(provinceId);
+        return province != null ? province.Name : "Unknown";
     }
 
-    // Lấy tên huyện từ API
     private async Task<string> GetDistrictName(int districtId)
     {
-        var response = await _httpClient.GetAsync($"https://provinces.open-api.vn/api/districts/{districtId}");
-        if (response.IsSuccessStatusCode)
-        {
-            var districtData = JsonConvert.DeserializeObject<District>(await response.Content.ReadAsStringAsync());
-            return districtData?.Name ?? "Unknown District";
-        }
-        return "Unknown District"; // Hoặc xử lý lỗi
+        var district = await _context.Districts.FindAsync(districtId);
+        return district != null ? district.Name : "Unknown";
     }
 
-    // Lấy tên xã từ API
     private async Task<string> GetWardName(int wardId)
     {
-        var response = await _httpClient.GetAsync($"https://provinces.open-api.vn/api/wards/{wardId}");
-        if (response.IsSuccessStatusCode)
-        {
-            var wardData = JsonConvert.DeserializeObject<Ward>(await response.Content.ReadAsStringAsync());
-            return wardData?.Name ?? "Unknown Ward";
-        }
-        return "Unknown Ward"; // Hoặc xử lý lỗi
+        var ward = await _context.Wards.FindAsync(wardId);
+        return ward != null ? ward.Name : "Unknown";
+    }
+
+    // GET: api/provinces
+    [HttpGet("provinces")]
+    public async Task<ActionResult<IEnumerable<Province>>> GetProvinces()
+    {
+        return await _context.Provinces.ToListAsync();
+    }
+
+    // GET: api/districts/{provinceId}
+    [HttpGet("districts/{provinceId}")]
+    public async Task<ActionResult<IEnumerable<District>>> GetDistricts(int provinceId)
+    {
+        return await _context.Districts
+                            .Where(d => d.ProvinceId == provinceId)
+                            .ToListAsync();
+    }
+
+    // GET: api/wards/{districtId}
+    [HttpGet("wards/{districtId}")]
+    public async Task<ActionResult<IEnumerable<Ward>>> GetWards(int districtId)
+    {
+        return await _context.Wards
+                            .Where(w => w.DistrictId == districtId)
+                            .ToListAsync();
     }
 
     // PUT: api/properties/5

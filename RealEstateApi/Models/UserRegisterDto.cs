@@ -37,6 +37,5 @@ public enum UserRole
 {
     Manager, // Giá trị mặc định là 0
     Owner,   // Giá trị là 1
-    Tenant ,  // Giá trị là 2
-    marketing
+    Tenant  // Giá trị là 2
 }

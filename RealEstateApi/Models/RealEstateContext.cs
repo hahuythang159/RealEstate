@@ -27,7 +27,11 @@ public class RealEstateContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-         modelBuilder.Entity<Property>()
+        modelBuilder.Entity<Property>()
+        .Property(p => p.Price)
+        .HasPrecision(18, 2); // Độ chính xác 18 chữ số, 2 chữ số thập phân
+
+    modelBuilder.Entity<Property>()
         .HasOne(p => p.Province)
         .WithMany()
         .HasForeignKey(p => p.ProvinceId)
