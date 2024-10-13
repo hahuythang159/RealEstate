@@ -7391,6 +7391,7 @@
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 8.0.8",
       "Microsoft.AspNetCore.OpenApi >= 8.0.2",
       "Microsoft.AspNetCore.SignalR >= 1.1.0",
+      "Microsoft.EntityFrameworkCore >= 8.0.8",
       "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.8",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.8",
       "Microsoft.IdentityModel.Tokens >= 8.0.2",
@@ -7405,11 +7406,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\HA HUY THANG\\RealEstateApplication\\RealEstateApi\\RealEstateApi.csproj",
+      "projectUniqueName": "c:\\Users\\HA HUY THANG\\RealEstateApplication\\RealEstateApi\\RealEstateApi.csproj",
       "projectName": "RealEstateApi",
-      "projectPath": "C:\\Users\\HA HUY THANG\\RealEstateApplication\\RealEstateApi\\RealEstateApi.csproj",
+      "projectPath": "c:\\Users\\HA HUY THANG\\RealEstateApplication\\RealEstateApi\\RealEstateApi.csproj",
       "packagesPath": "C:\\Users\\HA HUY THANG\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\HA HUY THANG\\RealEstateApplication\\RealEstateApi\\obj\\",
+      "outputPath": "c:\\Users\\HA HUY THANG\\RealEstateApplication\\RealEstateApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\DevExpress 23.1\\Components\\Offline Packages"
@@ -7475,6 +7476,10 @@
           "Microsoft.AspNetCore.SignalR": {
             "target": "Package",
             "version": "[1.1.0, )"
+          },
+          "Microsoft.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "[8.0.8, )"
           },
           "Microsoft.EntityFrameworkCore.SqlServer": {
             "target": "Package",

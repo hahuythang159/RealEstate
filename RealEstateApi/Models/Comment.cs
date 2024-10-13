@@ -6,20 +6,20 @@ namespace RealEstateApi.Models
     public class Comment
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();  // Định danh duy nhất
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public Guid  PropertyId { get; set; } // Khóa ngoại đến bất động sản
+        public Guid  PropertyId { get; set; }
 
         [Required]
-        public Guid  UserId { get; set; } // Khóa ngoại đến người dùng
+        public Guid  UserId { get; set; } 
 
         [Required]
         [StringLength(500, ErrorMessage = "Nội dung bình luận không được vượt quá 500 ký tự.")]
-        public string Content { get; set; } // Nội dung bình luận
+        public string Content { get; set; } 
 
         [DataType(DataType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Thời gian tạo bình luận
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         
     }
 }

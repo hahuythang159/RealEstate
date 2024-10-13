@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
-using RealEstateApi.Models; // Đảm bảo sử dụng namespace đúng
+using RealEstateApi.Models;
 
 
-namespace RealEstateApi.Data // Namespace cho CommentHub
+namespace RealEstateApi.Data 
 {
     public class CommentHub : Hub
     {

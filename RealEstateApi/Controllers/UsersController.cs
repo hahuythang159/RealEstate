@@ -74,10 +74,23 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<string>> Login([FromBody] LoginRequest loginRequest)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginRequest.UserName);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
+        if (user == null)
         {
-            return Unauthorized(new { message = "Tên người dùng hoặc mật khẩu không chính xác." });
+            return BadRequest(new { message = "Tên người dùng không tồn tại." });
         }
+
+        // Kiểm tra trạng thái hoạt động của người dùng
+        if (!user.IsActive)
+        {
+            return BadRequest(new { message = "Tài khoản đã bị vô hiệu hóa." });
+        }
+
+        // Kiểm tra mật khẩu
+        if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
+        {
+            return BadRequest(new { message = "Mật khẩu không chính xác." });
+        }
+
 
         // Tạo token
         var token = GenerateJwtToken(user);
@@ -122,37 +135,39 @@ public class UsersController : ControllerBase
 
     // PUT: api/users/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutUser(Guid id, [FromBody] User updatedUser)
+    public async Task<IActionResult> PutUser(Guid id,User updatedUser)
     {
-        Console.WriteLine("Yêu cầu cập nhật người dùng đã đến.");
-        Console.WriteLine($"Cập nhật người dùng có ID: {id}");
+        if (id != updatedUser.Id)
+        {
+            return BadRequest("ID không khớp với ID trong dữ liệu.");
+        }
 
         var existingUser = await _context.Users.FindAsync(id);
         if (existingUser == null)
         {
-            Console.WriteLine("Người dùng không tồn tại.");
-            return NotFound(new { message = "Người dùng không tồn tại." });
+            return NotFound();
         }
+        
+
+        existingUser.Role = updatedUser.Role;
+        existingUser.IsActive = updatedUser.IsActive; 
+
+        _context.Entry(existingUser).State = EntityState.Modified;
 
         try
         {
-            existingUser.UserName = updatedUser.UserName;
-            existingUser.Email = updatedUser.Email;
-            existingUser.PhoneNumber = updatedUser.PhoneNumber;
-            existingUser.Role = updatedUser.Role;
-            existingUser.IsActive = updatedUser.IsActive;
-
-            // Không cần gán EntityState ở đây nếu bạn đang thay đổi thuộc tính
             await _context.SaveChangesAsync();
-
-            Console.WriteLine("Người dùng đã được cập nhật thành công.");
-            return Ok(new { message = "Người dùng đã được chỉnh sửa thành công!" });
         }
-        catch (Exception ex)
+        catch (DbUpdateConcurrencyException)
         {
-            Console.WriteLine($"Lỗi khi cập nhật người dùng: {ex.Message}");
-            return StatusCode(500, "Có lỗi xảy ra trong quá trình cập nhật.");
+            if (!UserExists(id))
+            {
+                return NotFound();
+            }
+            return StatusCode(500, "Có lỗi xảy ra khi cập nhật người dùng.");
         }
+
+        return Ok(existingUser); 
     }
 
 

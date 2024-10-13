@@ -22,7 +22,8 @@ public class RealEstateContext : DbContext
         public DbSet<Comment> Comments { get; set; } 
         public DbSet<District> Districts { get; set; } 
         public DbSet<Province> Provinces { get; set; } 
-        public DbSet<Ward> Wards { get; set; } 
+        public DbSet<Ward> Wards { get; set; }  
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,7 +53,7 @@ public class RealEstateContext : DbContext
     modelBuilder.Entity<District>()
         .HasOne(d => d.Province)
         .WithMany(p => p.Districts) // Province có nhiều District
-        .HasForeignKey(d => d.ProvinceId)
+        .HasForeignKey(p => p.ProvinceId) // Định nghĩa rõ khóa ngoại
         .OnDelete(DeleteBehavior.Restrict);
 
     modelBuilder.Entity<Ward>()
@@ -60,6 +61,7 @@ public class RealEstateContext : DbContext
         .WithMany(d => d.Wards) // District có nhiều Ward
         .HasForeignKey(w => w.DistrictId)
         .OnDelete(DeleteBehavior.Restrict);
+    
     }
 }
 

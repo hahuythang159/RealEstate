@@ -10,12 +10,10 @@ public class Ward
     [StringLength(100)]
     public string Name { get; set; } = string.Empty;
 
-
-
     [Required]
     [ForeignKey("District")]
     public int DistrictId { get; set; }
-    public virtual District District { get; set; }  // Liên kết với Quận/Huyện
+    public virtual District District { get; set; } = null!;
 
     public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
 

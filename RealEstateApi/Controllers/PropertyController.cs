@@ -26,7 +26,7 @@ public class PropertiesController : ControllerBase
             .Include(p => p.Province)
             .Include(p => p.District)
             .Include(p => p.Ward)
-            .ToListAsync();
+            .ToListAsync(); 
     }
 
     // GET: api/properties/5
@@ -53,6 +53,7 @@ public class PropertiesController : ControllerBase
     {
         try
         {
+            // Kiểm tra tính hợp lệ của dữ liệu model
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
@@ -66,23 +67,46 @@ public class PropertiesController : ControllerBase
                 });
             }
 
+            // Kiểm tra OwnerId hợp lệ
             var owner = await _context.Users.FindAsync(property.OwnerId);
             if (owner == null)
             {
                 return BadRequest("Owner not found.");
             }
 
+            // Kiểm tra ProvinceId, DistrictId, WardId hợp lệ
+            var province = await _context.Provinces.FindAsync(property.ProvinceId);
+            if (province == null)
+            {
+                return BadRequest("Province not found.");
+            }
+
+            var district = await _context.Districts.FindAsync(property.DistrictId);
+            if (district == null)
+            {
+                return BadRequest("District not found.");
+            }
+
+            var ward = await _context.Wards.FindAsync(property.WardId);
+            if (ward == null)
+            {
+                return BadRequest("Ward not found.");
+            }
+
             // Thêm property vào database
             _context.Properties.Add(property);
             await _context.SaveChangesAsync();
 
+            // Trả về kết quả CreatedAtAction khi thêm thành công
             return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
         }
         catch (Exception ex)
         {
+            // Xử lý lỗi không mong muốn
             return StatusCode(500, new { message = "Internal server error: " + ex.Message });
         }
     }
+
 
 
     // Cập nhật GetProvinceName, GetDistrictName, GetWardName
@@ -138,7 +162,18 @@ public class PropertiesController : ControllerBase
             return BadRequest();
         }
 
-        _context.Entry(property).State = EntityState.Modified;
+        var existingProperty = await _context.Properties.FindAsync(id);
+        if (existingProperty == null)
+        {
+            return NotFound();
+        }
+
+        existingProperty.Description = property.Description; // Cập nhật mô tả
+        existingProperty.Price = property.Price; // Cập nhật giá
+        existingProperty.Interior = property.Interior; // Cập nhật giá
+
+
+        _context.Entry(existingProperty).State = EntityState.Modified;
 
         try
         {
@@ -156,6 +191,7 @@ public class PropertiesController : ControllerBase
         return NoContent();
     }
 
+
     // DELETE: api/properties/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProperty(Guid id)
@@ -171,6 +207,8 @@ public class PropertiesController : ControllerBase
 
         return NoContent();
     }
+
+
 
     private bool PropertyExists(Guid id)
     {

@@ -5,7 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.ComponentModel.DataAnnotations;
+using System;
+using RealEstateApi.Models;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -44,55 +45,59 @@ public class RentalsController : ControllerBase
 
     // POST: api/rentals
     [HttpPost]
-    public async Task<ActionResult<Rental>> PostRental([FromBody] Rental rentalDto)
+    public async Task<ActionResult<Rental>> PostRental( Rental rental)
     {
-        if (rentalDto == null)
+        try
         {
-            return BadRequest("Invalid rental data.");
+            // Kiểm tra tính hợp lệ của dữ liệu model
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Title = "One or more validation errors occurred.",
+                    Status = 400,
+                    Errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                });
+            }
+
+            // Thêm property vào database
+            _context.Rentals.Add(rental);
+            await _context.SaveChangesAsync();
+
+            // Trả về kết quả CreatedAtAction khi thêm thành công
+            return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, rental);
         }
-
-        // Lấy ID người dùng từ token
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-        if (userIdClaim == null)
+        catch (Exception ex)
         {
-            return Unauthorized(); // Người dùng chưa xác thực
+            // Xử lý lỗi không mong muốn
+            return StatusCode(500, new { message = "Internal server error: " + ex.Message });
         }
-
-        Guid tenantId = Guid.Parse(userIdClaim.Value);
-
-        // Tìm kiếm Property theo PropertyId
-        var property = await _context.Properties.FindAsync(rentalDto.PropertyId);
-        if (property == null)
-        {
-            return NotFound("Property not found.");
-        }
-
-        // Tạo Rental mới
-        var rental = new Rental
-        {
-            PropertyId = rentalDto.PropertyId,
-            Property = property, // Thêm thông tin property
-            TenantId = tenantId, // Gán ID người dùng vào TenantId
-            StartDate = rentalDto.StartDate,
-            EndDate = rentalDto.EndDate,
-        };
-
-        _context.Rentals.Add(rental);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, rental);
     }
 
     // PUT: api/rentals/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutRental(Guid id, Rental rental)
+    [Authorize(Roles = "Owner, Manager")] // Chỉ admin hoặc quản lý có quyền sửa rental
+    public async Task<IActionResult> PutRental(Guid id,  Rental rental)
     {
         if (id != rental.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(rental).State = EntityState.Modified;
+        var existingrental = await _context.Rentals.FindAsync(id);
+        if (existingrental == null)
+        {
+            return NotFound();
+        }
+
+        // Chỉ cập nhật các trường cần thiết
+        // existingrental.Description = rental.Description; // Cập nhật mô tả
+        // existingrental.Price = rental.Price; // Cập nhật giá
+
+        _context.Entry(existingrental).State = EntityState.Modified;
 
         try
         {
@@ -104,10 +109,7 @@ public class RentalsController : ControllerBase
             {
                 return NotFound();
             }
-            else
-            {
-                throw;
-            }
+            throw;
         }
 
         return NoContent();
@@ -115,12 +117,13 @@ public class RentalsController : ControllerBase
 
     // DELETE: api/rentals/5
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Owner, Manager")] // Chỉ admin hoặc quản lý có quyền xóa rental
     public async Task<IActionResult> DeleteRental(Guid id)
     {
         var rental = await _context.Rentals.FindAsync(id);
         if (rental == null)
         {
-            return NotFound();
+            return NotFound("Rental not found.");
         }
 
         _context.Rentals.Remove(rental);

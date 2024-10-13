@@ -10,7 +10,6 @@ public class User
     [StringLength(50, MinimumLength = 3, ErrorMessage = "Tên người dùng phải từ 3 đến 50 ký tự")]
     public string UserName { get; set; } = string.Empty;
 
-    [Required]
     public string PasswordHash { get; set; } = string.Empty; // Lưu mật khẩu dưới dạng mã hóa
 
     [Required]
@@ -25,9 +24,9 @@ public class User
 
     public bool IsTwoFactorEnabled { get; set; } = false; // 2FA
 
-    public bool IsActive { get; set; } = true; // Quản lý trạng thái tài khoản (hoạt động hoặc bị khóa)
+    public bool IsActive { get; set; } = true;
 
-    public virtual ICollection<Rental> Rentals { get; set; } // Thêm danh sách Rentals
+    public virtual ICollection<Rental>? Rentals { get; set; } = new List<Rental>(); 
 
 
     // Các mối quan hệ với Message

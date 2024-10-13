@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using RealEstateApi.Models; 
+using RealEstateApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 
 public class Rental
 {
@@ -9,17 +12,17 @@ public class Rental
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
-    public Guid  PropertyId { get; set; } // Khóa ngoại đến bất động sản
+    public Guid PropertyId { get; set; }
 
     [ForeignKey("PropertyId")]
-    public virtual Property Property { get; set; } // Điều hướng đến Property
+    public virtual Property? Property { get; set; }
 
     [Required]
-    public Guid  TenantId { get; set; } // Khóa ngoại đến người thuê (người dùng)
+    public Guid TenantId { get; set; }
 
     [Required]
-    [DataType(DataType.DateTime)]
-    public DateTime StartDate { get; set; } // Ngày bắt đầu thuê
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public DateTime StartDate { get; set; } = DateTime.Now;
 
     [Required]
     [DataType(DataType.DateTime)]
@@ -28,8 +31,25 @@ public class Rental
 
     [Required]
     [StringLength(20)]
-    public string Status { get; set; } // Trạng thái thuê
-    
+    public RentalStatus Status { get; set; } = RentalStatus.Active;
+
+    [Required]
+    [StringLength(100)]
+    public string? PaymentMethod { get; set; }
+
+    [NotMapped]
+    public decimal RentPrice => Property?.Price ?? 0;
+
     // Đây là thuộc tính điều hướng đến đối tượng Tenant
-    public User Tenant { get; set; } // Đối tượng liên kết đến User/Tenant
+    public virtual User Tenant { get; set; }
 }
+
+[JsonConverter(typeof(StringEnumConverter))]
+
+public enum RentalStatus
+{
+    Active,
+    Inactive,
+    Completed
+}
+

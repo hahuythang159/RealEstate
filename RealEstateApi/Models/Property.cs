@@ -6,6 +6,9 @@ public class Property
 {
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
+    [Required]
+    [StringLength(200, ErrorMessage = "Địa chỉ không vượt quá 200 ký tự.")]
+    public string Title { get; set; } = string.Empty;  // Số nhà hoặc tên đường
 
     [Required]
     [StringLength(200, ErrorMessage = "Địa chỉ không vượt quá 200 ký tự.")]
@@ -22,23 +25,15 @@ public class Property
     [Required]
     public Guid OwnerId { get; set; }
 
+    // Sử dụng Id thay vì object đầy đủ cho Province, District, và Ward
     [Required]
-    [ForeignKey("Province")]
     public int ProvinceId { get; set; }  // Liên kết với tỉnh
-    [JsonIgnore]
-    public virtual Province Province { get; set; }
 
     [Required]
-    [ForeignKey("District")]
     public int DistrictId { get; set; }  // Liên kết với huyện
-    [JsonIgnore]
-    public virtual District District { get; set; }
 
     [Required]
-    [ForeignKey("Ward")]
     public int WardId { get; set; }  // Liên kết với xã
-    [JsonIgnore]
-    public virtual Ward Ward { get; set; }
 
     [Required]
     [StringLength(500, ErrorMessage = "URL hình ảnh không vượt quá 500 ký tự.")]
@@ -58,21 +53,30 @@ public class Property
 
     [Required]
     [StringLength(100, ErrorMessage = "Loại hình bất động sản không vượt quá 100 ký tự.")]
-    public string PropertyType { get; set; } = string.Empty; // Căn hộ, nhà phố, đất nền, v.v.
+    public string PropertyType { get; set; } = string.Empty; 
 
     [Required]
     [StringLength(100, ErrorMessage = "Loại hình sử dụng không vượt quá 100 ký tự.")]
-    public string UsageType { get; set; } = string.Empty; // Loại hình sử dụng (Ví dụ: cho thuê, bán)
+    public string UsageType { get; set; } = string.Empty; 
+    [Required]
+    [StringLength(100, ErrorMessage = "Loại hình sử dụng không vượt quá 100 ký tự.")]
+    public string Interior { get; set; } = string.Empty; 
 
-    public virtual ICollection<Rental>? Rentals { get; set; } // Thuộc tính điều hướng cho Rental
+    [Required]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public DateTime PostedDate { get; set; } = DateTime.Now; // Thời gian thực tế
 
-    // Thêm các trường tên tỉnh, huyện, xã
-    [NotMapped]
-    public string ProvinceName { get; set; } = string.Empty; // Tên tỉnh
+    // Không validate các trường liên quan (Province, District, Ward)
+    [JsonIgnore]
+    public virtual Province? Province { get; set; } 
 
-    [NotMapped]
-    public string DistrictName { get; set; } = string.Empty; // Tên huyện
+    [JsonIgnore]
+    public virtual District? District { get; set; }  
 
-    [NotMapped]
-    public string WardName { get; set; } = string.Empty; // Tên xã
+    [JsonIgnore]
+    public virtual Ward? Ward { get; set; }
+
+    public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

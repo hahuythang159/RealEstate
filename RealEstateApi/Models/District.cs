@@ -12,9 +12,9 @@ public class District
     [Required]
     [ForeignKey("Province")]
     public int ProvinceId { get; set; }
-    public virtual Province Province { get; set; }  // Liên kết với Tỉnh
+    public virtual Province Province { get; set; } = null!;
 
-    public virtual ICollection<Ward> Wards { get; set; } = new List<Ward>();  // Đảm bảo là ICollection
+    public virtual ICollection<Ward> Wards { get; set; } = new List<Ward>();
     public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
 
 }
