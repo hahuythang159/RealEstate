@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using RealEstateApi.Models;
 
 public class User
 {
@@ -27,6 +28,8 @@ public class User
     public bool IsActive { get; set; } = true;
 
     public virtual ICollection<Rental>? Rentals { get; set; } = new List<Rental>(); 
+    public virtual ICollection<Comment>? Comment { get; set; } 
+
 
 
     // Các mối quan hệ với Message
@@ -37,4 +40,5 @@ public class User
     public ICollection<Review> Reviews { get; set; } = new List<Review>(); // Đánh giá của người dùng
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>(); // Đặt chỗ của người dùng
     public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>(); // Danh sách yêu thích
+
 }

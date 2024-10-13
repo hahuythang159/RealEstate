@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(RealEstateContext))]
-    partial class RealEstateContextModelSnapshot : ModelSnapshot
+    [Migration("20241013132605_EditComments")]
+    partial class EditComments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,8 +225,6 @@ namespace RealEstateApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Comments");
                 });
 
@@ -417,17 +418,6 @@ namespace RealEstateApi.Migrations
                     b.Navigation("Ward");
                 });
 
-            modelBuilder.Entity("RealEstateApi.Models.Comment", b =>
-                {
-                    b.HasOne("User", "User")
-                        .WithMany("Comment")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Rental", b =>
                 {
                     b.HasOne("Property", "Property")
@@ -501,8 +491,6 @@ namespace RealEstateApi.Migrations
             modelBuilder.Entity("User", b =>
                 {
                     b.Navigation("Bookings");
-
-                    b.Navigation("Comment");
 
                     b.Navigation("Favorites");
 

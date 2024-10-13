@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RealEstateApi.Models
 {
@@ -12,12 +13,18 @@ namespace RealEstateApi.Models
         public Guid PropertyId { get; set; }
 
         [Required(ErrorMessage = "User ID is required.")]
+        
         public Guid UserId { get; set; }
+
+        public string? UserName { get; set; } 
+
 
         [Required(ErrorMessage = "Content is required.")]
         [StringLength(500, ErrorMessage = "Content cannot exceed 500 characters.")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Gán giá trị mặc định cho CreatedAt
-    }
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        }
 }

@@ -8,7 +8,7 @@ using RealEstateApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace RealEstateApi.Controllers // Namespace cho CommentsController
+namespace RealEstateApi.Controllers
 {
     [Route("api/comments")]
     [ApiController]
@@ -23,25 +23,30 @@ namespace RealEstateApi.Controllers // Namespace cho CommentsController
             _hubContext = hubContext;
         }
 
-        [HttpGet("{propertyId}")] // Lấy bình luận theo PropertyId
-        public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments(Guid  propertyId)
+        [HttpGet("{propertyId}")]
+        public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments(Guid propertyId)
         {
             var comments = await _context.Comments
                 .Where(c => c.PropertyId == propertyId)
-                .Select(c => new CommentDto // Chuyển đổi thành CommentDto
-                {
-                    Id  = c.Id,
-                    PropertyId = c.PropertyId,
-                    UserId = c.UserId,
-                    Content = c.Content,
-                    CreatedAt = c.CreatedAt
-                })
+                .Join(_context.Users, 
+                    c => c.UserId, 
+                    u => u.Id, 
+                    (c, u) => new CommentDto
+                    {
+                        Id = c.Id,
+                        PropertyId = c.PropertyId,
+                        UserId = c.UserId,
+                        UserName = u.UserName, // Lấy tên người dùng từ bảng Users
+                        Content = c.Content,
+                        CreatedAt = c.CreatedAt
+                    })
                 .ToListAsync();
 
             return Ok(comments);
         }
 
-        [HttpPost] // Đánh dấu phương thức này để xử lý yêu cầu POST
+
+        [HttpPost]
         public async Task<IActionResult> PostComment([FromBody] CommentDto commentDto)
         {
             if (commentDto == null || commentDto.PropertyId == Guid.Empty || string.IsNullOrWhiteSpace(commentDto.Content))
@@ -57,22 +62,36 @@ namespace RealEstateApi.Controllers // Namespace cho CommentsController
                     PropertyId = commentDto.PropertyId,
                     UserId = commentDto.UserId,
                     Content = commentDto.Content,
-                    CreatedAt = DateTime.UtcNow // Thay đổi thời gian tạo nếu cần
+                    CreatedAt = DateTime.Now
                 };
 
                 // Thêm bình luận vào cơ sở dữ liệu
                 _context.Comments.Add(comment);
                 await _context.SaveChangesAsync();
 
+                // Lấy tên người dùng từ bảng Users
+                var user = await _context.Users.FindAsync(comment.UserId);
+
+                // Chuẩn bị phản hồi
+                var result = new CommentDto
+                {
+                    Id = comment.Id,
+                    PropertyId = comment.PropertyId,
+                    UserId = comment.UserId,
+                    UserName = user?.UserName, // Trả về tên người dùng
+                    Content = comment.Content,
+                    CreatedAt = comment.CreatedAt
+                };
+
                 // Gửi bình luận đến tất cả client
-                await _hubContext.Clients.All.SendAsync("ReceiveComment", commentDto.PropertyId, commentDto.UserId, commentDto.Content);
-                return Ok(comment); // Trả về bình luận đã được thêm
+                await _hubContext.Clients.All.SendAsync("ReceiveComment", result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi nếu có vấn đề trong khi gửi bình luận
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
     }
 }
