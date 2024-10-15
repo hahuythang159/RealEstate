@@ -15,7 +15,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter())); // Cấu hình JSON
 
-builder.Services.AddHttpClient(); // Thêm dòng này để đăng ký HttpClient
+builder.Services.AddHttpClient(); 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

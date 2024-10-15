@@ -49,7 +49,10 @@ const TenantDashboard = () => {
                     <Menu.Item key="3" icon={<UserOutlined/>} onClick={()=>navigate('/tanant/favorites')}>
                         Danh sách yêu thích
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<UserOutlined />} onClick={handleLogout}>
+                    <Menu.Item key="4" icon={<UserOutlined/>} onClick={()=>navigate('/tanant/approval')}>
+                        Danh sách hợp đồng
+                    </Menu.Item>
+                    <Menu.Item key="5" icon={<UserOutlined />} onClick={handleLogout}>
                         Đăng xuất
                     </Menu.Item>
                     </Menu>

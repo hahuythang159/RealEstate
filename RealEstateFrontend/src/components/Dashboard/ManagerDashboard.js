@@ -42,7 +42,10 @@ const AdminDashboard = () => {
                     <Menu.Item key="3" icon={<ApartmentOutlined />} onClick={() => navigate('/admin/property-list')}>
                         Quản lý tài sản
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<UserOutlined />} onClick={handleLogout}>
+                    <Menu.Item key="4" icon={<UserOutlined/>} onClick={()=>navigate('/admin/approval')}>
+                        Danh sách hợp đồng
+                    </Menu.Item>
+                    <Menu.Item key="5" icon={<UserOutlined />} onClick={handleLogout}>
                         Đăng xuất
                     </Menu.Item>
                 </Menu>

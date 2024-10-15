@@ -15,6 +15,7 @@ public class Rental
     public Guid PropertyId { get; set; }
 
     [ForeignKey("PropertyId")]
+    [JsonIgnore] 
     public virtual Property? Property { get; set; }
 
     [Required]
@@ -24,14 +25,13 @@ public class Rental
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime StartDate { get; set; } = DateTime.Now;
 
-    [Required]
     [DataType(DataType.DateTime)]
     [Range(typeof(DateTime), "01/01/2020", "12/31/2030", ErrorMessage = "Ngày kết thúc phải lớn hơn ngày bắt đầu.")]
-    public DateTime EndDate { get; set; } // Ngày kết thúc thuê
+    public DateTime EndDate { get; set; }
 
     [Required]
-    [StringLength(20)]
-    public RentalStatus Status { get; set; } = RentalStatus.Active;
+    [Column(TypeName = "varchar(20)")]
+    public RentalStatus Status { get; set; } = RentalStatus.PendingApproval;
 
     [Required]
     [StringLength(100)]
@@ -41,15 +41,19 @@ public class Rental
     public decimal RentPrice => Property?.Price ?? 0;
 
     // Đây là thuộc tính điều hướng đến đối tượng Tenant
-    public virtual User Tenant { get; set; }
+    [JsonIgnore] 
+    public virtual User? Tenant { get; set; }
+
 }
 
 [JsonConverter(typeof(StringEnumConverter))]
-
 public enum RentalStatus
 {
     Active,
     Inactive,
-    Completed
+    Approved,
+    PendingApproval
 }
+
+
 

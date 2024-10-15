@@ -35,9 +35,15 @@ const OwnerDashboard = () => {
                         Quản lý bất động sản
                     </Menu.Item>
                     <Menu.Item key="3" icon={<UserOutlined />} onClick={() => navigate('/owner/profile')}>
-                        Hồ sơ của tôi
+                        Hồ sơ của tôi 
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<UserOutlined />} onClick={handleLogout}>
+                    <Menu.Item key="4" icon={<UserOutlined/>} onClick={()=>navigate('/owner/approval')}>
+                        Danh sách hợp đồng 
+                    </Menu.Item>
+                    <Menu.Item key="5" icon={<UserOutlined/>} onClick={()=>navigate('/owner/approved')}>
+                        Hợp đồng đã duyệt 
+                    </Menu.Item>
+                    <Menu.Item key="6" icon={<UserOutlined />} onClick={handleLogout}>
                         Đăng xuất
                     </Menu.Item>
                 </Menu>

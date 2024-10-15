@@ -36,13 +36,13 @@ const Login = () => {
                 // Điều hướng đến dashboard tương ứng
                 switch (data.role) {
                     case 'Owner':
-                        navigate('/Owner');
+                        navigate('/owner/property-list');
                         break;
                     case 'Tenant':
-                        navigate('/Tenant');
+                        navigate('/tanant/property-list');
                         break;
                     case 'Manager':
-                        navigate('/Manager');
+                        navigate('/admin/property-list');
                         break;
                     default:
                         break;

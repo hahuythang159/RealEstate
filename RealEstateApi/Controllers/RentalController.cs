@@ -45,59 +45,67 @@ public class RentalsController : ControllerBase
 
     // POST: api/rentals
     [HttpPost]
-    public async Task<ActionResult<Rental>> PostRental( Rental rental)
+    public async Task<ActionResult<Rental>> PostRental(Rental rentalDto)
     {
         try
         {
-            // Kiểm tra tính hợp lệ của dữ liệu model
-            if (!ModelState.IsValid)
+            var property = await _context.Properties.FindAsync(rentalDto.PropertyId);
+            if (property == null)
             {
-                return BadRequest(new
-                {
-                    Title = "One or more validation errors occurred.",
-                    Status = 400,
-                    Errors = ModelState.ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                    )
-                });
+                return NotFound(new { message = "Bất động sản không tồn tại." });
             }
 
-            // Thêm property vào database
+            // Kiểm tra tenant có tồn tại hay không
+            var tenant = await _context.Users.FindAsync(rentalDto.TenantId);
+            if (tenant == null)
+            {
+                return NotFound(new { message = "Người thuê không tồn tại." });
+            }
+
+            // Tạo rental mới
+            var rental = new Rental
+            {
+                PropertyId = rentalDto.PropertyId,
+                TenantId = rentalDto.TenantId,
+                StartDate = rentalDto.StartDate,
+                EndDate = rentalDto.EndDate,
+                PaymentMethod = rentalDto.PaymentMethod,
+                Status = RentalStatus.PendingApproval // Mặc định trạng thái là PendingApproval
+            };
+
             _context.Rentals.Add(rental);
             await _context.SaveChangesAsync();
 
-            // Trả về kết quả CreatedAtAction khi thêm thành công
             return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, rental);
         }
         catch (Exception ex)
         {
-            // Xử lý lỗi không mong muốn
-            return StatusCode(500, new { message = "Internal server error: " + ex.Message });
+            return StatusCode(500, "Lỗi máy chủ: " + ex.Message);
         }
     }
 
     // PUT: api/rentals/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Owner, Manager")] // Chỉ admin hoặc quản lý có quyền sửa rental
-    public async Task<IActionResult> PutRental(Guid id,  Rental rental)
+    [Authorize(Roles = "Owner, Manager")] // Chỉ Owner hoặc Manager có quyền sửa rental
+    public async Task<IActionResult> PutRental(Guid id, Rental rental)
     {
         if (id != rental.Id)
         {
             return BadRequest();
         }
 
-        var existingrental = await _context.Rentals.FindAsync(id);
-        if (existingrental == null)
+        var existingRental = await _context.Rentals.FindAsync(id);
+        if (existingRental == null)
         {
             return NotFound();
         }
 
-        // Chỉ cập nhật các trường cần thiết
-        // existingrental.Description = rental.Description; // Cập nhật mô tả
-        // existingrental.Price = rental.Price; // Cập nhật giá
+        // Cập nhật các trường cần thiết
+        existingRental.StartDate = rental.StartDate;
+        existingRental.EndDate = rental.EndDate;
+        existingRental.Status = rental.Status; // Cập nhật trạng thái nếu cần
 
-        _context.Entry(existingrental).State = EntityState.Modified;
+        _context.Entry(existingRental).State = EntityState.Modified;
 
         try
         {
@@ -117,7 +125,7 @@ public class RentalsController : ControllerBase
 
     // DELETE: api/rentals/5
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Owner, Manager")] // Chỉ admin hoặc quản lý có quyền xóa rental
+    [Authorize(Roles = "Owner, Manager")] // Chỉ Owner hoặc Manager có quyền xóa rental
     public async Task<IActionResult> DeleteRental(Guid id)
     {
         var rental = await _context.Rentals.FindAsync(id);
@@ -136,4 +144,55 @@ public class RentalsController : ControllerBase
     {
         return _context.Rentals.Any(e => e.Id == id);
     }
+
+    // GET: api/rentals/pending
+    [HttpGet("pending")]
+    [Authorize(Roles = "Owner, Manager, Tenant")] // Tất cả các vai trò đều có thể xem rental chờ phê duyệt
+    public async Task<ActionResult<IEnumerable<Rental>>> GetPendingRentals()
+    {
+        var pendingRentals = await _context.Rentals
+            .Where(r => r.Status == RentalStatus.PendingApproval)
+            .Include(r => r.Property)
+            .Include(r => r.Tenant)
+            .ToListAsync();
+
+        return pendingRentals;
+    }
+
+    // PATCH: api/rentals/{id}/approve
+    [HttpPatch("{id}/approve")]
+    public async Task<IActionResult> ApproveRental(Guid id)
+    {
+        var rental = await _context.Rentals.FindAsync(id);
+        if (rental == null)
+        {
+            return NotFound(new { message = "Hợp đồng không tìm thấy." });
+        }
+
+        if (rental.Status != RentalStatus.PendingApproval)
+        {
+            return BadRequest(new { message = "Hợp đồng không thể được duyệt vì không ở trạng thái chờ phê duyệt." });
+        }
+
+        try
+        {
+            // Cập nhật trạng thái thành Approved
+            rental.Status = RentalStatus.Approved;
+            _context.Entry(rental).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            return StatusCode(500, new { message = "Có lỗi xảy ra khi duyệt hợp đồng: " + ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Có lỗi xảy ra khi duyệt hợp đồng: " + ex.ToString() });
+        }
+
+        return NoContent();
+    }
+
+
 }

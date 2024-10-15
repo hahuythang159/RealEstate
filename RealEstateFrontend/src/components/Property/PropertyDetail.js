@@ -137,7 +137,7 @@ const PropertyDetail = () => {
 
     const handleCreateRental = () => {
         if (userRole === 'Tenant') {
-            navigate(`/add-rental`,{ state: { propertyId: id } }); // Truyền id qua state
+            navigate(`/add-rental`,{ state: { propertyId: id } }); 
         } else {
             message.error('Bạn không có quyền tạo hợp đồng.');
         }

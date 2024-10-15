@@ -66,7 +66,6 @@ public class Property
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime PostedDate { get; set; } = DateTime.Now; // Thời gian thực tế
 
-    // Không validate các trường liên quan (Province, District, Ward)
     [JsonIgnore]
     public virtual Province? Province { get; set; } 
 
@@ -75,8 +74,10 @@ public class Property
 
     [JsonIgnore]
     public virtual Ward? Ward { get; set; }
-
+    
+    [JsonIgnore]
     public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
 
+    [JsonIgnore]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
