@@ -68,7 +68,6 @@ const App = () => {
                 <Route path="/admin/users" element={<UserList />} />
                 <Route path="/profile" element={<ProfilePage/>} />
                 <Route path="/property-list" element={<PropertyList/>} />
-                <Route path="/property-card" element={<PropertyCard/>} />
 
 
                 

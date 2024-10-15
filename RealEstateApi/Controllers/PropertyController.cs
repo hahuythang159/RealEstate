@@ -215,6 +215,7 @@ public class PropertiesController : ControllerBase
         return _context.Properties.Any(e => e.Id == id);
     }
 
+
     // Hàm log lỗi ModelState
     private void LogModelStateErrors(ModelStateDictionary modelState)
     {

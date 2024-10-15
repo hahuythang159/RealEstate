@@ -9,6 +9,7 @@ const PropertyList = () => {
     const [properties, setProperties] = useState([]);
 
     useEffect(() => {
+        console.log('useEffect PropertyList')
         const fetchProperties = async () => {
             try {
                 const response = await fetch('/api/properties');
@@ -25,6 +26,7 @@ const PropertyList = () => {
         fetchProperties();
     }, []);
 
+
     return (
         <Row gutter={[16, 16]}>
             {properties.length === 0 ? (
@@ -33,7 +35,7 @@ const PropertyList = () => {
                 </Col>
             ) : (
                 properties.map(property => (
-                    <Col span={8} key={property.id}>
+                    <Col span={6} key={property.id}>
                         <PropertyCard property={property} />
                     </Col>
                 ))

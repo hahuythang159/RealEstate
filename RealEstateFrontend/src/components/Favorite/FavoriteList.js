@@ -42,22 +42,20 @@ const Favorites = () => {
     return (
         <div>
             <h2>Danh Sách Bất Động Sản Yêu Thích</h2>
-            {loading ? (
-                <Spin tip="Đang tải..." />
-            ) : favorites.length === 0 ? (
-                <Typography.Text type="danger">Không có bất động sản nào trong danh sách yêu thích.</Typography.Text>
-            ) : (
+            {loading ? (<Spin tip="Đang tải..." />) 
+            : (favorites.length === 0 
+                ? (<Typography.Text type="danger">Không có bất động sản nào trong danh sách yêu thích.</Typography.Text>) 
+                : (
                 <Row gutter={[16, 16]}>
                     {favorites.map(item => (
-                        // Kiểm tra xem property có tồn tại không
-                        item.property && (
-                            <Col span={8} key={item.propertyId}>
-                                <PropertyCard property={item.property} /> {/* Truyền thông tin về bất động sản */}
+                        item && (
+                            <Col span={6} key={item.propertyId}>
+                                <PropertyCard property={item} />
                             </Col>
                         )
                     ))}
                 </Row>
-            )}
+            ))}
         </div>
     );
 };

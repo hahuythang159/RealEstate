@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Button, Tooltip, notification } from 'antd'; // Nhập notification từ antd
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Tooltip, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { EyeOutlined, HeartOutlined } from '@ant-design/icons';
 
@@ -12,49 +12,63 @@ const PropertyCard = ({ property, userId }) => {
         navigate(`/property/${property.id}`);
     };
 
-    const handleFavorite = async () => {
-        const userId = localStorage.getItem('userId'); 
-
-        if (!isFavorited) {
+    // Lấy trạng thái yêu thích khi trang được tải
+    useEffect(() => {
+        const fetchFavoriteStatus = async () => {
             try {
-                const response = await fetch('/api/favorites', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: userId,
-                        propertyId: property.id,
-                    }),
-                });
-    
-                // Kiểm tra xem phản hồi có thành công không
+                const userId = localStorage.getItem('userId');
+                const response = await fetch(`/api/favorites/user/${userId}/${property.id}`);
                 if (response.ok) {
                     const data = await response.json();
-                    setIsFavorited(true);
-    
-                    // Hiển thị thông báo thành công
-                    notification.success({
-                        message: 'Thành công!',
-                        description: 'Đã thêm vào danh sách yêu thích.',
-                    });
-    
-                    console.log('Server response:', data); 
+                    setIsFavorited(data.isFavorited);
                 } else {
-                    // Đọc phản hồi lỗi từ server
-                    const errorText = await response.text(); // Đọc phản hồi dưới dạng văn bản
-                    throw new Error(errorText); // Ném lỗi với thông điệp từ server
+                    console.error('Failed to load favorite status.');
                 }
             } catch (error) {
-                console.error('Error adding favorite:', error.message); 
-                notification.error({
-                    message: 'Lỗi',
-                    description: 'Không thể thêm vào danh sách yêu thích. Vui lòng thử lại sau.',
-                });
+                console.error('Error fetching favorite status:', error.message);
             }
+        };
+
+        fetchFavoriteStatus();
+    }, [userId, property.id]); // Chạy lại khi userId hoặc property.id thay đổi
+
+    // Xử lý thêm hoặc bỏ yêu thích
+    const handleFavorite = async () => {
+        const userId = localStorage.getItem('userId');
+
+        try {
+            const response = await fetch('/api/favorites/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    propertyId: property.id,
+                }),
+            });
+
+            // Kiểm tra phản hồi
+            if (response.ok) {
+                const data = await response.json();
+                setIsFavorited(!isFavorited); // Đảo ngược trạng thái yêu thích
+                notification.success({
+                    message: 'Thành công!',
+                    description: data.message, // Thông báo từ server
+                });
+
+            } else {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error.message);
+            notification.error({
+                message: 'Lỗi',
+                description: 'Không thể thay đổi trạng thái yêu thích. Vui lòng thử lại sau.',
+            });
         }
     };
-    
 
     return (
         <Card

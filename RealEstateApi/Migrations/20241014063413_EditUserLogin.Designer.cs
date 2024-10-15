@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(RealEstateContext))]
-    partial class RealEstateContextModelSnapshot : ModelSnapshot
+    [Migration("20241014063413_EditUserLogin")]
+    partial class EditUserLogin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,8 +93,6 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PropertyId");
 
                     b.HasIndex("UserId");
 
@@ -389,21 +390,11 @@ namespace RealEstateApi.Migrations
 
             modelBuilder.Entity("Favorite", b =>
                 {
-                    b.HasOne("Property", "Property")
-                        .WithMany()
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", "User")
-                        .WithMany("UserFavorites")
+                    b.HasOne("User", null)
+                        .WithMany("Favorites")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Property");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Property", b =>
@@ -522,13 +513,13 @@ namespace RealEstateApi.Migrations
                 {
                     b.Navigation("Bookings");
 
+                    b.Navigation("Favorites");
+
                     b.Navigation("Rentals");
 
                     b.Navigation("Reviews");
 
                     b.Navigation("UserComments");
-
-                    b.Navigation("UserFavorites");
                 });
 
             modelBuilder.Entity("Ward", b =>

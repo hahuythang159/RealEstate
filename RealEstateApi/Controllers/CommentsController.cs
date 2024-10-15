@@ -36,6 +36,7 @@ namespace RealEstateApi.Controllers
                         Id = c.Id,
                         PropertyId = c.PropertyId,
                         UserId = c.UserId,
+                        Avatar = u.Avatar,
                         UserName = u.UserName, // Lấy tên người dùng từ bảng Users
                         Content = c.Content,
                         CreatedAt = c.CreatedAt
@@ -78,6 +79,7 @@ namespace RealEstateApi.Controllers
                     Id = comment.Id,
                     PropertyId = comment.PropertyId,
                     UserId = comment.UserId,
+                    Avatar = user?.Avatar, 
                     UserName = user?.UserName, // Trả về tên người dùng
                     Content = comment.Content,
                     CreatedAt = comment.CreatedAt

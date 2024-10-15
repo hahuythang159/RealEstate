@@ -22,48 +22,70 @@ public class FavoritesController : ControllerBase
         return await _context.Favorites.ToListAsync();
     }
 
-    // GET: api/favorites/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Favorite>> GetFavorite(Guid id)
+    // GET: api/favorites/{userId}
+    [HttpGet("user/{userId}")]
+    public async Task<ActionResult<IEnumerable<Property>>> GetFavoritesByUser(Guid userId)
     {
-        var favorite = await _context.Favorites.FindAsync(id);
-        if (favorite == null)
+        var favorites = await _context.Favorites
+            .Where(f => f.UserId == userId)
+            .Include(f => f.Property)
+            .ToListAsync();
+
+        if (favorites == null || !favorites.Any())
         {
-            return NotFound();
+            return NotFound(new { message = "Không có bất động sản nào trong danh sách yêu thích." });
         }
 
-        return favorite;
+        // Trả về danh sách bất động sản từ danh sách yêu thích
+        var properties = favorites.Select(f => f.Property).ToList();
+
+        return Ok(properties);
     }
 
-    // POST: api/favorites
-    [HttpPost]
-    public async Task<ActionResult<Favorite>> PostFavorite(Favorite favorite)
+
+     // POST/PUT: api/favorites/toggle
+    [HttpPost("toggle")]
+    public async Task<IActionResult> ToggleFavorite(Favorite favorite)
     {
         if (favorite == null)
         {
             return BadRequest("Favorite cannot be null.");
         }
 
-        _context.Favorites.Add(favorite);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetFavorite), new { id = favorite.Id }, favorite);
-    }
-
-    // DELETE: api/favorites/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteFavorite(Guid id)
-    {
-        var favorite = await _context.Favorites.FindAsync(id);
-        if (favorite == null)
+        // Kiểm tra người dùng tồn tại
+        var userExists = await _context.Users.AnyAsync(u => u.Id == favorite.UserId);
+        if (!userExists)
         {
-            return NotFound();
+            return NotFound("User not found.");
         }
 
-        _context.Favorites.Remove(favorite);
-        await _context.SaveChangesAsync();
+        // Kiểm tra nếu người dùng đã yêu thích bất động sản này
+        var existingFavorite = await _context.Favorites
+            .FirstOrDefaultAsync(f => f.UserId == favorite.UserId && f.PropertyId == favorite.PropertyId);
 
-        return NoContent();
+        if (existingFavorite != null)
+        {
+            // Nếu bất động sản đã có trong danh sách yêu thích, xóa nó
+            _context.Favorites.Remove(existingFavorite);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã bỏ khỏi danh sách yêu thích." });
+        }
+        else
+        {
+            _context.Favorites.Add(favorite);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đã thêm vào danh sách yêu thích." });
+        }
+    }
+    // GET: api/favorites/user/{userId}/{propertyId}
+    [HttpGet("user/{userId}/{propertyId}")]
+    public async Task<IActionResult> CheckFavoriteStatus(Guid userId, Guid propertyId)
+    {
+        var isFavorited = await _context.Favorites
+            .AnyAsync(f => f.UserId == userId && f.PropertyId == propertyId);
+
+        return Ok(new { isFavorited });
     }
 
     private bool FavoriteExists(Guid id)

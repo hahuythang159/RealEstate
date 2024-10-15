@@ -17,6 +17,7 @@ namespace RealEstateApi.Models
         public Guid UserId { get; set; }
 
         public string? UserName { get; set; } 
+        public string? Avatar { get; set; } 
 
 
         [Required(ErrorMessage = "Content is required.")]

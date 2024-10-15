@@ -69,7 +69,7 @@ const PropertyDetail = () => {
     }, [property]);
 
     const handleDelete = async () => {
-        if(userRole==='Owner'){
+        if(userRole==='Owner'|| userRole==='Manager'){
             await fetch(`/api/properties/${id}`, { method: 'DELETE' });
             message.success('Xoá thành công!');
             navigate('/Owner');
@@ -205,7 +205,7 @@ const PropertyDetail = () => {
                         </Button>
                     )}
 
-                    {userRole === 'Manager' && (
+                    {(userRole === 'Manager' || userRole === 'Owner')  && (
                         <Button
                             icon={<DeleteOutlined />}
                             danger

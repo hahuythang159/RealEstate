@@ -163,10 +163,6 @@
             <Input onChange={handleChange} />
           </Form.Item>
 
-          <Form.Item label="Địa chỉ cụ thể" name="address" rules={[{ required: true, message: 'Hãy nhập số nhà/ tên đường' }]}>
-            <Input onChange={handleChange} />
-          </Form.Item>
-
           <Form.Item label="Thành phố" required>
             <Select
               value={selectedCity}
@@ -201,6 +197,10 @@
                 <Option key={ward.code} value={ward.code}>{ward.name}</Option>
               ))}
             </Select>
+          </Form.Item>
+
+          <Form.Item label="Địa chỉ cụ thể" name="address" rules={[{ required: true, message: 'Hãy nhập số nhà/ tên đường' }]}>
+            <Input onChange={handleChange} />
           </Form.Item>
 
           <Form.Item label="Mô tả" name="description" rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}>
@@ -249,7 +249,7 @@
 
           <Form.Item label="Loại bất động sản" required name="propertyType" rules={[{ required: true, message: 'Vui lòng chọn loại bất động sản' }]}>
             <Select onChange={value => setProperty({ ...property, propertyType: value })}>
-              <Option value="Căn hộ">Căn hộ</Option>
+              <Option value="Căn hộ/Chung cư">Căn hộ/Chung cư</Option>
               <Option value="Nhà riêng">Nhà riêng</Option>
               <Option value="Đất nền">Đất nền</Option>
             </Select>

@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
         try
         {
             // Kiểm tra nếu người dùng đã tồn tại
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userDto.UserName);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDto.Email);
             if (existingUser != null)
             {
                 return BadRequest(new { message = "Tên người dùng đã tồn tại." });
@@ -73,10 +73,10 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login([FromBody] LoginRequest loginRequest)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginRequest.UserName);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginRequest.Email);
         if (user == null)
         {
-            return BadRequest(new { message = "Tên người dùng không tồn tại." });
+            return BadRequest(new { message = "Enmail người dùng không tồn tại." });
         }
 
         // Kiểm tra trạng thái hoạt động của người dùng
@@ -101,8 +101,9 @@ public class UsersController : ControllerBase
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Role, user.Role) // Thêm claim role
         };
 
@@ -119,9 +120,8 @@ public class UsersController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    // GET: api/users/5
+    // GET: api/users/{id}
     [HttpGet("{id}")]
-    [Authorize] 
     public async Task<ActionResult<User>> GetUser(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
@@ -147,10 +147,14 @@ public class UsersController : ControllerBase
         {
             return NotFound();
         }
-        
 
+        existingUser.UserName = updatedUser.UserName; 
+        existingUser.Email = updatedUser.Email; 
+        existingUser.PhoneNumber = updatedUser.PhoneNumber;
         existingUser.Role = updatedUser.Role;
         existingUser.IsActive = updatedUser.IsActive; 
+        existingUser.Avatar = updatedUser.Avatar; 
+
 
         _context.Entry(existingUser).State = EntityState.Modified;
 
@@ -187,6 +191,49 @@ public class UsersController : ControllerBase
 
         return NoContent();
     }
+    // POST: api/users/upload-avatar
+    [HttpPost("upload-avatar")]
+    public async Task<IActionResult> UploadAvatar(IFormFile file)
+    {
+        // Lấy thông tin ID từ claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        
+        if (userIdClaim == null)
+        {
+            return BadRequest("Người dùng không tồn tại.");
+        }
+
+        Guid id = Guid.Parse(userIdClaim.Value);
+        Console.WriteLine($"User ID: {id}"); // Kiểm tra ID người dùng trong console
+
+        // Tìm người dùng trong cơ sở dữ liệu
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound("Người dùng không tồn tại.");
+        }
+
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("File không hợp lệ.");
+        }
+
+        // Lưu file vào thư mục
+        var filePath = Path.Combine("wwwroot/avatars", file.FileName);
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        // Cập nhật avatar của người dùng
+        user.Avatar = $"/avatars/{file.FileName}"; // Cập nhật đường dẫn đến avatar
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { url = user.Avatar });
+    }
+
+
 
     private bool UserExists(Guid id)
     {

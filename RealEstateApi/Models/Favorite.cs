@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 public class Favorite
 {
@@ -6,8 +8,16 @@ public class Favorite
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
-    public Guid  UserId { get; set; } // Khóa ngoại đến người dùng
+    [ForeignKey("User")]
+    public Guid UserId { get; set; } 
 
     [Required]
-    public Guid  PropertyId { get; set; } // Khóa ngoại đến bất động sản
+    [ForeignKey("Property")] 
+    public Guid PropertyId { get; set; } 
+
+    [JsonIgnore]
+    public virtual User? User { get; set; }
+
+    [JsonIgnore]
+    public virtual Property? Property { get; set; }
 }
