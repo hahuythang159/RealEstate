@@ -3,7 +3,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using RealEstateApi.Data; // Đảm bảo rằng dòng này đã có
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,9 +56,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],  // Phải khớp với giá trị issuer trong token
-            ValidAudience = jwtSettings["Audience"], // Phải khớp với giá trị audience trong token
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"])) // Khóa bảo mật phải đúng
+            ValidIssuer = jwtSettings["Issuer"], 
+            ValidAudience = jwtSettings["Audience"], 
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]))
         };
     });
 
@@ -67,7 +66,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        builder => builder.WithOrigins() 
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
 });
 
 builder.Services.AddSignalR(); // đăng ký dịch vụ SignalR
@@ -104,8 +105,7 @@ app.UseRouting();
 
 app.UseCors("AllowAllOrigins");
 
-// Sử dụng authentication và authorization
-//Middleware
+
 app.UseAuthentication(); // Thêm middleware authentication
 app.UseAuthorization();  // Thêm middleware authorization
 
@@ -129,7 +129,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapHub<CommentHub>("/commentHub"); // định tuyến Hub
+app.MapHub<ChatHub>("/chathub"); // định tuyến Hub
 
 app.MapControllers();
 builder.Logging.AddConsole();  // Thêm provider Console để ghi log ra console

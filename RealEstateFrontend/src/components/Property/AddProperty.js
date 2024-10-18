@@ -18,7 +18,6 @@
       bathrooms: '',
       area: '',
       propertyType: '',
-      usageType: '',
       interior:'',
       provinceId: '',
       districtId: '',
@@ -101,8 +100,8 @@
     
     const handleCityChange = (value) => {
       setSelectedCity(value);
-      setSelectedDistrict(''); // Reset quận/huyện
-      setSelectedWard(''); // Reset xã/phường
+      setSelectedDistrict('');
+      setSelectedWard('');
     };
 
     const handleDistrictChange = (value) => {
@@ -116,10 +115,10 @@
       setError('');
       setSuccess('');
 
-      if (!selectedCity || !selectedDistrict || !selectedWard) {
-        setError('Vui lòng chọn tỉnh/thành phố, quận/huyện và phường/xã.');
-        return;
-      }
+      // if (!selectedCity || !selectedDistrict || !selectedWard) {
+      //   setError('Vui lòng chọn tỉnh/thành phố, quận/huyện và phường/xã.');
+      //   return;
+      // }
 
       // Tạo dữ liệu bất động sản để gửi
       const propertyData = {
@@ -148,7 +147,7 @@
         setSuccess('Thêm bất động sản thành công với ID: ' + data.id);
 
         message.success('Thêm bất động sản thành công!');
-        navigate('/Owner');
+        navigate('/owner/property-list');
       } catch (err) {
         console.error('Catch error:', err);
         setError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
@@ -163,7 +162,7 @@
             <Input onChange={handleChange} />
           </Form.Item>
 
-          <Form.Item label="Thành phố" required>
+          <Form.Item label="Thành phố" >
             <Select
               value={selectedCity}
               onChange={handleCityChange}
@@ -175,7 +174,7 @@
             </Select>
           </Form.Item>
 
-          <Form.Item label="Quận/Huyện" required>
+          <Form.Item label="Quận/Huyện" >
             <Select
               value={selectedDistrict}
               onChange={handleDistrictChange}
@@ -187,7 +186,7 @@
             </Select>
           </Form.Item>
 
-          <Form.Item label="Phường/Xã" required>
+          <Form.Item label="Phường/Xã" >
             <Select
               value={selectedWard}
               onChange={value => setSelectedWard(value)}
@@ -250,15 +249,9 @@
           <Form.Item label="Loại bất động sản" required name="propertyType" rules={[{ required: true, message: 'Vui lòng chọn loại bất động sản' }]}>
             <Select onChange={value => setProperty({ ...property, propertyType: value })}>
               <Option value="Căn hộ/Chung cư">Căn hộ/Chung cư</Option>
+              <Option value="Phòng trọ">Phòng trọ</Option>
               <Option value="Nhà riêng">Nhà riêng</Option>
-              <Option value="Đất nền">Đất nền</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item label="Loại hình sử dụng" required name="usageType" rules={[{ required: true, message: 'Vui lòng chọn loại hình sử dụng' }]}>
-            <Select onChange={value => setProperty({ ...property, usageType: value })}>
-              <Option value="Cho thuê">Cho thuê</Option>
-              <Option value="Mua bán">Mua bán</Option>
+              <Option value="Đất nền">Đất nền</Option>      
             </Select>
           </Form.Item>
           

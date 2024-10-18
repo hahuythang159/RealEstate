@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RealEstateApi.Data; 
 using RealEstateApi.Models; 
 using Microsoft.EntityFrameworkCore;
 
@@ -15,9 +14,9 @@ namespace RealEstateApi.Controllers
     public class CommentsController : ControllerBase
     {
         private readonly RealEstateContext _context; 
-        private readonly IHubContext<CommentHub> _hubContext;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public CommentsController(RealEstateContext context, IHubContext<CommentHub> hubContext)
+        public CommentsController(RealEstateContext context, IHubContext<ChatHub> hubContext)
         {
             _context = context;
             _hubContext = hubContext;
@@ -37,7 +36,7 @@ namespace RealEstateApi.Controllers
                         PropertyId = c.PropertyId,
                         UserId = c.UserId,
                         Avatar = u.Avatar,
-                        UserName = u.UserName, // Lấy tên người dùng từ bảng Users
+                        UserName = u.UserName,
                         Content = c.Content,
                         CreatedAt = c.CreatedAt
                     })

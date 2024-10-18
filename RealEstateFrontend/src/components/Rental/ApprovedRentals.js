@@ -8,20 +8,20 @@ function ApprovedRentals() {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null);
-  const [users, setUsers] = useState([]); // State để lưu danh sách người dùng
-
+  const [users, setUsers] = useState([]); 
 
   useEffect(() => {
     const fetchRentals = async () => {
       setLoading(true);
       try {
-        await fetchUsers(); // Gọi hàm lấy người dùng
+        await fetchUsers();
         const response = await fetch('/api/rentals?status=Approved');
         if (!response.ok) {
           throw new Error('Lỗi khi lấy danh sách hợp đồng đã duyệt.');
         }
         const data = await response.json();
-        setRentals(data);
+        const approvedRentals = data.filter(rental => rental.status === 'Approved');
+        setRentals(approvedRentals);
       } catch (error) {
         console.error('Error fetching rentals:', error);
         message.error('Có lỗi xảy ra khi lấy danh sách hợp đồng đã duyệt.');
@@ -32,14 +32,15 @@ function ApprovedRentals() {
 
     fetchRentals();
   }, []);
+
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users'); // Giả sử API này trả về danh sách người dùng
+      const response = await fetch('/api/users');
       if (!response.ok) {
         throw new Error('Lỗi khi lấy danh sách người dùng.');
       }
       const data = await response.json();
-      setUsers(data); // Lưu danh sách người dùng vào state
+      setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
       message.error('Có lỗi xảy ra khi lấy danh sách người dùng.');
@@ -68,23 +69,25 @@ function ApprovedRentals() {
       key: 'id',
     },
     {
-        title: 'Người thuê',
-        dataIndex: 'tenantId',
-        key: 'tenantId',
-        render: (text) => {
-          const user = users.find(user => user.id === text); // Tìm người dùng theo ID
-          return user ? user.userName : text; // Nếu tìm thấy, hiển thị tên; nếu không, hiển thị ID
-        },
+      title: 'Người thuê',
+      dataIndex: 'tenantId',
+      key: 'tenantId',
+      render: (text) => {
+        const user = users.find(user => user.id === text); 
+        return user ? user.userName : text;
       },
+    },
     {
       title: 'Ngày bắt đầu',
       dataIndex: 'startDate',
       key: 'startDate',
+      render: (text) => new Date(text).toLocaleString(), // Hiển thị giờ, phút, giây
     },
     {
       title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
+      render: (text) => new Date(text).toLocaleString(), // Hiển thị giờ, phút, giây
     },
     {
       title: 'Trạng thái',
@@ -121,11 +124,10 @@ function ApprovedRentals() {
         {selectedRental && (
           <div>
             <p><strong>Người thuê:</strong> {selectedRental.tenantId}</p>
-            <p><strong>Ngày bắt đầu:</strong> {new Date(selectedRental.startDate).toLocaleDateString()}</p>
-            <p><strong>Ngày kết thúc:</strong> {new Date(selectedRental.endDate).toLocaleDateString()}</p>
+            <p><strong>Ngày bắt đầu:</strong> {new Date(selectedRental.startDate).toLocaleString()}</p>
+            <p><strong>Ngày kết thúc:</strong> {new Date(selectedRental.endDate).toLocaleString()}</p>
             <p><strong>Phương thức thanh toán:</strong> {selectedRental.paymentMethod}</p>
             <p><strong>Trạng thái:</strong> {selectedRental.status}</p>
-            {/* Thêm thông tin khác nếu cần */}
           </div>
         )}
       </Modal>

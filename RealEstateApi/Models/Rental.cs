@@ -33,10 +33,6 @@ public class Rental
     [Column(TypeName = "varchar(20)")]
     public RentalStatus Status { get; set; } = RentalStatus.PendingApproval;
 
-    [Required]
-    [StringLength(100)]
-    public string? PaymentMethod { get; set; }
-
     [NotMapped]
     public decimal RentPrice => Property?.Price ?? 0;
 

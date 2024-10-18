@@ -1,26 +1,22 @@
 ﻿// using System;
 // using System.ComponentModel.DataAnnotations;
+// using System.ComponentModel.DataAnnotations.Schema;
 
 // public class Message
 // {
-//     public int Id { get; set; } // Định danh duy nhất
+//     [Key]
+//     public Guid Id { get; set; } = Guid.NewGuid();
 
-//     [Required]
-//     public int SenderId { get; set; } // Khóa ngoại đến người gửi
+//     public string Content { get; set; } = string.Empty;
 
-//     [Required]
-//     public int ReceiverId { get; set; } // Khóa ngoại đến người nhận
+//     public Guid SenderId { get; set; }
+//     public Guid ReceiverId { get; set; } 
 
-//     [Required]
-//     [StringLength(1000, ErrorMessage = "Nội dung tin nhắn không vượt quá 1000 ký tự")]
-//     public string Content { get; set; } // Nội dung tin nhắn
+//     [ForeignKey("SenderId")]
+//     public virtual User? Sender { get; set; }
 
-//     [Required]
-//     public DateTime Timestamp { get; set; } = DateTime.UtcNow; // Thời gian gửi
+//     [ForeignKey("ReceiverId")]
+//     public virtual User? Receiver { get; set; }
 
-//     public User Sender { get; set; } // Tham chiếu đến người gửi
-//     public User Receiver { get; set; } // Tham chiếu đến người nhận
-
-//     // Optional: thêm thuộc tính trạng thái
-//     public bool IsRead { get; set; } = false; // Trạng thái đã đọc
+//     public DateTime SentAt { get; set; } = DateTime.Now;
 // }

@@ -21,7 +21,6 @@ function AddRental() {
     startDate: '',
     endDate: '',
     status: 'PendingApproval',
-    paymentMethod: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -88,7 +87,6 @@ function AddRental() {
       ...rentalData,
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate,
-      paymentMethod: values.paymentMethod,
       status: 'PendingApproval',
   };
   console.log("Dữ liệu gửi đi:", rentalPayload);
@@ -124,6 +122,24 @@ function AddRental() {
         setLoading(false);
       });
   };
+  useEffect(() => {
+    if (propertyDetail) {
+        fetch(`https://provinces.open-api.vn/api/p/${propertyDetail.provinceId}`)
+            .then(response => response.json())
+            .then(data => setProvince(data.name))
+            .catch(error => console.error('Error fetching province:', error));
+
+        fetch(`https://provinces.open-api.vn/api/d/${propertyDetail.districtId}`)
+            .then(response => response.json())
+            .then(data => setDistrict(data.name))
+            .catch(error => console.error('Error fetching district:', error));
+
+        fetch(`https://provinces.open-api.vn/api/w/${propertyDetail.wardId}`)
+            .then(response => response.json())
+            .then(data => setWard(data.name))
+            .catch(error => console.error('Error fetching ward:', error));
+    }
+}, [propertyDetail]);
 
   
 
@@ -160,14 +176,6 @@ function AddRental() {
             </Form.Item>
             <Form.Item>
                 <strong>Ngày bắt đầu:</strong> {new Date().toLocaleDateString()}
-            </Form.Item>
-
-            <Form.Item label="Phương thức thanh toán" name="paymentMethod" rules={[{ required: true, message: 'Vui lòng chọn phương thức thanh toán!' }]}>
-                <Select placeholder="Chọn phương thức thanh toán">
-                    <Select.Option value="cash">Tiền mặt</Select.Option>
-                    <Select.Option value="creditCard">Thẻ tín dụng</Select.Option>
-                    <Select.Option value="bankTransfer">Chuyển khoản ngân hàng</Select.Option>
-                </Select>
             </Form.Item>
 
         {/* Nút hiển thị điều khoản */}

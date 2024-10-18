@@ -5,7 +5,7 @@
 namespace RealEstateApi.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdatePropertyRelationships3 : Migration
+    public partial class RemovePaymentMethodFromRentals : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Tooltip, notification } from 'antd';
+import { Card, Button, Tooltip, notification, Flex } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { EyeOutlined, HeartOutlined } from '@ant-design/icons';
 
@@ -54,7 +54,7 @@ const PropertyCard = ({ property, userId }) => {
                 setIsFavorited(!isFavorited); // Đảo ngược trạng thái yêu thích
                 notification.success({
                     message: 'Thành công!',
-                    description: data.message, // Thông báo từ server
+                    description: data.message,
                 });
 
             } else {
@@ -82,21 +82,19 @@ const PropertyCard = ({ property, userId }) => {
             <p><strong>Giá:</strong> {property.price} VNĐ</p>
             <p><strong>Diện tích:</strong> {property.area} m²</p>
             <p><strong>Loại bất động sản:</strong> {property.propertyType}</p>
-            <Tooltip title="Xem chi tiết">
+            <Flex gap="small" align="flex-start" vertical>
                 <Button type="primary" icon={<EyeOutlined />} onClick={handleViewDetails}>
                     Xem chi tiết
                 </Button>
-            </Tooltip>
-            <Tooltip title={isFavorited ? "Đã yêu thích" : "Thêm vào yêu thích"}>
                 <Button 
                     type="default" 
                     icon={<HeartOutlined />} 
                     onClick={handleFavorite} 
-                    style={{ marginLeft: 8, color: isFavorited ? 'red' : 'inherit' }}
+                    style={{ color: isFavorited ? 'red' : 'inherit' }}
                 >
                     {isFavorited ? 'Yêu thích' : 'Thêm yêu thích'}
                 </Button>
-            </Tooltip>
+                </Flex>
         </Card>
     );
 };

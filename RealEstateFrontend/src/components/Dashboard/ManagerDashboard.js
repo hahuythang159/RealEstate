@@ -1,30 +1,16 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState } from 'react';
 import { Layout, Menu  } from 'antd';
-import { UserOutlined, DashboardOutlined, ApartmentOutlined } from '@ant-design/icons';
+import { UserOutlined, DashboardOutlined, ApartmentOutlined,FileProtectOutlined  } from '@ant-design/icons';
+
 import { useNavigate,Outlet } from 'react-router-dom';
 
 
 const {  Sider,Content  } = Layout;
 
 const AdminDashboard = () => {
-    const [collapsed, setCollapsed] = useState(false); // State để điều khiển trạng thái thu gọn
+    const [collapsed, setCollapsed] = useState(false);
 
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('role');
-        localStorage.removeItem('token');
-        navigate('/login'); // Quay lại trang đăng nhập
-    };
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-
-        // Nếu không có token, điều hướng về trang login
-        if (!token) {
-            navigate('/login');
-        }
-    }, [navigate]);
     
     console.log("Dữ liệu localStorage:", localStorage);
 
@@ -42,11 +28,8 @@ const AdminDashboard = () => {
                     <Menu.Item key="3" icon={<ApartmentOutlined />} onClick={() => navigate('/admin/property-list')}>
                         Quản lý tài sản
                     </Menu.Item>
-                    <Menu.Item key="4" icon={<UserOutlined/>} onClick={()=>navigate('/admin/approval')}>
+                    <Menu.Item key="4" icon={<FileProtectOutlined/>} onClick={()=>navigate('/admin/approved')}>
                         Danh sách hợp đồng
-                    </Menu.Item>
-                    <Menu.Item key="5" icon={<UserOutlined />} onClick={handleLogout}>
-                        Đăng xuất
                     </Menu.Item>
                 </Menu>
             </Sider>

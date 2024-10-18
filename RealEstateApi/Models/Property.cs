@@ -7,12 +7,12 @@ public class Property
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
     [Required]
-    [StringLength(200, ErrorMessage = "Địa chỉ không vượt quá 200 ký tự.")]
-    public string Title { get; set; } = string.Empty;  // Số nhà hoặc tên đường
+    [StringLength(500, ErrorMessage = "Tiêu đề không vượt quá 200 ký tự.")]
+    public string Title { get; set; } = string.Empty; 
 
     [Required]
     [StringLength(200, ErrorMessage = "Địa chỉ không vượt quá 200 ký tự.")]
-    public string Address { get; set; } = string.Empty;  // Số nhà hoặc tên đường
+    public string Address { get; set; } = string.Empty;  
 
     [Required]
     [StringLength(1000, ErrorMessage = "Mô tả không vượt quá 1000 ký tự.")]
@@ -26,14 +26,11 @@ public class Property
     public Guid OwnerId { get; set; }
 
     // Sử dụng Id thay vì object đầy đủ cho Province, District, và Ward
-    [Required]
-    public int ProvinceId { get; set; }  // Liên kết với tỉnh
+    public int? ProvinceId { get; set; } 
 
-    [Required]
-    public int DistrictId { get; set; }  // Liên kết với huyện
+    public int? DistrictId { get; set; } 
 
-    [Required]
-    public int WardId { get; set; }  // Liên kết với xã
+    public int? WardId { get; set; }
 
     [Required]
     [StringLength(500, ErrorMessage = "URL hình ảnh không vượt quá 500 ký tự.")]
@@ -57,14 +54,12 @@ public class Property
 
     [Required]
     [StringLength(100, ErrorMessage = "Loại hình sử dụng không vượt quá 100 ký tự.")]
-    public string UsageType { get; set; } = string.Empty; 
-    [Required]
-    [StringLength(100, ErrorMessage = "Loại hình sử dụng không vượt quá 100 ký tự.")]
     public string Interior { get; set; } = string.Empty; 
 
     [Required]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime PostedDate { get; set; } = DateTime.Now; // Thời gian thực tế
+    public bool IsHidden { get; set; } = false;
 
     [JsonIgnore]
     public virtual Province? Province { get; set; } 

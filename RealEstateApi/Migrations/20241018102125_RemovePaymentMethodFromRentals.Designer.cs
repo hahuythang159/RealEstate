@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(RealEstateContext))]
-    [Migration("20241008040053_UpdatePropertyRelationships6")]
-    partial class UpdatePropertyRelationships6
+    [Migration("20241018102125_RemovePaymentMethodFromRentals")]
+    partial class RemovePaymentMethodFromRentals
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,6 +94,8 @@ namespace RealEstateApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PropertyId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Favorites");
@@ -132,8 +134,20 @@ namespace RealEstateApi.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("Interior")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PostedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -147,10 +161,13 @@ namespace RealEstateApi.Migrations
                     b.Property<int?>("ProvinceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UsageType")
+                    b.Property<int?>("ProvinceId1")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int?>("WardId")
                         .HasColumnType("int");
@@ -160,6 +177,8 @@ namespace RealEstateApi.Migrations
                     b.HasIndex("DistrictId");
 
                     b.HasIndex("ProvinceId");
+
+                    b.HasIndex("ProvinceId1");
 
                     b.HasIndex("WardId");
 
@@ -175,7 +194,6 @@ namespace RealEstateApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -196,6 +214,7 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("PropertyId")
@@ -205,6 +224,8 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -222,12 +243,12 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("varchar(20)");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
@@ -278,6 +299,14 @@ namespace RealEstateApi.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -356,11 +385,21 @@ namespace RealEstateApi.Migrations
 
             modelBuilder.Entity("Favorite", b =>
                 {
-                    b.HasOne("User", null)
-                        .WithMany("Favorites")
+                    b.HasOne("Property", "Property")
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("User", "User")
+                        .WithMany("UserFavorites")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Property");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Property", b =>
@@ -375,6 +414,10 @@ namespace RealEstateApi.Migrations
                         .HasForeignKey("ProvinceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Province", null)
+                        .WithMany("Properties")
+                        .HasForeignKey("ProvinceId1");
+
                     b.HasOne("Ward", "Ward")
                         .WithMany("Properties")
                         .HasForeignKey("WardId")
@@ -385,6 +428,17 @@ namespace RealEstateApi.Migrations
                     b.Navigation("Province");
 
                     b.Navigation("Ward");
+                });
+
+            modelBuilder.Entity("RealEstateApi.Models.Comment", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany("UserComments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Rental", b =>
@@ -409,7 +463,7 @@ namespace RealEstateApi.Migrations
             modelBuilder.Entity("Review", b =>
                 {
                     b.HasOne("Property", "Property")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -446,22 +500,28 @@ namespace RealEstateApi.Migrations
             modelBuilder.Entity("Property", b =>
                 {
                     b.Navigation("Rentals");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Province", b =>
                 {
                     b.Navigation("Districts");
+
+                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("User", b =>
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Favorites");
-
                     b.Navigation("Rentals");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("UserComments");
+
+                    b.Navigation("UserFavorites");
                 });
 
             modelBuilder.Entity("Ward", b =>

@@ -14,6 +14,7 @@ const { Option } = Select;
 const PropertyDetail = () => {
     const { id } = useParams();
     const [property, setProperty] = useState(null);
+    const [editing, setEditing] = useState(false);
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const userRole=localStorage.getItem('role');
@@ -22,7 +23,6 @@ const PropertyDetail = () => {
     const [province, setProvince] = useState(null);
     const userId = localStorage.getItem('userId');
     const [comments, setComments] = useState([]);
-    const [newComment, setNewComment] = useState('');
 
 
 
@@ -67,43 +67,71 @@ const PropertyDetail = () => {
         }
     }, [property]);
 
+    const handleDelete = async () => {
+        if(userRole==='Owner'|| userRole==='Manager'){
+            await fetch(`/api/properties/${id}`, { method: 'DELETE' });
+            message.success('Xoá thành công!');
+            navigate('/Owner');
+        }
+        else{
+            message.error('Bạn không có quyền xóa bất động sản này.');
+
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (userRole === 'Owner') {
+            try {
+                // Xác thực các trường của form
+                await form.validateFields();
+                const values = form.getFieldsValue();
+                const updatedData = {
+                    id: id,
+                    title:values.title,
+                    description: values.description,
+                    address:values.address,
+                    price: values.price,
+                    ownerId: values.ownerId, 
+                    provinceId: values.provinceId, 
+                    districtId: values.districtId, 
+                    wardId: values.wardId,
+                    imageUrl: values.imageUrl,
+                    bedrooms: values.bedrooms,
+                    bathrooms: values.bathrooms, 
+                    area: values.area, 
+                    propertyType: values.propertyType, 
+                    interior: values.interior,
+                    postedDate: values.postedDate,
+                };
     
-
-    const handleCreateRental = () => {
-        if (userRole === 'Tenant') {
-            navigate(`/add-rental`,{ state: { propertyId: id } }); 
+                const response = await fetch(`/api/properties/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData),
+                });
+    
+                console.log('Response Status:', response.status);
+                console.log('Response:', await response.clone().text());
+    
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.log('Errors:', errorData.errors);
+                    message.error('Cập nhật không thành công. Vui lòng kiểm tra thông tin.');
+                    return;
+                }
+    
+                message.success('Cập nhật thành công!');
+                fetchProperty();
+                setEditing(false);
+            } catch (error) {
+                console.error('Error:', error);
+                message.error('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
         } else {
-            message.error('Bạn không có quyền tạo hợp đồng.');
+            message.error('Bạn không có quyền chỉnh sửa bất động sản này.');
         }
     };
-
-    const handleCommentSubmit = async () => {
-        if (!newComment.trim()) {
-            message.error('Vui lòng nhập nội dung bình luận');
-            return;
-        }
-
-        const commentData = {
-            propertyId: id,
-            userId: userId,
-            content: newComment
-        };
-
-        const response = await fetch(`/api/comments`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(commentData)
-        });
-
-        if (response.ok) {
-            const newCommentFromServer = await response.json();
-            setComments([...comments, newCommentFromServer]);
-            setNewComment(''); // Clear input field
-            message.success('Bình luận đã được gửi');
-        } else {
-            message.error('Gửi bình luận thất bại');
-        }
-    };
+    
 
 
     return (
@@ -128,12 +156,54 @@ const PropertyDetail = () => {
                    <br />({dayjs(property.postedDate).fromNow()})</p>
 
                 <div style={{ marginTop: '20px' }}>
-                    {userRole === 'Tenant' && (
-                        <Button type="primary" onClick={handleCreateRental}>
-                            Tạo hợp đồng thuê
+                    {userRole === 'Owner' && (
+                        <Button
+                            icon={<EditOutlined />}
+                            type="primary"
+                            onClick={() => setEditing(!editing)}
+                            style={{ marginRight: '10px' }}
+                        >
+                            {editing ? 'Hủy' : 'Chỉnh sửa'}
+                        </Button>
+                    )}
+
+                    {(userRole === 'Manager' || userRole === 'Owner')  && (
+                        <Button
+                            icon={<DeleteOutlined />}
+                            danger
+                            onClick={handleDelete}
+                        >
+                            Xóa
                         </Button>
                     )}
                 </div>
+
+                {editing && (
+                    <Form form={form} onFinish={handleUpdate} layout="vertical" style={{ marginTop: '20px' }}>
+                        <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: 'Nhập mô tả' }]}>
+                            <Input.TextArea />
+                        </Form.Item>
+                        <Form.Item name="price" label="Giá" rules={[{ required: true, message: 'Nhập giá' }]}>
+                            <Input type="number" />
+                        </Form.Item>
+                        <Form.Item name="interior" label="Tình trạng nội thất" rules={[{ required: true, message: 'Hãy chọn tình trạng nội thất' }]}>
+                        <Select placeholder="Chọn tình trạng nội thất">
+                            <Option value="Nội thất cơ bản">Nội thất cơ bản</Option>
+                            <Option value="Nội thất cao cấp">Nội thất cao cấp</Option>
+                            <Option value="Không có nội thất">Không có nội thất</Option>
+                        </Select>
+                        </Form.Item>
+                        <Form.Item name="title" hidden={true}></Form.Item>
+                        <Form.Item name="address" hidden={true}></Form.Item>
+                        <Form.Item name="imageUrl" hidden={true}></Form.Item>
+                        <Form.Item name="propertyType" hidden={true}></Form.Item>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit">
+                                Cập nhật
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                )}
                 <h3>Bình luận</h3>
             <div>
             {comments.length > 0 ? (
@@ -156,24 +226,6 @@ const PropertyDetail = () => {
                     <p>Chưa có bình luận.</p>
                 )}
             </div>
-
-            {/* Form thêm bình luận */}
-            <Form layout="inline" onFinish={handleCommentSubmit} style={{ marginTop: '20px' }}>
-                <Form.Item>
-                    <Input.TextArea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Viết bình luận..."
-                        rows={2}
-                        style={{ width: '400px' }}
-                    />
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">
-                        Gửi bình luận
-                    </Button>
-                </Form.Item>
-            </Form>
             </Card>
             ) : (
                 <p>Loading...</p>

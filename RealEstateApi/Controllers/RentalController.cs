@@ -69,7 +69,6 @@ public class RentalsController : ControllerBase
                 TenantId = rentalDto.TenantId,
                 StartDate = rentalDto.StartDate,
                 EndDate = rentalDto.EndDate,
-                PaymentMethod = rentalDto.PaymentMethod,
                 Status = RentalStatus.PendingApproval // Mặc định trạng thái là PendingApproval
             };
 
@@ -86,7 +85,7 @@ public class RentalsController : ControllerBase
 
     // PUT: api/rentals/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Owner, Manager")] // Chỉ Owner hoặc Manager có quyền sửa rental
+    [Authorize(Roles = "Owner, Manager")] 
     public async Task<IActionResult> PutRental(Guid id, Rental rental)
     {
         if (id != rental.Id)
@@ -100,10 +99,9 @@ public class RentalsController : ControllerBase
             return NotFound();
         }
 
-        // Cập nhật các trường cần thiết
         existingRental.StartDate = rental.StartDate;
         existingRental.EndDate = rental.EndDate;
-        existingRental.Status = rental.Status; // Cập nhật trạng thái nếu cần
+        existingRental.Status = rental.Status;
 
         _context.Entry(existingRental).State = EntityState.Modified;
 

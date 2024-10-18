@@ -40,11 +40,6 @@ public class User
 
 
 
-
-    // Các mối quan hệ với Message
-    // public ICollection<Message> SentMessages { get; set; } = new List<Message>(); // Tin nhắn đã gửi
-    // public ICollection<Message> ReceivedMessages { get; set; } = new List<Message>(); // Tin nhắn đã nhận
-
     // Thêm mối quan hệ nếu cần
     public ICollection<Review> Reviews { get; set; } = new List<Review>(); // Đánh giá của người dùng
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>(); // Đặt chỗ của người dùng

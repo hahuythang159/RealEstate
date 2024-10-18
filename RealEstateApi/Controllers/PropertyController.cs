@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Security.Claims;
 
 
 [Route("api/[controller]")]
@@ -20,14 +21,47 @@ public class PropertiesController : ControllerBase
 
     // GET: api/properties
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Property>>> GetProperties()
+    public async Task<ActionResult<IEnumerable<Property>>> GetProperties(
+        [FromQuery] decimal? minPrice, 
+        [FromQuery] decimal? maxPrice,
+        [FromQuery] int? bedrooms,
+        [FromQuery] int? bathrooms)
     {
-        return await _context.Properties
+        var query = _context.Properties
             .Include(p => p.Province)
             .Include(p => p.District)
             .Include(p => p.Ward)
-            .ToListAsync(); 
+            .Include(p => p.Rentals) 
+            .Where(p => !p.Rentals.Any(r => r.Status == RentalStatus.Approved))
+            .AsQueryable();
+
+        // Lọc theo giá
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        // Lọc theo số phòng ngủ
+        if (bedrooms.HasValue)
+        {
+            query = query.Where(p => p.Bedrooms == bedrooms.Value);
+        }
+
+        // Lọc theo số phòng tắm
+        if (bathrooms.HasValue)
+        {
+            query = query.Where(p => p.Bathrooms == bathrooms.Value);
+        }
+        
+
+        // Trả về danh sách bất động sản đã lọc
+        return await query.ToListAsync();
     }
+
 
     // GET: api/properties/5
     [HttpGet("{id}")]
@@ -75,23 +109,23 @@ public class PropertiesController : ControllerBase
             }
 
             // Kiểm tra ProvinceId, DistrictId, WardId hợp lệ
-            var province = await _context.Provinces.FindAsync(property.ProvinceId);
-            if (province == null)
-            {
-                return BadRequest("Province not found.");
-            }
+            // var province = await _context.Provinces.FindAsync(property.ProvinceId);
+            // if (province == null)
+            // {
+            //     return BadRequest("Province not found.");
+            // }
 
-            var district = await _context.Districts.FindAsync(property.DistrictId);
-            if (district == null)
-            {
-                return BadRequest("District not found.");
-            }
+            // var district = await _context.Districts.FindAsync(property.DistrictId);
+            // if (district == null)
+            // {
+            //     return BadRequest("District not found.");
+            // }
 
-            var ward = await _context.Wards.FindAsync(property.WardId);
-            if (ward == null)
-            {
-                return BadRequest("Ward not found.");
-            }
+            // var ward = await _context.Wards.FindAsync(property.WardId);
+            // if (ward == null)
+            // {
+            //     return BadRequest("Ward not found.");
+            // }
 
             // Thêm property vào database
             _context.Properties.Add(property);
@@ -109,49 +143,34 @@ public class PropertiesController : ControllerBase
 
 
 
-    // Cập nhật GetProvinceName, GetDistrictName, GetWardName
-    private async Task<string> GetProvinceName(int provinceId)
-    {
-        var province = await _context.Provinces.FindAsync(provinceId);
-        return province != null ? province.Name : "Unknown";
-    }
-
-    private async Task<string> GetDistrictName(int districtId)
-    {
-        var district = await _context.Districts.FindAsync(districtId);
-        return district != null ? district.Name : "Unknown";
-    }
-
-    private async Task<string> GetWardName(int wardId)
-    {
-        var ward = await _context.Wards.FindAsync(wardId);
-        return ward != null ? ward.Name : "Unknown";
-    }
-
-    // GET: api/provinces
     [HttpGet("provinces")]
-    public async Task<ActionResult<IEnumerable<Province>>> GetProvinces()
+    public async Task<IActionResult> GetProvinces()
     {
-        return await _context.Provinces.ToListAsync();
+        var provinces = await _context.Provinces.ToListAsync();
+        return Ok(provinces);
     }
 
-    // GET: api/districts/{provinceId}
-    [HttpGet("districts/{provinceId}")]
-    public async Task<ActionResult<IEnumerable<District>>> GetDistricts(int provinceId)
+    // Lấy danh sách huyện theo tỉnh Id
+    [HttpGet("provinces/{provinceId}/districts")]
+    public async Task<IActionResult> GetDistrictsByProvince(int provinceId)
     {
-        return await _context.Districts
-                            .Where(d => d.ProvinceId == provinceId)
-                            .ToListAsync();
+        var districts = await _context.Districts
+                                      .Where(d => d.ProvinceId == provinceId)
+                                      .ToListAsync();
+        return Ok(districts);
     }
 
-    // GET: api/wards/{districtId}
-    [HttpGet("wards/{districtId}")]
-    public async Task<ActionResult<IEnumerable<Ward>>> GetWards(int districtId)
+    // Lấy danh sách xã/phường theo huyện Id
+    [HttpGet("districts/{districtId}/wards")]
+    public async Task<IActionResult> GetWardsByDistrict(int districtId)
     {
-        return await _context.Wards
-                            .Where(w => w.DistrictId == districtId)
-                            .ToListAsync();
+        var wards = await _context.Wards
+                                  .Where(w => w.DistrictId == districtId)
+                                  .ToListAsync();
+        return Ok(wards);
     }
+
+
 
     // PUT: api/properties/5
     [HttpPut("{id}")]
@@ -207,6 +226,45 @@ public class PropertiesController : ControllerBase
 
         return NoContent();
     }
+    // GET: api/properties/my-properties?userId=some-guid
+    [HttpGet("my-properties")]
+    public async Task<IActionResult> GetMyProperties([FromQuery] string userId)
+    {
+        // Kiểm tra nếu userId null hoặc không hợp lệ
+        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid parsedUserId))
+        {
+            return BadRequest("UserId không hợp lệ.");
+        }
+
+        // Lấy danh sách bất động sản của người dùng
+        var properties = await _context.Properties
+                                        .Where(p => p.OwnerId == parsedUserId)
+                                        .ToListAsync();
+
+        // Kiểm tra nếu người dùng không có bất động sản
+        if (properties == null || properties.Count == 0)
+        {
+            return NotFound("Người dùng không có bất động sản nào.");
+        }
+
+        return Ok(properties);
+    }
+    // PUT: api/properties/{id}/hide
+    [HttpPut("{id}/hide")]
+    public async Task<IActionResult> HideProperty(Guid id)
+    {
+        var property = await _context.Properties.FindAsync(id);
+        if (property == null)
+        {
+            return NotFound();
+        }
+
+        property.IsHidden = true;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
 
 
 
