@@ -27,6 +27,9 @@ import ApprovedRentals from './components/Rental/ApprovedRentals';
 import MyPropertyList from './components/Property/MyPropertyList';
 import ProductDetail from './components/Property/ProductDetail';
 import ProductList from './components/Property/ProductList';
+import VisitPage from './components/VisitPage';
+import TrustedCompanies from './components/TrustedCompanies';
+
 
 // Import các dashboard theo vai trò
 import OwnerDashboard from './components/Dashboard/OwnerDashboard';
@@ -110,6 +113,9 @@ const App = () => {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/" element={<Home />} />
           <Route path="/access-denied" element={<AccessDenied />} />
+          <Route path="/trust" element={<TrustedCompanies />} />
+          <Route path="/visit" element={<VisitPage />} />
+
 
           <Route
             path="*"

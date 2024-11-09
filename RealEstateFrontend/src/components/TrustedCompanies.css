@@ -1,49 +1,90 @@
 .trusted-companies {
-    background-color: #f9f9f9;
-    padding: 40px 20px;
-    text-align: center;
-    font-family: Arial, sans-serif;
-  }
-  
-  .trusted-companies-content {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .trusted-companies h1 {
-    font-size: 36px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  .trusted-companies p {
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 30px;
-  }
-  
-  .visit-button {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .trusted-companies-logos {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
-  }
-  
-  .trusted-companies-logos img {
-    max-height: 40px;
-    margin: 10px;
-  }
-  
+  background-color: #f9f9f9;
+  padding: 40px 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.trusted-companies-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.trusted-companies h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: left;
+  flex: 1;
+}
+
+.trusted-companies p {
+  font-family: 'Poppins', sans-serif;
+  color: #555;
+  font-size: 15px;
+  text-align: left;
+  flex: 2;
+  max-width: 50%;
+  margin-bottom: 0;
+}
+
+.trusted-companies-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.visit-button {
+  background-color: #333;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 99px;
+  cursor: pointer;
+  width: 200px;
+  max-width: 100%;
+  margin-left: 200px;
+  margin-bottom: 50px;
+}
+
+.visit-button:hover {
+  background-color: #555;
+}
+
+hr {
+  width: 50%;
+  margin: 20px auto;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.trusted-companies-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.trusted-companies-logos img {
+  transition:
+    transform 0.3s ease,
+    filter 0.3s ease;
+  width: 120px;
+  height: auto;
+  filter: brightness(0.7);
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.trusted-companies-logos img:hover {
+  transform: translateY(-10px);
+  filter: brightness(1.3);
+}
