@@ -48,6 +48,11 @@ const MyPropertyList = () => {
 
     const handleHideProperty = async () => {
         if (selectedProperty) {
+            // Cập nhật giao diện ngay lập tức
+            const updatedProperties = properties.filter(p => p.id !== selectedProperty.id);
+            setProperties(updatedProperties);
+            message.success('Đã ẩn bất động sản thành công');
+    
             try {
                 const response = await fetch(`/api/properties/${selectedProperty.id}/hide`, {
                     method: 'PUT',
@@ -55,19 +60,23 @@ const MyPropertyList = () => {
                         'Content-Type': 'application/json',
                     },
                 });
-
-                if (response.ok) {
-                    setProperties(properties.filter(p => p.id !== selectedProperty.id));
-                    message.success('Đã ẩn bất động sản thành công');
-                    handleCancel();
-                } else {
-                    message.error('Không thể ẩn bất động sản: ' + response.statusText);
+    
+                if (!response.ok) {
+                    // Nếu yêu cầu thất bại, khôi phục lại cập nhật
+                    setProperties(properties);
+                    const errorText = await response.text();
+                    message.error('Không thể ẩn bất động sản: ' + errorText);
                 }
             } catch (error) {
+                // Nếu có lỗi xảy ra, khôi phục lại cập nhật
+                setProperties(properties);
                 message.error('Lỗi khi ẩn bất động sản: ' + error.message);
+            } finally {
+                handleCancel();
             }
         }
     };
+    
 
     const handleEditProperty = async () => {
         if (selectedProperty) {

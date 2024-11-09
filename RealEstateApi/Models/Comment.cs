@@ -14,7 +14,7 @@ namespace RealEstateApi.Models
         public Guid  PropertyId { get; set; }
 
         [Required(ErrorMessage = "User ID is required.")]
-        [ForeignKey("User")] // Ràng buộc khóa ngoại tới thực thể User
+        [ForeignKey("User")] 
         public Guid UserId { get; set; }
         
         [JsonIgnore]

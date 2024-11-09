@@ -71,7 +71,7 @@ const PropertyDetail = () => {
         if(userRole==='Owner'|| userRole==='Manager'){
             await fetch(`/api/properties/${id}`, { method: 'DELETE' });
             message.success('Xoá thành công!');
-            navigate('/Owner');
+            navigate('/owner/my-product');
         }
         else{
             message.error('Bạn không có quyền xóa bất động sản này.');

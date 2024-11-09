@@ -6,20 +6,23 @@ function AwaitingApproval() {
   const navigate = useNavigate();
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]); // State để lưu danh sách người dùng
+  const [users, setUsers] = useState([]);
+  const [currentUserRole, setCurrentUserRole] = useState(null);
 
   useEffect(() => {
     const fetchRentals = async () => {
       setLoading(true);
       try {
         await fetchUsers();
+        const role = localStorage.getItem('role');
+        setCurrentUserRole(role);
+
         const response = await fetch('/api/rentals');
         if (!response.ok) {
           throw new Error('Lỗi khi lấy danh sách hợp đồng.');
         }
         const data = await response.json();
 
-        // Lọc chỉ lấy các hợp đồng có trạng thái 'PendingApproval'
         const pendingRentals = data.filter(rental => rental.status === 'PendingApproval');
         setRentals(pendingRentals);
       } catch (error) {
@@ -53,12 +56,16 @@ function AwaitingApproval() {
       const response = await fetch(`/api/rentals/${rentalId}/approve`, {
         method: 'PATCH',
       });
+      const responseData = await response.json();
+
       if (!response.ok) {
+        console.error('Error approving rental:', responseData);
+
         throw new Error('Lỗi khi duyệt hợp đồng.');
       }
-      message.success('Hợp đồng đã được duyệt thành công.');
+      message.success('Hợp đồng đã được duyệt thành công và email đã được gửi.');
 
-      // Cập nhật lại danh sách hợp đồng
+
       setRentals((prevRentals) => prevRentals.filter((rental) => rental.id !== rentalId));
     } catch (error) {
       console.error('Error approving rental:', error);
@@ -88,21 +95,19 @@ function AwaitingApproval() {
       dataIndex: 'startDate',
       key: 'startDate',
       render: (text) => new Date(text).toLocaleString(),
-
     },
     {
       title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
       render: (text) => new Date(text).toLocaleString(),
-
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
     },
-    {
+    ...(currentUserRole === 'Owner' ? [{
       title: 'Hành động',
       key: 'action',
       render: (text, record) => (
@@ -110,7 +115,7 @@ function AwaitingApproval() {
           Duyệt
         </Button>
       ),
-    },
+    }] : []),
   ];
 
   return (

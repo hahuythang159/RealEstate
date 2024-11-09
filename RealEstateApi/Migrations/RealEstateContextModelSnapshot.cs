@@ -173,6 +173,8 @@ namespace RealEstateApi.Migrations
 
                     b.HasIndex("DistrictId");
 
+                    b.HasIndex("OwnerId");
+
                     b.HasIndex("ProvinceId");
 
                     b.HasIndex("ProvinceId1");
@@ -297,9 +299,8 @@ namespace RealEstateApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Avatar")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("Avatar")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -406,6 +407,12 @@ namespace RealEstateApi.Migrations
                         .HasForeignKey("DistrictId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("User", "Owner")
+                        .WithMany("Properties")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Province", "Province")
                         .WithMany()
                         .HasForeignKey("ProvinceId")
@@ -421,6 +428,8 @@ namespace RealEstateApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("District");
+
+                    b.Navigation("Owner");
 
                     b.Navigation("Province");
 
@@ -511,6 +520,8 @@ namespace RealEstateApi.Migrations
             modelBuilder.Entity("User", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Properties");
 
                     b.Navigation("Rentals");
 

@@ -1,11 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\Controllers",
-    "\\Data",
-    "\\Models",
-    "\\Properties"
+    ""
   ],
-  "SelectedNode": "\\Models\\RealEstateContext.cs",
+  "SelectedNode": "\\Data",
   "PreviewInSolutionExplorer": false
 }

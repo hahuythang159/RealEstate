@@ -8,7 +8,7 @@ function ApprovedRentals() {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null);
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchRentals = async () => {
@@ -20,7 +20,9 @@ function ApprovedRentals() {
           throw new Error('Lỗi khi lấy danh sách hợp đồng đã duyệt.');
         }
         const data = await response.json();
-        const approvedRentals = data.filter(rental => rental.status === 'Approved');
+        const approvedRentals = data.filter(
+          (rental) => rental.status === 'Approved'
+        );
         setRentals(approvedRentals);
       } catch (error) {
         console.error('Error fetching rentals:', error);
@@ -73,7 +75,7 @@ function ApprovedRentals() {
       dataIndex: 'tenantId',
       key: 'tenantId',
       render: (text) => {
-        const user = users.find(user => user.id === text); 
+        const user = users.find((user) => user.id === text);
         return user ? user.userName : text;
       },
     },
@@ -81,13 +83,13 @@ function ApprovedRentals() {
       title: 'Ngày bắt đầu',
       dataIndex: 'startDate',
       key: 'startDate',
-      render: (text) => new Date(text).toLocaleString(), // Hiển thị giờ, phút, giây
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Ngày kết thúc',
       dataIndex: 'endDate',
       key: 'endDate',
-      render: (text) => new Date(text).toLocaleString(), // Hiển thị giờ, phút, giây
+      render: (text) => new Date(text).toLocaleString(),
     },
     {
       title: 'Trạng thái',
@@ -98,7 +100,11 @@ function ApprovedRentals() {
       title: 'Hành động',
       key: 'action',
       render: (text, record) => (
-        <Button type="primary" onClick={() => handleViewDetails(record)} disabled={loading}>
+        <Button
+          type="primary"
+          onClick={() => handleViewDetails(record)}
+          disabled={loading}
+        >
           Xem Chi Tiết
         </Button>
       ),
@@ -123,11 +129,20 @@ function ApprovedRentals() {
       >
         {selectedRental && (
           <div>
-            <p><strong>Người thuê:</strong> {selectedRental.tenantId}</p>
-            <p><strong>Ngày bắt đầu:</strong> {new Date(selectedRental.startDate).toLocaleString()}</p>
-            <p><strong>Ngày kết thúc:</strong> {new Date(selectedRental.endDate).toLocaleString()}</p>
-            <p><strong>Phương thức thanh toán:</strong> {selectedRental.paymentMethod}</p>
-            <p><strong>Trạng thái:</strong> {selectedRental.status}</p>
+            <p>
+              <strong>Người thuê:</strong> {selectedRental.tenantId}
+            </p>
+            <p>
+              <strong>Ngày bắt đầu:</strong>{' '}
+              {new Date(selectedRental.startDate).toLocaleString()}
+            </p>
+            <p>
+              <strong>Ngày kết thúc:</strong>{' '}
+              {new Date(selectedRental.endDate).toLocaleString()}
+            </p>
+            <p>
+              <strong>Trạng thái:</strong> {selectedRental.status}
+            </p>
           </div>
         )}
       </Modal>

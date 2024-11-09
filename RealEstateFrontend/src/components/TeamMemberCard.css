@@ -1,0 +1,42 @@
+.team-member-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    width: 250px;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.member-info h3 {
+    font-size: 1.25rem;
+    margin: 10px 0;
+    color: #212529;
+}
+
+.member-info p {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.contact-icon {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+}

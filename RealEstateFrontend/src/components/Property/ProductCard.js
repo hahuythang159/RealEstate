@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Card, Button, Tooltip, notification } from 'antd';
+import { Card, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EyeOutlined } from '@ant-design/icons';
 
 const ProductCard = ({ property, onDelete }) => {
     const navigate = useNavigate();
@@ -9,35 +9,8 @@ const ProductCard = ({ property, onDelete }) => {
 
     const handleViewDetails = () => {
         navigate(`/product/${property.id}`);
+
     };
-
-    const handleDelete = async () => {
-        try {
-            const response = await fetch(`/api/properties/delete/${property.id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                notification.success({
-                    message: 'Xóa thành công!',
-                    description: 'Bất động sản đã được xóa.',
-                });
-                onDelete(property.id); // Gọi hàm onDelete để cập nhật danh sách bất động sản
-            } else {
-                notification.error({
-                    message: 'Lỗi',
-                    description: 'Không thể xóa bất động sản. Vui lòng thử lại sau.',
-                });
-            }
-        } catch (error) {
-            console.error('Error deleting property:', error.message);
-            notification.error({
-                message: 'Lỗi',
-                description: 'Không thể xóa bất động sản. Vui lòng thử lại sau.',
-            });
-        }
-    };
-
     return (
         <Card
         hoverable
@@ -53,9 +26,6 @@ const ProductCard = ({ property, onDelete }) => {
             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                 <Button type="primary" icon={<EyeOutlined />} onClick={handleViewDetails}>
                     Xem chi tiết
-                </Button>
-                <Button type="danger" icon={<DeleteOutlined />} onClick={handleDelete}>
-                    Xóa
                 </Button>
             </div>
         </Card>

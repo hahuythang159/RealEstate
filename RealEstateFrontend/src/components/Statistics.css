@@ -1,0 +1,20 @@
+.statistics {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 50px;
+    background-color: #f8f9fa;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item h3 {
+    font-size: 2rem;
+    color: #333;
+}
+
+.stat-item p {
+    font-size: 1rem;
+    color: #6c757d;
+}

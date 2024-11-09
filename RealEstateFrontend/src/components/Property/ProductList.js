@@ -52,9 +52,9 @@ const ProductList = () => {
 
     return (
         <>
-            <Row gutter={16}>
+            <Row gutter={16} style={{padding:'24px'}}>
                 {currentProperties.map((property) => (
-                    <Col span={8} key={property.id}>
+                    <Col span={8} key={property.id} style={{paddingBottom:'24px'}}>
                         <ProductCard property={property} onDelete={handleDeleteProperty} />
                     </Col>
                 ))}

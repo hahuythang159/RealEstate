@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const AddUser = () => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('tenant'); // Giá trị mặc định
+  const [role, setRole] = useState('tenant');
 
   const handleSubmit = async (e) => {
     e.preventDefault();

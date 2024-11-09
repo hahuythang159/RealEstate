@@ -60,7 +60,13 @@ public class RealEstateContext : DbContext
         .HasOne(w => w.District)
         .WithMany(d => d.Wards) // District có nhiều Ward
         .HasForeignKey(w => w.DistrictId)
-        .OnDelete(DeleteBehavior.Restrict);    
+        .OnDelete(DeleteBehavior.Restrict);  
+
+    modelBuilder.Entity<Property>()
+        .HasOne(p => p.Owner)
+        .WithMany(u => u.Properties)
+        .HasForeignKey(p => p.OwnerId)
+        .OnDelete(DeleteBehavior.Restrict);
     }
 }
 

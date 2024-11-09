@@ -12,37 +12,36 @@ const Login = () => {
     const handleLogin = async (values) => {
         setLoading(true);
 
-        try {
-            const response = await fetch('/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(values), // Sử dụng giá trị từ form
-            });
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values),
+                });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                message.error(errorData.message); // Hiển thị thông báo lỗi
+                message.error(errorData.message);
             } else {
                 const data = await response.json();
                 localStorage.setItem('userId', data.userId);
                 localStorage.setItem('role', data.role);
-                localStorage.setItem('token', data.token); // Lưu JWT token
+                localStorage.setItem('token', data.token);
 
 
                 message.success('Đăng nhập thành công!');
 
-                // Điều hướng đến dashboard tương ứng
                 switch (data.role) {
                     case 'Owner':
-                        navigate('/owner/property-list');
+                        navigate('/');
                         break;
                     case 'Tenant':
-                        navigate('/tanant/property-list');
+                        navigate('/');
                         break;
                     case 'Manager':
-                        navigate('/admin/property-list');
+                        navigate('/');
                         break;
                     default:
                         break;
@@ -57,13 +56,13 @@ const Login = () => {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-container" >
             <Title level={2}>Đăng Nhập</Title>
             <Form
                 name="login-form"
                 onFinish={handleLogin}
                 layout="vertical"
-                style={{ maxWidth: 400, margin: '0 auto' }} // Tùy chỉnh chiều rộng form
+                style={{ maxWidth: 400, margin: '0 auto' }}
             >
                 <Form.Item
                     name="email"

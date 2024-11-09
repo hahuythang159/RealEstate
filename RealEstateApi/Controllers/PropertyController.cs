@@ -45,20 +45,16 @@ public class PropertiesController : ControllerBase
             query = query.Where(p => p.Price <= maxPrice.Value);
         }
 
-        // Lọc theo số phòng ngủ
         if (bedrooms.HasValue)
         {
             query = query.Where(p => p.Bedrooms == bedrooms.Value);
         }
 
-        // Lọc theo số phòng tắm
         if (bathrooms.HasValue)
         {
             query = query.Where(p => p.Bathrooms == bathrooms.Value);
         }
         
-
-        // Trả về danh sách bất động sản đã lọc
         return await query.ToListAsync();
     }
 
@@ -87,7 +83,6 @@ public class PropertiesController : ControllerBase
     {
         try
         {
-            // Kiểm tra tính hợp lệ của dữ liệu model
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
@@ -101,31 +96,29 @@ public class PropertiesController : ControllerBase
                 });
             }
 
-            // Kiểm tra OwnerId hợp lệ
             var owner = await _context.Users.FindAsync(property.OwnerId);
             if (owner == null)
             {
                 return BadRequest("Owner not found.");
             }
 
-            // Kiểm tra ProvinceId, DistrictId, WardId hợp lệ
-            // var province = await _context.Provinces.FindAsync(property.ProvinceId);
-            // if (province == null)
-            // {
-            //     return BadRequest("Province not found.");
-            // }
+            var province = await _context.Provinces.FindAsync(property.ProvinceId);
+            if (province == null)
+            {
+                return BadRequest("Province not found.");
+            }
 
-            // var district = await _context.Districts.FindAsync(property.DistrictId);
-            // if (district == null)
-            // {
-            //     return BadRequest("District not found.");
-            // }
+            var district = await _context.Districts.FindAsync(property.DistrictId);
+            if (district == null)
+            {
+                return BadRequest("District not found.");
+            }
 
-            // var ward = await _context.Wards.FindAsync(property.WardId);
-            // if (ward == null)
-            // {
-            //     return BadRequest("Ward not found.");
-            // }
+            var ward = await _context.Wards.FindAsync(property.WardId);
+            if (ward == null)
+            {
+                return BadRequest("Ward not found.");
+            }
 
             // Thêm property vào database
             _context.Properties.Add(property);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Tooltip, notification, Flex } from 'antd';
+import { Card, Button, notification, Flex } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { EyeOutlined, HeartOutlined } from '@ant-design/icons';
 
@@ -12,7 +12,6 @@ const PropertyCard = ({ property, userId }) => {
         navigate(`/property/${property.id}`);
     };
 
-    // Lấy trạng thái yêu thích khi trang được tải
     useEffect(() => {
         const fetchFavoriteStatus = async () => {
             try {
@@ -51,7 +50,7 @@ const PropertyCard = ({ property, userId }) => {
             // Kiểm tra phản hồi
             if (response.ok) {
                 const data = await response.json();
-                setIsFavorited(!isFavorited); // Đảo ngược trạng thái yêu thích
+                setIsFavorited(!isFavorited);
                 notification.success({
                     message: 'Thành công!',
                     description: data.message,

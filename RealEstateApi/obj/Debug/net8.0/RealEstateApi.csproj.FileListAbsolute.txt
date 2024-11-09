@@ -293,3 +293,7 @@ C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\obj\Debug\net8.0\refin
 C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\obj\Debug\net8.0\RealEstateApi.pdb
 C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\obj\Debug\net8.0\RealEstateApi.genruntimeconfig.cache
 C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\obj\Debug\net8.0\ref\RealEstateApi.dll
+C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\bin\Debug\net8.0\MailKit.dll
+C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\bin\Debug\net8.0\MimeKit.dll
+C:\Users\HA HUY THANG\RealEstateApplication\RealEstateApi\bin\Debug\net8.0\System.Formats.Asn1.dll

@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using RealEstateApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,11 @@ builder.Services.AddControllers()
 
 builder.Services.AddHttpClient(); 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<RentalService>();
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<EmailService>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Real Estate API", Version = "v1" });
@@ -71,7 +77,7 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
-builder.Services.AddSignalR(); // đăng ký dịch vụ SignalR
+builder.Services.AddSignalR();
 
 
 // Tạo ứng dụng
@@ -94,7 +100,7 @@ app.Use(async (context, next) =>
     catch (Exception ex)
     {
         Console.WriteLine($"Error: {ex.Message}");
-        context.Response.StatusCode = 500; // Hoặc mã trạng thái khác tùy thuộc vào loại lỗi
+        context.Response.StatusCode = 500;
         await context.Response.WriteAsync("An error occurred: " + ex.Message);
     }
 });
@@ -106,8 +112,8 @@ app.UseRouting();
 app.UseCors("AllowAllOrigins");
 
 
-app.UseAuthentication(); // Thêm middleware authentication
-app.UseAuthorization();  // Thêm middleware authorization
+app.UseAuthentication();
+app.UseAuthorization(); 
 
 var summaries = new[]
 {
@@ -129,11 +135,11 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapHub<ChatHub>("/chathub"); // định tuyến Hub
+app.MapHub<ChatHub>("/chathub");
 
 app.MapControllers();
-builder.Logging.AddConsole();  // Thêm provider Console để ghi log ra console
-builder.Logging.AddDebug();    // Thêm provider Debug để ghi log trong chế độ debug
+builder.Logging.AddConsole();  
+builder.Logging.AddDebug();   
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

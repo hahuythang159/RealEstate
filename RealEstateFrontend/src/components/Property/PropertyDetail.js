@@ -4,10 +4,10 @@ import { Card,Descriptions, Button, Form, Input, message,Select ,List } from 'an
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/vi';  // Import locale Vietnamese
+import 'dayjs/locale/vi';
 
 
-dayjs.extend(relativeTime);  // Kích hoạt plugin relativeTime
+dayjs.extend(relativeTime); 
 dayjs.locale('vi'); 
 
 const { Option } = Select;
@@ -16,28 +16,51 @@ const PropertyDetail = () => {
     const [property, setProperty] = useState(null);
     const [form] = Form.useForm();
     const navigate = useNavigate();
-    const userRole=localStorage.getItem('role');
+    const userRole = localStorage.getItem('role');
+    const [loading, setLoading] = useState(true);
     const [ward, setWard] = useState(null);
     const [district, setDistrict] = useState(null);
     const [province, setProvince] = useState(null);
     const userId = localStorage.getItem('userId');
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
-
-
-
+    const [owner, setOwner] = useState(null);
 
     const fetchProperty = async () => {
-        const response = await fetch(`/api/properties/${id}`);
-        const data = await response.json();
-        setProperty(data);
-        form.setFieldsValue(data);
+        try {
+            const response = await fetch(`/api/properties/${id}`);
+            if (!response.ok) throw new Error('Không thể lấy thông tin bất động sản');
+            const data = await response.json();
+            console.log('Property Data:', data);
+            setProperty(data);
+            await fetchOwner(data.ownerId); 
+        } catch (error) {
+            message.error(`Không thể lấy thông tin bất động sản: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
     };
+    
+    
+
+    const fetchOwner = async (ownerId) => {
+        try {
+            const response = await fetch(`/api/users/${ownerId}`);
+            if (!response.ok) throw new Error(`Lỗi ${response.status}: ${response.statusText}`);
+            const ownerData = await response.json();
+            console.log('Owner Data:', ownerData);
+            setOwner(ownerData);
+        } catch (error) {
+            message.error(`Không thể lấy thông tin chủ sở hữu: ${error.message}`);
+        }
+    };
+    
     const fetchComments = async () => {
         const response = await fetch(`/api/comments/${id}`);
         const data = await response.json();
         setComments(data);
     };
+    
 
     useEffect(() => {
         fetchProperty();
@@ -71,7 +94,7 @@ const PropertyDetail = () => {
 
     const handleCreateRental = () => {
         if (userRole === 'Tenant') {
-            navigate(`/add-rental`,{ state: { propertyId: id } }); 
+            navigate(`/tanant/add-rental`,{ state: { propertyId: id } }); 
         } else {
             message.error('Bạn không có quyền tạo hợp đồng.');
         }
@@ -126,6 +149,8 @@ const PropertyDetail = () => {
                 <p><strong>Tình trạng nội thất:</strong> {property.interior}</p>
                 <p><strong>Thời gian đăng:</strong> {dayjs(property.postedDate).format('DD/MM/YYYY HH:mm')} 
                    <br />({dayjs(property.postedDate).fromNow()})</p>
+                
+                   {owner && <p><strong>Chủ sở hữu:</strong> {owner.userName}</p>} {/* Hoặc owner.fullName nếu bạn có trường này */}
 
                 <div style={{ marginTop: '20px' }}>
                     {userRole === 'Tenant' && (

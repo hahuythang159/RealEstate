@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import './RegisterForm.css';
+import { Form, Input, Button, Select, message, Spin } from 'antd';
+import './RegisterForm.css'; // Đảm bảo file CSS của bạn vẫn được sử dụng
 
 const RegisterForm = () => {
   const [userName, setUserName] = useState('');
@@ -9,11 +10,17 @@ const RegisterForm = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [role, setRole] = useState('Tenant');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Trạng thái cho loader
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setLoading(true); // Bắt đầu quá trình gửi yêu cầu
+  const isValidPhoneNumber = (phoneNumber) => {
+    const phoneRegex = /(03|05|07|08|09|01[2|6|8|9])\d{8}/;
+    return phoneRegex.test(phoneNumber);
+  };
+
+  const handleRegister = async (values) => {
+    setLoading(true);
+
+    const { userName, password, confirmPassword, email, phoneNumber, role } = values;
 
     if (password !== confirmPassword) {
       setError('Mật khẩu và mật khẩu xác nhận không khớp.');
@@ -27,128 +34,114 @@ const RegisterForm = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          userName, 
+        body: JSON.stringify({
+          userName,
           password,
           confirmPassword,
-          // passwordHash: password, // Gửi mật khẩu gốc
-          email, 
-          phoneNumber, 
+          email,
+          phoneNumber,
           role,
-          isTwoFactorEnabled: false, // Giá trị mặc định
-          isActive: true // Giá trị mặc định
+          isTwoFactorEnabled: false,
+          isActive: true,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error data:', errorData); // In ra thông tin lỗi trong console
         setError(errorData.message || 'Đăng ký thất bại.');
+        message.error(errorData.message || 'Đăng ký thất bại.');
       } else {
         setError('');
-        alert('Đăng ký thành công');
+        message.success('Đăng ký thành công');
       }
     } catch (err) {
       setError('Có lỗi xảy ra, vui lòng thử lại sau.');
+      message.error('Có lỗi xảy ra, vui lòng thử lại sau.');
     } finally {
-      setLoading(false); // Kết thúc quá trình
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleRegister} className="form">
-      <div>
-        <label htmlFor="userName" className="label">Tên người dùng:</label>
-        <input
-          type="text"
-          id="userName"
+    <div className="register-container">
+      <h2>Đăng Ký</h2>
+      <Form
+        name="register"
+        onFinish={handleRegister}
+        initialValues={{ role: 'Tenant' }}
+        layout="vertical"
+      >
+        <Form.Item
+          label="Tên người dùng"
           name="userName"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          required
-          autoComplete="username"
-          className="input"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="password" className="label">Mật khẩu:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="new-password"
-          className="input"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="confirmPassword" className="label">Xác nhận mật khẩu:</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-          autoComplete="new-password"
-          className="input"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="email" className="label">Email:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-          className="input"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="phoneNumber" className="label">Số điện thoại:</label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          name="phoneNumber"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          required
-          autoComplete="tel"
-          className="input"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="role" className="label">Vai trò:</label>
-        <select
-          id="role"
-          name="role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="select"
-          autoComplete="off"
+          rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
         >
-          <option value="Owner">Chủ bất động sản</option>
-          <option value="Tenant">Người thuê</option>
-          <option value="Manager">Quản lý</option>
-        </select>
-      </div>
+          <Input value={userName} onChange={(e) => setUserName(e.target.value)} />
+        </Form.Item>
 
-      <button type="submit" className="button" disabled={loading}>
-        {loading ? 'Đang đăng ký...' : 'Đăng ký'}
-      </button>
+        <Form.Item
+          label="Mật khẩu"
+          name="password"
+          rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+        >
+          <Input.Password value={password} onChange={(e) => setPassword(e.target.value)} />
+        </Form.Item>
 
-      {error && <p className="error">{error}</p>}
-    </form>
+        <Form.Item
+          label="Xác nhận mật khẩu"
+          name="confirmPassword"
+          rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu!' }]}
+        >
+          <Input.Password
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ!' }]}
+        >
+          <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+        </Form.Item>
+
+        <Form.Item
+          label="Số điện thoại"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: 'Vui lòng nhập số điện thoại!' },
+            {
+              validator: (_, value) =>
+                isValidPhoneNumber(value) ? Promise.resolve() : Promise.reject('Số điện thoại không hợp lệ'),
+            },
+          ]}
+        >
+          <Input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+        </Form.Item>
+
+        <Form.Item label="Vai trò" name="role">
+          <Select value={role} onChange={(value) => setRole(value)}>
+            <Select.Option value="Owner">Chủ bất động sản</Select.Option>
+            <Select.Option value="Tenant">Người thuê</Select.Option>
+            <Select.Option value="Manager">Quản lý</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            loading={loading}
+          >
+            {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+          </Button>
+        </Form.Item>
+
+        {error && <p className="error">{error}</p>}
+      </Form>
+    </div>
   );
 };
 
