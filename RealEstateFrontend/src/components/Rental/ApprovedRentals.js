@@ -1,29 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, message, Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
 
 function ApprovedRentals() {
-  const navigate = useNavigate();
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null);
-  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchRentals = async () => {
       setLoading(true);
       try {
-        await fetchUsers();
-        const response = await fetch('/api/rentals?status=Approved');
+        const response = await fetch('/api/rentals/approved');
         if (!response.ok) {
           throw new Error('Lỗi khi lấy danh sách hợp đồng đã duyệt.');
         }
         const data = await response.json();
-        const approvedRentals = data.filter(
-          (rental) => rental.status === 'Approved'
-        );
-        setRentals(approvedRentals);
+        setRentals(data);
       } catch (error) {
         console.error('Error fetching rentals:', error);
         message.error('Có lỗi xảy ra khi lấy danh sách hợp đồng đã duyệt.');
@@ -34,20 +27,6 @@ function ApprovedRentals() {
 
     fetchRentals();
   }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch('/api/users');
-      if (!response.ok) {
-        throw new Error('Lỗi khi lấy danh sách người dùng.');
-      }
-      const data = await response.json();
-      setUsers(data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      message.error('Có lỗi xảy ra khi lấy danh sách người dùng.');
-    }
-  };
 
   const handleViewDetails = (rental) => {
     setSelectedRental(rental);
@@ -66,30 +45,25 @@ function ApprovedRentals() {
 
   const columns = [
     {
-      title: 'ID',
+      title: 'Mã Hợp Đồng',
       dataIndex: 'id',
       key: 'id',
     },
+    
+    {
+      title: 'Tên Bất Động Sản',
+      dataIndex: 'propertyName',
+      key: 'propertyName',
+    },
+    {
+      title: 'Tên Chủ Sở Hữu',
+      dataIndex: 'ownerName',
+      key: 'ownerName',
+    },
     {
       title: 'Người thuê',
-      dataIndex: 'tenantId',
-      key: 'tenantId',
-      render: (text) => {
-        const user = users.find((user) => user.id === text);
-        return user ? user.userName : text;
-      },
-    },
-    {
-      title: 'Ngày bắt đầu',
-      dataIndex: 'startDate',
-      key: 'startDate',
-      render: (text) => new Date(text).toLocaleString(),
-    },
-    {
-      title: 'Ngày kết thúc',
-      dataIndex: 'endDate',
-      key: 'endDate',
-      render: (text) => new Date(text).toLocaleString(),
+      dataIndex: 'tenantName',
+      key: 'tenantName',
     },
     {
       title: 'Trạng thái',
@@ -130,7 +104,16 @@ function ApprovedRentals() {
         {selectedRental && (
           <div>
             <p>
-              <strong>Người thuê:</strong> {selectedRental.tenantId}
+              <strong>Mã Hợp Đồng:</strong> {selectedRental.id}
+            </p>
+            <p>
+              <strong>Người Thuê:</strong> {selectedRental.tenantName}
+            </p>
+            <p>
+              <strong>Bất Động Sản:</strong> {selectedRental.propertyName}
+            </p>
+            <p>
+              <strong>Chủ Sở Hữu:</strong> {selectedRental.ownerName}
             </p>
             <p>
               <strong>Ngày bắt đầu:</strong>{' '}

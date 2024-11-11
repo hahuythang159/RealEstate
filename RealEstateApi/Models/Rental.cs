@@ -36,7 +36,6 @@ public class Rental
     [NotMapped]
     public decimal RentPrice => Property?.Price ?? 0;
 
-    // Đây là thuộc tính điều hướng đến đối tượng Tenant
     [JsonIgnore] 
     public virtual User? Tenant { get; set; }
 
@@ -45,8 +44,8 @@ public class Rental
 [JsonConverter(typeof(StringEnumConverter))]
 public enum RentalStatus
 {
-    Active,
-    Inactive,
+    ExpiredContract,
+    ContractCanceled,
     Approved,
     PendingApproval
 }

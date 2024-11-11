@@ -24,8 +24,8 @@ const AdminDashboard = () => {
         width={200}
         className="site-layout-background"
         collapsed={collapsed}
-        onMouseEnter={handleMouseEnter} // Khi hover vào sidebar, mở rộng
-        onMouseLeave={handleMouseLeave} // Khi rời khỏi sidebar, thu gọn
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <div className="logo" />
         <Menu mode="inline" defaultSelectedKeys={['1']} style={{ height: '100%', borderRight: 0 }}>
@@ -37,6 +37,9 @@ const AdminDashboard = () => {
           </Menu.Item>
           <Menu.Item key="3" icon={<FileProtectOutlined />} onClick={() => navigate('/admin/approved')}>
             Danh sách hợp đồng
+          </Menu.Item>
+          <Menu.Item key="4" icon={<FileProtectOutlined />} onClick={() => navigate('/admin/canceled-rentals')}>
+            Hợp đồng bị huỷ
           </Menu.Item>
         </Menu>
       </Sider>

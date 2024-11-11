@@ -202,10 +202,9 @@ public class PropertiesController : ControllerBase
             return NotFound();
         }
 
-        existingProperty.Description = property.Description; // Cập nhật mô tả
-        existingProperty.Price = property.Price; // Cập nhật giá
-        existingProperty.Interior = property.Interior; // Cập nhật giá
-
+        existingProperty.Description = property.Description;
+        existingProperty.Price = property.Price;
+        existingProperty.Interior = property.Interior;
 
         _context.Entry(existingProperty).State = EntityState.Modified;
 
@@ -276,15 +275,27 @@ public class PropertiesController : ControllerBase
 
         return NoContent();
     }
+    
+    // GET: api/properties/average-price-by-type
+    [HttpGet("average-price-by-type")]
+    public async Task<ActionResult<IEnumerable<PropertyTypeAveragePrice>>> GetAveragePriceByPropertyType()
+    {
+        var averagePrices = await _context.Properties
+            .GroupBy(p => p.PropertyType)
+            .Select(g => new PropertyTypeAveragePrice
+            {
+                PropertyType = g.Key,
+                AveragePrice = g.Average(p => p.Price)
+            })
+            .ToListAsync();
 
-
-
+        return Ok(averagePrices);
+    }
 
     private bool PropertyExists(Guid id)
     {
         return _context.Properties.Any(e => e.Id == id);
     }
-
 
     // Hàm log lỗi ModelState
     private void LogModelStateErrors(ModelStateDictionary modelState)

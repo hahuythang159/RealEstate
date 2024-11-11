@@ -3,29 +3,66 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using RealEstateApi.Models;
-
+using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<RealEstateContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Cấu hình JSON
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
-        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter())); // Cấu hình JSON
+        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter()));
 
-builder.Services.AddHttpClient(); 
+builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<RentalService>();
 
+// Cấu hình EmailSettings từ appsettings.json
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<EmailService>();
 
+// Đăng ký background service (ContractExpirationService) là scoped
+builder.Services.AddHostedService<ContractExpirationService>();
+
+// Cấu hình xác thực JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+        };
+    });
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder => builder.WithOrigins()
+                                                           .AllowAnyMethod()
+                                                           .AllowAnyHeader());
+});
+
+builder.Services.AddSignalR();
+
+// Add Swagger for API documentation
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Real Estate API", Version = "v1" });
-    // Thêm cấu hình cho Swagger để sử dụng xác thực JWT
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -46,39 +83,10 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            new string[] { }
         }
     });
 });
-
-// Cấu hình xác thực JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"], 
-            ValidAudience = jwtSettings["Audience"], 
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]))
-        };
-    });
-
-// CORS configuration
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllOrigins",
-        builder => builder.WithOrigins() 
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
-});
-
-builder.Services.AddSignalR();
-
 
 // Tạo ứng dụng
 var app = builder.Build();
@@ -105,20 +113,15 @@ app.Use(async (context, next) =>
     }
 });
 
-
 app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseCors("AllowAllOrigins");
 
-
 app.UseAuthentication();
-app.UseAuthorization(); 
+app.UseAuthorization();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
 
 app.MapGet("/weatherforecast", () =>
 {
@@ -138,8 +141,10 @@ app.MapGet("/weatherforecast", () =>
 app.MapHub<ChatHub>("/chathub");
 
 app.MapControllers();
+
 builder.Logging.AddConsole();  
 builder.Logging.AddDebug();   
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

@@ -22,7 +22,7 @@ public class RentalsController : ControllerBase
 
 
 
-    public RentalsController(RealEstateContext context,RentalService rentalService, IConfiguration configuration)
+    public RentalsController(RealEstateContext context, RentalService rentalService, IConfiguration configuration)
     {
         _context = context;
         _rentalService = rentalService;
@@ -96,7 +96,7 @@ public class RentalsController : ControllerBase
 
     // PUT: api/rentals/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Owner, Manager")] 
+    [Authorize(Roles = "Owner, Manager")]
     public async Task<IActionResult> PutRental(Guid id, Rental rental)
     {
         if (id != rental.Id)
@@ -172,8 +172,68 @@ public class RentalsController : ControllerBase
             return pendingRentals;
         }
 
-        return BadRequest("User ID không hợp lệ."); 
+        return BadRequest("User ID không hợp lệ.");
     }
+    // GET: api/rentals/canceled
+    [HttpGet("canceled")]
+    public async Task<ActionResult<IEnumerable<Rental>>> GetCanceledRentals()
+    {
+        var canceledRentals = await _context.Rentals
+            .Where(r => r.Status == RentalStatus.ContractCanceled)
+            .Include(r => r.Property)
+            .ThenInclude(p => p.Owner)
+            .Include(r => r.Tenant)
+            .ToListAsync();
+
+        if (!canceledRentals.Any())
+        {
+            return NotFound(new { message = "Không có hợp đồng nào đã huỷ." });
+        }
+
+        var rentalsWithDetails = canceledRentals.Select(rental => new
+        {
+            rental.Id,
+            tenantName = rental.Tenant?.UserName,
+            propertyName = rental.Property?.Address,
+            ownerName = rental.Property?.Owner?.UserName,
+            startDate = rental.StartDate,
+            status = rental.Status.ToString(),
+        }).ToList();
+
+        return Ok(rentalsWithDetails);
+    }
+    // GET: api/rentals/approved
+    [HttpGet("approved")]
+    public async Task<ActionResult<IEnumerable<Rental>>> GetApprovedRentals()
+    {
+        var approvedRentals = await _context.Rentals
+            .Where(r => r.Status == RentalStatus.Approved)
+            .Include(r => r.Property)  // Bao gồm thông tin Property
+            .ThenInclude(p => p.Owner) // Bao gồm thông tin Owner từ Property
+            .Include(r => r.Tenant)    // Bao gồm thông tin Tenant
+            .ToListAsync();
+
+        if (!approvedRentals.Any())
+        {
+            return NotFound(new { message = "Không có hợp đồng nào đã duyệt." });
+        }
+
+        var rentalsWithDetails = approvedRentals.Select(rental => new
+        {
+            rental.Id,
+            tenantName = rental.Tenant?.UserName,        // Lấy tên người thuê
+            propertyName = rental.Property?.Address,     // Lấy tên bất động sản
+            ownerName = rental.Property?.Owner?.UserName, // Lấy tên chủ sở hữu
+            startDate = rental.StartDate,
+            endDate = rental.EndDate,
+            status = rental.Status.ToString(),
+        }).ToList();
+
+        return Ok(rentalsWithDetails);
+    }
+
+
+
 
     // PATCH: api/rentals/{id}/approve
     [HttpPatch("{id}/approve")]
@@ -213,6 +273,44 @@ public class RentalsController : ControllerBase
             return StatusCode(500, new { message = "Có lỗi xảy ra khi duyệt hợp đồng: " + ex.ToString() });
         }
     }
+    // PATCH: api/rentals/{id}/cancel
+    [HttpPatch("{id}/cancel")]
+    public async Task<IActionResult> CancelRental(Guid id)
+    {
+        var rental = await _context.Rentals
+            .Include(r => r.Tenant)
+            .Include(r => r.Property)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (rental == null)
+        {
+            return NotFound(new { message = "Hợp đồng không tìm thấy." });
+        }
+
+        if (rental.Status == RentalStatus.ContractCanceled)
+        {
+            return BadRequest(new { message = "Hợp đồng đã bị huỷ." });
+        }
+
+        rental.Status = RentalStatus.ContractCanceled;
+        _context.Entry(rental).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            await SendCancellationEmail(rental);
+
+            return Ok(new { message = "Hợp đồng đã bị huỷ và email thông báo đã được gửi." });
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            return StatusCode(500, new { message = "Có lỗi xảy ra khi huỷ hợp đồng: " + ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Có lỗi xảy ra khi huỷ hợp đồng: " + ex.ToString() });
+        }
+    }
     private async Task SendStatusUpdateEmail(Rental rental)
     {
         var emailSettings = _configuration.GetSection("EmailSettings");
@@ -227,6 +325,47 @@ public class RentalsController : ControllerBase
         string body = $"Xin chào {rental.Tenant.UserName},\n\n" +
                       $"Hợp đồng thuê bất động sản '{rental.Property.Address}' của bạn đã được duyệt.\n\n" +
                       "Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!\n\nTrân trọng,\nĐội ngũ Team quản lý bất động sản";
+
+        using (var smtpClient = new SmtpClient(smtpServer)
+        {
+            Port = port,
+            Credentials = new NetworkCredential(senderEmail, password),
+            EnableSsl = true,
+        })
+        {
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(senderEmail, senderName),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = false,
+            };
+            mailMessage.To.Add(tenantEmail);
+
+            try
+            {
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi gửi email: " + ex.Message);
+            }
+        }
+    }
+    private async Task SendCancellationEmail(Rental rental)
+    {
+        var emailSettings = _configuration.GetSection("EmailSettings");
+        string smtpServer = emailSettings["SmtpServer"];
+        int port = int.Parse(emailSettings["Port"]);
+        string senderName = emailSettings["SenderName"];
+        string senderEmail = emailSettings["SenderEmail"];
+        string password = emailSettings["Password"];
+
+        string tenantEmail = rental.Tenant.Email;
+        string subject = $"Cập nhật trạng thái hợp đồng thuê: {rental.Id}";
+        string body = $"Xin chào {rental.Tenant.UserName},\n\n" +
+                      $"Rất tiếc, hợp đồng thuê bất động sản '{rental.Property.Address}' của bạn đã bị huỷ.\n\n" +
+                      "Nếu có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.\n\nTrân trọng,\nĐội ngũ quản lý bất động sản";
 
         using (var smtpClient = new SmtpClient(smtpServer)
         {
