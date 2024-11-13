@@ -1,16 +1,14 @@
 import React from 'react';
-import { Layout, Input, Button, Space } from 'antd';
+import { Layout, Button, Space } from 'antd';
 import {
   LogoutOutlined,
-  SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
-const { Search } = Input;
 
-const AppHeader = ({ logo, onLogout, isDarkMode }) => {
+const AppHeader = ({ logo, isDarkMode }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const role = localStorage.getItem('role');
@@ -44,7 +42,7 @@ const AppHeader = ({ logo, onLogout, isDarkMode }) => {
     if (role === 'Owner') {
       navigate('/owner/profile');
     } else if (role === 'Tenant') {
-      navigate('/tanant/approval');
+      navigate('/tenant/approval');
     } else if (role === 'Manager') {
       navigate('/admin/users');
     }
@@ -86,24 +84,9 @@ const AppHeader = ({ logo, onLogout, isDarkMode }) => {
           }}
         />
       </div>
+      
 
-      <Search
-        placeholder="Search properties"
-        enterButton={<SearchOutlined />}
-        style={{
-          width: 300,
-          borderRadius: '25px',
-          transition: 'all 0.3s ease',
-        }}
-        onSearch={(value) => console.log(value)}
-        onFocus={(e) =>
-          (e.target.style.borderColor = isDarkMode ? '#E0282E' : '#1677FF')
-        }
-        onBlur={(e) =>
-          (e.target.style.borderColor = isDarkMode ? '#888' : '#ccc')
-        }
-      />
-
+     
       <Space>
         <Button
           icon={<UserOutlined />}

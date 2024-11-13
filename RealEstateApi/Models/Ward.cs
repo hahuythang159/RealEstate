@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Ward
 {
     [Key]
-    public int Id { get; set; }  // Id xã/phường
+    public int Id { get; set; }
     [Required]
     [StringLength(100)]
     public string Name { get; set; } = string.Empty;

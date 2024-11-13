@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   Row,
   Col,
-  Typography,
   Pagination,
   Select,
   Button,
-  Carousel,
 } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import PropertyCard from './Property/PropertyCard';
@@ -16,8 +14,10 @@ import HeroSection from './HeroSection';
 import TeamSection from './TeamSection';
 import Testimonials from './Testimonials';
 import ImageCarousel from './ImageCarousel';
+import GitHubGlobe  from './GitHubGlobe';
+import useIntersectionObserver from '../hooks/useIntersectionObserver';
+import './fadeInOut.css';
 
-const { Title } = Typography;
 const { Option } = Select;
 
 const Home = () => {
@@ -35,6 +35,26 @@ const Home = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+
+  const isGitHubGlobe = useIntersectionObserver({
+    target: '.git-hubGlobea',
+  });
+  const isImageCarouselVisible = useIntersectionObserver({
+    target: '.image-carousel1',
+  });
+  const isHeroSectionVisible = useIntersectionObserver({
+    target: '.hero-section1',
+  });
+  const isTestimonialsVisible = useIntersectionObserver({
+    target: '.testimonials-section1',
+  });
+  const isTrustedCompaniesVisible = useIntersectionObserver({
+    target: '.trusted-companies1',
+  });
+  const isTeamSectionVisible = useIntersectionObserver({
+    target: '.team-section1',
+  });
+  const isFooterVisible = useIntersectionObserver({ target: '.footer1' });
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -99,10 +119,7 @@ const Home = () => {
       if (!response.ok) {
         throw new Error('Đã xảy ra lỗi khi lấy dữ liệu');
       }
-
-      // Phân tích dữ liệu trả về từ API
       const data = await response.json();
-
       const filteredProperties = data.filter(
         (property) =>
           !property.rentals ||
@@ -144,13 +161,32 @@ const Home = () => {
 
   return (
     <>
-      <ImageCarousel />
-
-      <TrustedCompanies />
-
-      <HeroSection />
-
-      <TeamSection />
+    
+    <div
+        className={`.git-hubGlobea ${isGitHubGlobe ? 'fade-in' : 'fade-out'}`}
+      >
+        <GitHubGlobe />
+      </div>
+      <div
+        className={`image-carousel1 ${isImageCarouselVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <ImageCarousel />
+      </div>
+      <div
+        className={`trusted-companies1 ${isTrustedCompaniesVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <TrustedCompanies />
+      </div>
+      <div
+        className={`hero-section1 ${isHeroSectionVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <HeroSection />
+      </div>
+      <div
+        className={`team-section1 ${isTeamSectionVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <TeamSection />
+      </div>
 
       <Row gutter={[16, 16]} style={{ paddingTop: 20 }}>
         <Col xs={24} sm={8} md={6}>
@@ -300,7 +336,6 @@ const Home = () => {
           </Button>
         </Col>
       </Row>
-
       <Row gutter={[16, 32]} style={{ paddingTop: 50, paddingLeft: 50 }}>
         {paginatedProperties.length === 0 ? (
           <Col span={24} style={{ textAlign: 'center' }}>
@@ -326,7 +361,6 @@ const Home = () => {
           ))
         )}
       </Row>
-
       {total > pageSize && (
         <Pagination
           current={currentPage}
@@ -336,10 +370,15 @@ const Home = () => {
           style={{ marginTop: 20, textAlign: 'center' }}
         />
       )}
+      <div
+        className={`testimonials-section1 ${isTestimonialsVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <Testimonials />
+      </div>
 
-      <Testimonials />
-
-      <Footer />
+      <div className={`footer1 ${isFooterVisible ? 'fade-in' : 'fade-out'}`}>
+        <Footer />
+      </div>
     </>
   );
 };

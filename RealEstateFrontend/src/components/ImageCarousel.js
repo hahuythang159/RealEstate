@@ -8,6 +8,7 @@ const ImageCarousel = () => {
     <Carousel
       autoplay
       effect="fade"
+      autoplaySpeed={3000}
       prevArrow={<LeftOutlined />}
       nextArrow={<RightOutlined />}
       className="custom-carousel"

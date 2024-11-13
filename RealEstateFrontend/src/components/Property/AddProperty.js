@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Button, InputNumber, message } from 'antd';
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  InputNumber,
+  message,
+  Upload,
+} from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -12,7 +21,6 @@ const AddProperty = () => {
     description: '',
     price: '',
     ownerId: '',
-    imageUrl: '',
     bedrooms: '',
     bathrooms: '',
     area: '',
@@ -23,6 +31,7 @@ const AddProperty = () => {
     wardId: '',
   });
 
+  const [imageFiles, setImageFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [cities, setCities] = useState([]);
@@ -112,33 +121,54 @@ const AddProperty = () => {
     setSelectedWard('');
   };
 
+  const handleUploadChange = ({ fileList }) => {
+    setImageFiles(fileList);
+  };
+  
+
   const handleSubmit = async (values) => {
     setError('');
     setSuccess('');
-
+  
     if (!selectedCity || !selectedDistrict || !selectedWard) {
       setError('Vui lòng chọn tỉnh/thành phố, quận/huyện và phường/xã.');
       return;
     }
-
-    const propertyData = {
-      ...values,
-      ownerId: property.ownerId,
-      provinceId: selectedCity,
-      districtId: selectedDistrict,
-      wardId: selectedWard,
-    };
-    console.log(propertyData);
-
+  
+    // Tạo FormData và thêm tất cả dữ liệu cùng file ảnh
+    const formData = new FormData();
+    
+    // Thêm các thuộc tính của Property vào FormData
+    formData.append('Property.OwnerId', property.ownerId);
+    formData.append('Property.ProvinceId', selectedCity);
+    formData.append('Property.DistrictId', selectedDistrict);
+    formData.append('Property.WardId', selectedWard);
+    
+    // Thêm các trường dữ liệu khác vào formData
+    Object.entries(values).forEach(([key, value]) => {
+      formData.append(`Property.${key}`, value);
+    });
+  
+    // Thêm các file ảnh vào FormData
+    imageFiles.forEach((file) => {
+      formData.append('Images', file.originFileObj); // Gửi danh sách các ảnh với cùng key 'Images'
+    });
+  
+    // Log formData để kiểm tra
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+  
     try {
       const response = await fetch('/api/properties', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(propertyData),
+        body: formData,
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
+        console.log("Backend error:", errorData);
+  
         setError(
           errorData.errors
             ? Object.values(errorData.errors).flat().join(', ')
@@ -146,10 +176,11 @@ const AddProperty = () => {
         );
         return;
       }
-
+  
       const data = await response.json();
+      console.log(data);
+  
       setSuccess('Thêm bất động sản thành công với ID: ' + data.id);
-
       message.success('Thêm bất động sản thành công!');
       navigate('/owner/my-product');
     } catch (err) {
@@ -157,7 +188,6 @@ const AddProperty = () => {
       setError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
-
   return (
     <div>
       <h2>Thêm Bất Động Sản</h2>
@@ -242,8 +272,21 @@ const AddProperty = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Hình ảnh" required name="imageUrl">
-          <Input onChange={handleChange} />
+        <Form.Item label="Hình ảnh" required>
+          <Upload
+            listType="picture-card"
+            fileList={imageFiles}
+            onChange={handleUploadChange}
+            beforeUpload={() => false}
+            multiple
+          >
+            {imageFiles.length < 5 && (
+              <div>
+                <PlusOutlined />
+                <div style={{ marginTop: 8 }}>Tải lên</div>
+              </div>
+            )}
+          </Upload>
         </Form.Item>
 
         <Form.Item

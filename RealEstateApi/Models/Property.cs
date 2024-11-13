@@ -8,11 +8,11 @@ public class Property
     public Guid Id { get; set; } = Guid.NewGuid();
     [Required]
     [StringLength(500, ErrorMessage = "Tiêu đề không vượt quá 200 ký tự.")]
-    public string Title { get; set; } = string.Empty; 
+    public string Title { get; set; } = string.Empty;
 
     [Required]
     [StringLength(200, ErrorMessage = "Địa chỉ không vượt quá 200 ký tự.")]
-    public string Address { get; set; } = string.Empty;  
+    public string Address { get; set; } = string.Empty;
 
     [Required]
     [StringLength(1000, ErrorMessage = "Mô tả không vượt quá 1000 ký tự.")]
@@ -25,15 +25,11 @@ public class Property
     [Required]
     public Guid OwnerId { get; set; }
 
-    public int? ProvinceId { get; set; } 
+    public int? ProvinceId { get; set; }
 
-    public int? DistrictId { get; set; } 
+    public int? DistrictId { get; set; }
 
     public int? WardId { get; set; }
-
-    [Required]
-    [StringLength(500, ErrorMessage = "URL hình ảnh không vượt quá 500 ký tự.")]
-    public string ImageUrl { get; set; } = string.Empty;
 
     [Required]
     [Range(0, int.MaxValue)]
@@ -49,33 +45,34 @@ public class Property
 
     [Required]
     [StringLength(100, ErrorMessage = "Loại hình bất động sản không vượt quá 100 ký tự.")]
-    public string PropertyType { get; set; } = string.Empty; 
+    public string PropertyType { get; set; } = string.Empty;
 
     [Required]
     [StringLength(100, ErrorMessage = "Loại hình sử dụng không vượt quá 100 ký tự.")]
-    public string Interior { get; set; } = string.Empty; 
+    public string Interior { get; set; } = string.Empty;
 
     [Required]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime PostedDate { get; set; } = DateTime.Now; 
+    public DateTime PostedDate { get; set; } = DateTime.Now;
     public bool IsHidden { get; set; } = false;
 
     [JsonIgnore]
-    public virtual Province? Province { get; set; } 
+    public virtual Province? Province { get; set; }
 
     [JsonIgnore]
-    public virtual District? District { get; set; }  
+    public virtual District? District { get; set; }
 
     [JsonIgnore]
     public virtual Ward? Ward { get; set; }
     [JsonIgnore]
-    public virtual User? Owner { get; set; }  
-    
-    [JsonIgnore]
-    public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+    public virtual User? Owner { get; set; }
 
     [JsonIgnore]
+    public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+    [JsonIgnore]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    [JsonIgnore]
+    public virtual ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
 
 
 }

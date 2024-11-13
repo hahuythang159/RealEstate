@@ -20,7 +20,7 @@ public class UserRegisterDto
     public string PhoneNumber { get; set; } = string.Empty;
 
     [Required]
-    public UserRole Role { get; set; } = UserRole.Tenant; // Mặc định là Tenant
+    public UserRole Role { get; set; } = UserRole.Tenant;
 
     [Required]
     public bool IsTwoFactorEnabled { get; set; } = false;
@@ -29,7 +29,7 @@ public class UserRegisterDto
     public bool IsActive { get; set; } = true;
 
     [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
-    public string ConfirmPassword { get; set; } = string.Empty; // Thuộc tính xác nhận mật khẩu
+    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 [JsonConverter(typeof(StringEnumConverter))]

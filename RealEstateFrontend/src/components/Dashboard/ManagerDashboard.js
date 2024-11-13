@@ -9,17 +9,16 @@ const AdminDashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
 
-  // Handle hover event
   const handleMouseEnter = () => {
-    setCollapsed(false); // Mở menu khi hover
+    setCollapsed(false);
   };
 
   const handleMouseLeave = () => {
-    setCollapsed(true); // Thu gọn menu khi không hover
+    setCollapsed(true);
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh'}}>
       <Sider
         width={200}
         className="site-layout-background"

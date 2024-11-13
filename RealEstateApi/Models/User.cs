@@ -37,8 +37,8 @@ public class User
 
 
     public virtual ICollection<Rental>? Rentals { get; set; } = new List<Rental>(); 
-    public virtual ICollection<Comment>? UserComments { get; set; } = new List<Comment>(); // Đặt tên rõ ràng
-    public virtual ICollection<Favorite> UserFavorites { get; set; } = new List<Favorite>(); // Danh sách yêu thích
+    public virtual ICollection<Comment>? UserComments { get; set; } = new List<Comment>();
+    public virtual ICollection<Favorite> UserFavorites { get; set; } = new List<Favorite>();
     [JsonIgnore]
     public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
 

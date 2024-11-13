@@ -19,15 +19,12 @@ const Favorites = () => {
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    message.error(`Error fetching favorites: ${errorData.message}`);
+                    response.json();
                 } else {
                     const data = await response.json();
-                    console.log('data', data);
-                    setFavorites(data); // Lưu danh sách yêu thích vào state
+                    setFavorites(data);
                 }
             } catch (error) {
-                console.error('Fetch error:', error);
                 message.error(`Failed to fetch favorites: ${error.message}`);
             } finally {
                 setLoading(false);

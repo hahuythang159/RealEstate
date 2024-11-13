@@ -38,51 +38,48 @@ public class PropertiesController : ControllerBase
             .Where(p => !p.Rentals.Any(r => r.Status == RentalStatus.Approved))
             .AsQueryable();
 
-        // Lọc theo giá
-        if (minPrice.HasValue)
-        {
-            query = query.Where(p => p.Price >= minPrice.Value);
-        }
-        if (maxPrice.HasValue)
-        {
-            query = query.Where(p => p.Price <= maxPrice.Value);
-        }
+        // Apply filters
+        if (minPrice.HasValue) query = query.Where(p => p.Price >= minPrice.Value);
+        if (maxPrice.HasValue) query = query.Where(p => p.Price <= maxPrice.Value);
+        if (bedrooms.HasValue) query = query.Where(p => p.Bedrooms == bedrooms.Value);
+        if (bathrooms.HasValue) query = query.Where(p => p.Bathrooms == bathrooms.Value);
+        if (provinceId.HasValue) query = query.Where(p => p.ProvinceId == provinceId.Value);
+        if (districtId.HasValue) query = query.Where(p => p.DistrictId == districtId.Value);
+        if (wardId.HasValue) query = query.Where(p => p.WardId == wardId.Value);
 
-        if (bedrooms.HasValue)
-        {
-            query = query.Where(p => p.Bedrooms == bedrooms.Value);
-        }
+        var properties = await query.ToListAsync(); // Load properties first
 
-        if (bathrooms.HasValue)
-        {
-            query = query.Where(p => p.Bathrooms == bathrooms.Value);
-        }
-        if (provinceId.HasValue && !await _context.Provinces.AnyAsync(p => p.Id == provinceId.Value))
-        {
-            return BadRequest("Province không tồn tại.");
-        }
-        if (districtId.HasValue && !await _context.Districts.AnyAsync(d => d.Id == districtId.Value))
-        {
-            return BadRequest("District không tồn tại.");
-        }
-        if (wardId.HasValue && !await _context.Wards.AnyAsync(w => w.Id == wardId.Value))
-        {
-            return BadRequest("Ward không tồn tại.");
-        }
-        if (provinceId.HasValue)
-        {
-            query = query.Where(p => p.ProvinceId == provinceId.Value);
-        }
-        if (districtId.HasValue)
-        {
-            query = query.Where(p => p.DistrictId == districtId.Value);
-        }
-        if (wardId.HasValue)
-        {
-            query = query.Where(p => p.WardId == wardId.Value);
-        }
+        // Now fetch images after properties are loaded
+        var propertyIds = properties.Select(p => p.Id).ToList();
+        var images = await _context.PropertyImages
+            .Where(pi => propertyIds.Contains(pi.PropertyId))
+            .ToListAsync();
 
-        return await query.ToListAsync();
+        var propertiesWithImages = properties.Select(p => new
+        {
+            p.Id,
+            p.Title,
+            p.Address,
+            p.Description,
+            p.Price,
+            p.OwnerId,
+            p.ProvinceId,
+            p.DistrictId,
+            p.WardId,
+            p.Bedrooms,
+            p.Bathrooms,
+            p.Area,
+            p.PropertyType,
+            p.Interior,
+            p.PostedDate,
+            p.IsHidden,
+            Province = p.Province?.Name,
+            District = p.District?.Name,
+            Ward = p.Ward?.Name,
+            Images = images.Where(i => i.PropertyId == p.Id)
+        });
+
+        return Ok(propertiesWithImages);
     }
 
 
@@ -90,6 +87,7 @@ public class PropertiesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Property>> GetProperty(Guid id)
     {
+        // Truy vấn bất động sản từ bảng Properties
         var property = await _context.Properties
             .Include(p => p.Province)
             .Include(p => p.District)
@@ -101,17 +99,61 @@ public class PropertiesController : ControllerBase
             return NotFound();
         }
 
-        return property;
+        // Truy vấn hình ảnh từ bảng PropertyImage liên quan đến PropertyId
+        var images = await _context.PropertyImages
+            .Where(pi => pi.PropertyId == id)
+            .Select(pi => new
+            {
+                pi.Id,
+                pi.ImageUrl
+            })
+            .ToListAsync();
+
+        // Gắn danh sách hình ảnh vào đối tượng Property
+        var propertyResponse = new
+        {
+            property.Id,
+            property.Title,
+            property.Address,
+            property.Description,
+            property.Price,
+            property.OwnerId,
+            property.ProvinceId,
+            property.DistrictId,
+            property.WardId,
+            property.Bedrooms,
+            property.Bathrooms,
+            property.Area,
+            property.PropertyType,
+            property.Interior,
+            property.PostedDate,
+            property.IsHidden,
+            Province = property.Province?.Name,
+            District = property.District?.Name,
+            Ward = property.Ward?.Name,
+            Images = images
+        };
+
+        return Ok(propertyResponse);
     }
 
-    // POST: api/properties
     [HttpPost]
-    public async Task<ActionResult<Property>> PostProperty(Property property)
+    public async Task<ActionResult<Property>> PostProperty([FromForm] PropertyRequest request)
     {
         try
         {
+            // Kiểm tra các lỗi validation
             if (!ModelState.IsValid)
+
             {
+                foreach (var error in ModelState)
+                {
+                    foreach (var subError in error.Value.Errors)
+                    {
+                        Console.WriteLine($"Error in {error.Key}: {subError.ErrorMessage}");
+                    }
+                }
+
                 return BadRequest(new
                 {
                     Title = "One or more validation errors occurred.",
@@ -123,39 +165,57 @@ public class PropertiesController : ControllerBase
                 });
             }
 
-            var owner = await _context.Users.FindAsync(property.OwnerId);
+            var owner = await _context.Users.FindAsync(request.Property.OwnerId);
             if (owner == null)
             {
                 return BadRequest("Owner not found.");
             }
 
-            if (property.ProvinceId != 0 && !await _context.Provinces.AnyAsync(p => p.Id == property.ProvinceId))
+            if (request.Property.ProvinceId != 0 && !await _context.Provinces.AnyAsync(p => p.Id == request.Property.ProvinceId))
             {
                 return BadRequest("Province not found.");
             }
-            if (property.DistrictId != 0 && !await _context.Districts.AnyAsync(d => d.Id == property.DistrictId))
+            if (request.Property.DistrictId != 0 && !await _context.Districts.AnyAsync(d => d.Id == request.Property.DistrictId))
             {
                 return BadRequest("District not found.");
             }
-            if (property.WardId != 0 && !await _context.Wards.AnyAsync(w => w.Id == property.WardId))
+            if (request.Property.WardId != 0 && !await _context.Wards.AnyAsync(w => w.Id == request.Property.WardId))
             {
                 return BadRequest("Ward not found.");
             }
+            if (request.Images == null || request.Images.Count == 0)
+            {
+                return BadRequest("No images uploaded.");
+            }
 
-            // Thêm property vào database
-            _context.Properties.Add(property);
+            _context.Properties.Add(request.Property);
             await _context.SaveChangesAsync();
 
-            // Trả về kết quả CreatedAtAction khi thêm thành công
-            return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
+            foreach (var image in request.Images)
+            {
+                if (image != null && image.Length > 0)
+                {
+                    var imageUrl = await SaveImageAsync(image);
+
+                    var propertyImage = new PropertyImage
+                    {
+                        PropertyId = request.Property.Id,
+                        ImageUrl = imageUrl
+                    };
+
+                    _context.PropertyImages.Add(propertyImage);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetProperty), new { id = request.Property.Id }, request.Property);
         }
         catch (Exception ex)
         {
-            // Xử lý lỗi không mong muốn
             return StatusCode(500, new { message = "Internal server error: " + ex.Message });
         }
     }
-
 
 
     [HttpGet("provinces")]
@@ -184,8 +244,6 @@ public class PropertiesController : ControllerBase
                                   .ToListAsync();
         return Ok(wards);
     }
-
-
 
     // PUT: api/properties/5
     [HttpPut("{id}")]
@@ -275,7 +333,7 @@ public class PropertiesController : ControllerBase
 
         return NoContent();
     }
-    
+
     // GET: api/properties/average-price-by-type
     [HttpGet("average-price-by-type")]
     public async Task<ActionResult<IEnumerable<PropertyTypeAveragePrice>>> GetAveragePriceByPropertyType()
@@ -306,6 +364,28 @@ public class PropertiesController : ControllerBase
             {
                 Console.WriteLine($"Field: {entry.Key}, Error: {error.ErrorMessage}");
             }
+        }
+    }
+    private async Task<string> SaveImageAsync(IFormFile image)
+    {
+        try
+        {
+            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+            Directory.CreateDirectory(uploadsFolderPath);
+
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+            var filePath = Path.Combine(uploadsFolderPath, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+
+            return Path.Combine("images", uniqueFileName).Replace("\\", "/");
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error saving image: " + ex.Message);
         }
     }
 }

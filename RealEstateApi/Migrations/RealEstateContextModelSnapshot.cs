@@ -126,11 +126,6 @@ namespace RealEstateApi.Migrations
                     b.Property<int?>("DistrictId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("Interior")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -182,6 +177,27 @@ namespace RealEstateApi.Migrations
                     b.HasIndex("WardId");
 
                     b.ToTable("Properties");
+                });
+
+            modelBuilder.Entity("PropertyImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("PropertyImages");
                 });
 
             modelBuilder.Entity("Province", b =>
@@ -436,6 +452,17 @@ namespace RealEstateApi.Migrations
                     b.Navigation("Ward");
                 });
 
+            modelBuilder.Entity("PropertyImage", b =>
+                {
+                    b.HasOne("Property", "Property")
+                        .WithMany("Images")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("RealEstateApi.Models.Comment", b =>
                 {
                     b.HasOne("User", "User")
@@ -505,6 +532,8 @@ namespace RealEstateApi.Migrations
 
             modelBuilder.Entity("Property", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Rentals");
 
                     b.Navigation("Reviews");

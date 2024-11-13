@@ -31,7 +31,7 @@ const OwnerDashboard = () => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', overflow:'hidden' }}>
       <Sider
         width={200}
         className="site-layout-background"

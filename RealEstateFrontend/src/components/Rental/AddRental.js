@@ -117,7 +117,7 @@ function AddRental() {
       })
       .then((data) => {
         message.success('Hợp đồng đã được thêm và đang chờ duyệt.');
-        navigate('/tanant/approval');
+        navigate('/tenant/approval');
       })
       .catch((error) => {
         console.error('Error adding rental:', error);

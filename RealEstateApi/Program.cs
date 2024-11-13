@@ -21,6 +21,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter()));
 
+builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<RentalService>();
@@ -98,7 +99,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Real Estate API v1"));
 }
 
-// Middleware để ghi lại thông tin lỗi
 app.Use(async (context, next) =>
 {
     try
@@ -139,7 +139,7 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.MapHub<ChatHub>("/chathub");
-
+app.UseStaticFiles();
 app.MapControllers();
 
 builder.Logging.AddConsole();  

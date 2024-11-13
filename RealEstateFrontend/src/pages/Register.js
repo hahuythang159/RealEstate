@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Select, message, Spin } from 'antd';
-import './RegisterForm.css'; // Đảm bảo file CSS của bạn vẫn được sử dụng
+import { Form, Input, Button, Select, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import './RegisterForm.css';
 
 const RegisterForm = () => {
   const [userName, setUserName] = useState('');
@@ -11,6 +12,7 @@ const RegisterForm = () => {
   const [role, setRole] = useState('Tenant');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const isValidPhoneNumber = (phoneNumber) => {
     const phoneRegex = /(03|05|07|08|09|01[2|6|8|9])\d{8}/;
@@ -53,6 +55,7 @@ const RegisterForm = () => {
       } else {
         setError('');
         message.success('Đăng ký thành công');
+        navigate('/');
       }
     } catch (err) {
       setError('Có lỗi xảy ra, vui lòng thử lại sau.');

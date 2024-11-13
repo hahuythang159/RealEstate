@@ -39,7 +39,7 @@ const TenantDashboard = () => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh'}}>
       <Sider
         width={200}
         className="site-layout-background"
@@ -52,28 +52,28 @@ const TenantDashboard = () => {
           <Menu.Item
             key="1"
             icon={<HeartOutlined />}
-            onClick={() => navigate('/tanant/favorites')}
+            onClick={() => navigate('/tenant/favorites')}
           >
             Danh sách yêu thích
           </Menu.Item>
           <Menu.Item
             key="2"
             icon={<FileSyncOutlined />}
-            onClick={() => navigate('/tanant/approval')}
+            onClick={() => navigate('/tenant/approval')}
           >
             Danh sách hợp đồng
           </Menu.Item>
           <Menu.Item
             key="3"
             icon={<FileProtectOutlined />}
-            onClick={() => navigate('/tanant/approved')}
+            onClick={() => navigate('/tenant/approved')}
           >
             Hợp đồng đã duyệt
           </Menu.Item>
           <Menu.Item
             key="4"
             icon={<UserOutlined />}
-            onClick={() => navigate('/tanant/profile')}
+            onClick={() => navigate('/tenant/profile')}
           >
             Hồ sơ của tôi
           </Menu.Item>

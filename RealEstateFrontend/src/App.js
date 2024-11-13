@@ -88,11 +88,10 @@ const App = () => {
         <AppHeader logo={logo} isDarkMode={isDarkMode}/>
         <Routes>
           <Route element={renderDashboard(TenantDashboard, 'Tenant')}>
-            <Route path="/tanant/profile" element={<ProfilePage />} />
-            <Route path="/tanant/favorites" element={<Favorites />} />
-            <Route path="/tanant/approval" element={<AwaitingApproval />} />
-            <Route path="/tanant/approved" element={<ApprovedRentals />} />
-            <Route path="/tanant/add-rental" element={<AddRental />} />
+            <Route path="/tenant/profile" element={<ProfilePage />} />
+            <Route path="/tenant/favorites" element={<Favorites />} />
+            <Route path="/tenant/approval" element={<AwaitingApproval />} />
+            <Route path="/tenant/approved" element={<ApprovedRentals />} />
           </Route>
 
           <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
@@ -100,7 +99,6 @@ const App = () => {
             <Route path="/admin/property-list" element={<AwaitingApproval />} />
             <Route path="/admin/approved" element={<ApprovedRentals />} />
             <Route path="/admin/canceled-rentals" element={<CanceledRentals />} />
-
           </Route>
 
           <Route element={renderDashboard(OwnerDashboard, 'Owner')}>
@@ -111,18 +109,17 @@ const App = () => {
             <Route path="/owner/my-properties" element={<MyPropertyList />} />
             <Route path="/owner/my-product" element={<ProductList />} />
           </Route>
-
+          
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/add-rental" element={<AddRental />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/" element={<Home />} />
           <Route path="/access-denied" element={<AccessDenied />} />
           <Route path="/trust" element={<TrustedCompanies />} />
           <Route path="/visit" element={<VisitPage />} />
           <Route path="/chart" element={<PriceChart />} />
-
-          
 
           <Route
             path="*"
