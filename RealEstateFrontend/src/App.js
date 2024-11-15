@@ -16,6 +16,7 @@ import ProfilePage from './users/ProfilePage';
 import AppHeader from './components/Header';
 import SocialLinks from './components/SocialLinks';
 import Favorites from './components/Favorite/FavoriteList';
+import './App.css';
 
 // Import các thành phần bất động sản
 import AddRental from './components/Rental/AddRental';
@@ -32,25 +33,30 @@ import VisitPage from './components/VisitPage';
 import TrustedCompanies from './components/TrustedCompanies';
 import PriceChart from './components/PriceChart';
 
-
 // Import các dashboard theo vai trò
 import OwnerDashboard from './components/Dashboard/OwnerDashboard';
 import TenantDashboard from './components/Dashboard/TenantDashboard';
 import ManagerDashboard from './components/Dashboard/ManagerDashboard';
 import AccessDenied from './pages/AccessDenied';
-
+import viMessages from './locales/vi.json';
+import enMessages from './locales/en.json';
+import { IntlProvider } from 'react-intl';
 
 import { useState } from 'react';
-import { ConfigProvider, theme, Button } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+const messages = {
+  vi: viMessages,
+  en: enMessages,
+};
 const App = () => {
   const [logo] = useState('/images/LogoRealEstate.png');
-
   const { defaultAlgorithm, darkAlgorithm } = theme;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const role = localStorage.getItem('role');
+  const [locale, setLocale] = useState('vi');
 
   const renderDashboard = (Component, requiredRole) => {
     return role === requiredRole ? (
@@ -63,72 +69,121 @@ const App = () => {
   const handleClick = () => {
     setIsDarkMode((previousValue) => !previousValue);
   };
+  const handleLocaleChange = () => {
+    setLocale(locale === 'vi' ? 'en' : 'vi');
+  };
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
-        token: {
-          colorPrimary: isDarkMode ? '#E0282E' : '#1677FF',
-          colorTextBase: isDarkMode ? '#ffffff' : '#000000',
-          colorBgContainer: isDarkMode ? '#000000' : '#ffffff',
-          Button: {
-            colorBg: isDarkMode ? '#262626' : '#e6f7ff',
-            colorBgHover: isDarkMode ? '#1890ff' : '#40a9ff',
-            colorBorder: isDarkMode ? '#1890ff' : '#40a9ff',
-            colorText: isDarkMode ? '#ffffff' : '#000000',
+    <IntlProvider locale={locale} messages={messages[locale]}>
+      <ConfigProvider
+        theme={{
+          algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
+          token: {
+            colorPrimary: isDarkMode ? '#E0282E' : '#1677FF',
+            colorTextBase: isDarkMode ? '#ffffff' : '#000000',
+            colorBgContainer: isDarkMode ? '#000000' : '#ffffff',
+            Button: {
+              colorBg: isDarkMode ? '#262626' : '#e6f7ff',
+              colorBgHover: isDarkMode ? '#1890ff' : '#40a9ff',
+              colorBorder: isDarkMode ? '#1890ff' : '#40a9ff',
+              colorText: isDarkMode ? '#ffffff' : '#000000',
+            },
           },
-        },
-      }}
-    >
-      <Button onClick={handleClick}>
-        Chuyển sang chế độ {isDarkMode ? 'Sáng' : 'Tối'}
-      </Button>
-      <Router>
-        <AppHeader logo={logo} isDarkMode={isDarkMode}/>
-        <Routes>
-          <Route element={renderDashboard(TenantDashboard, 'Tenant')}>
-            <Route path="/tenant/profile" element={<ProfilePage />} />
-            <Route path="/tenant/favorites" element={<Favorites />} />
-            <Route path="/tenant/approval" element={<AwaitingApproval />} />
-            <Route path="/tenant/approved" element={<ApprovedRentals />} />
-          </Route>
-
-          <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
-            <Route path="/admin/users" element={<UserList />} />
-            <Route path="/admin/property-list" element={<AwaitingApproval />} />
-            <Route path="/admin/approved" element={<ApprovedRentals />} />
-            <Route path="/admin/canceled-rentals" element={<CanceledRentals />} />
-          </Route>
-
-          <Route element={renderDashboard(OwnerDashboard, 'Owner')}>
-            <Route path="/owner/add-property" element={<AddProperty />} />
-            <Route path="/owner/profile" element={<ProfilePage />} />
-            <Route path="/owner/approval" element={<AwaitingApproval />} />
-            <Route path="/owner/approved" element={<ApprovedRentals />} />
-            <Route path="/owner/my-properties" element={<MyPropertyList />} />
-            <Route path="/owner/my-product" element={<ProductList />} />
-          </Route>
-          
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/property/:id" element={<PropertyDetail />} />
-          <Route path="/add-rental" element={<AddRental />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/access-denied" element={<AccessDenied />} />
-          <Route path="/trust" element={<TrustedCompanies />} />
-          <Route path="/visit" element={<VisitPage />} />
-          <Route path="/chart" element={<PriceChart />} />
-
-          <Route
-            path="*"
-            element={<Navigate to={role ? `/${role}` : '/login'} />}
+        }}
+      >
+        <div
+          className={`fixed-circle ${isDarkMode ? 'dark-mode' : 'light-mode'}`}
+          style={{
+            padding: '10px',
+            display: 'flex',
+            gap: '15px',
+            paddingLeft: '1350px',
+            backgroundColor: isDarkMode ? '#333' : '#ffff',
+            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <i
+            className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} ${isDarkMode ? 'active' : ''}`}
+            onClick={handleClick}
+            style={{
+              fontSize: '15px',
+              cursor: 'pointer',
+              color: isDarkMode ? '#fff' : '#FFD700',
+            }}
           />
-        </Routes>
-        <SocialLinks />
-      </Router>
-    </ConfigProvider>
+          <i
+            className={`fas fa-language ${locale === 'vi' ? 'active' : ''}`}
+            onClick={handleLocaleChange}
+            style={{
+              fontSize: '15px',
+              cursor: 'pointer',
+              gap: '5px',
+              position: 'relative',
+            }}
+          >
+            <i
+              style={{
+                marginLeft: '2px',
+                fontSize: '12px',
+                position: 'absolute',
+              }}
+            >
+              {locale === 'vi' ? 'VN' : 'GB'}
+            </i>
+          </i>
+        </div>
+        <Router>
+          <AppHeader logo={logo} isDarkMode={isDarkMode} />
+          <Routes>
+            <Route element={renderDashboard(TenantDashboard, 'Tenant')}>
+              <Route path="/tenant/profile" element={<ProfilePage />} />
+              <Route path="/tenant/favorites" element={<Favorites />} />
+              <Route path="/tenant/approval" element={<AwaitingApproval />} />
+              <Route path="/tenant/approved" element={<ApprovedRentals />} />
+            </Route>
+
+            <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
+              <Route path="/admin/users" element={<UserList />} />
+              <Route
+                path="/admin/property-list"
+                element={<AwaitingApproval />}
+              />
+              <Route path="/admin/approved" element={<ApprovedRentals />} />
+              <Route
+                path="/admin/canceled-rentals"
+                element={<CanceledRentals />}
+              />
+            </Route>
+
+            <Route element={renderDashboard(OwnerDashboard, 'Owner')}>
+              <Route path="/owner/add-property" element={<AddProperty />} />
+              <Route path="/owner/profile" element={<ProfilePage />} />
+              <Route path="/owner/approval" element={<AwaitingApproval />} />
+              <Route path="/owner/approved" element={<ApprovedRentals />} />
+              <Route path="/owner/my-properties" element={<MyPropertyList />} />
+              <Route path="/owner/my-product" element={<ProductList />} />
+            </Route>
+
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/property/:id" element={<PropertyDetail />} />
+            <Route path="/add-rental" element={<AddRental />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/access-denied" element={<AccessDenied />} />
+            <Route path="/trust" element={<TrustedCompanies />} />
+            <Route path="/visit" element={<VisitPage />} />
+            <Route path="/chart" element={<PriceChart />} />
+
+            <Route
+              path="*"
+              element={<Navigate to={role ? `/${role}` : '/login'} />}
+            />
+          </Routes>
+          <SocialLinks />
+        </Router>
+      </ConfigProvider>
+    </IntlProvider>
   );
 };
 

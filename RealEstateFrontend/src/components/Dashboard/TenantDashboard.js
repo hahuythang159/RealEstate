@@ -7,24 +7,17 @@ import {
   FileSyncOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet } from 'react-router-dom';
+import { useIntl } from 'react-intl'; // Sử dụng useIntl để lấy bản dịch
 
 const { Sider, Content } = Layout;
 
 const TenantDashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const intl = useIntl(); // Sử dụng useIntl để lấy bản dịch
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-
-    if (!token) {
-      navigate('/login');
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-
     if (!token) {
       navigate('/login');
     }
@@ -35,11 +28,11 @@ const TenantDashboard = () => {
   };
 
   const handleMouseLeave = () => {
-    setCollapsed(true); 
+    setCollapsed(true);
   };
 
   return (
-    <Layout style={{ minHeight: '100vh'}}>
+    <Layout style={{ minHeight: '100vh' }}>
       <Sider
         width={200}
         className="site-layout-background"
@@ -54,28 +47,28 @@ const TenantDashboard = () => {
             icon={<HeartOutlined />}
             onClick={() => navigate('/tenant/favorites')}
           >
-            Danh sách yêu thích
+            {intl.formatMessage({ id: 'favorites_list' })} {/* Dùng bản dịch */}
           </Menu.Item>
           <Menu.Item
             key="2"
             icon={<FileSyncOutlined />}
             onClick={() => navigate('/tenant/approval')}
           >
-            Danh sách hợp đồng
+            {intl.formatMessage({ id: 'contract_list' })}
           </Menu.Item>
           <Menu.Item
             key="3"
             icon={<FileProtectOutlined />}
             onClick={() => navigate('/tenant/approved')}
           >
-            Hợp đồng đã duyệt
+            {intl.formatMessage({ id: 'approved_contracts' })}
           </Menu.Item>
           <Menu.Item
             key="4"
             icon={<UserOutlined />}
             onClick={() => navigate('/tenant/profile')}
           >
-            Hồ sơ của tôi
+            {intl.formatMessage({ id: 'my_profile' })}
           </Menu.Item>
         </Menu>
       </Sider>

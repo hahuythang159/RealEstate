@@ -47,9 +47,8 @@ public class PropertiesController : ControllerBase
         if (districtId.HasValue) query = query.Where(p => p.DistrictId == districtId.Value);
         if (wardId.HasValue) query = query.Where(p => p.WardId == wardId.Value);
 
-        var properties = await query.ToListAsync(); // Load properties first
+        var properties = await query.ToListAsync();
 
-        // Now fetch images after properties are loaded
         var propertyIds = properties.Select(p => p.Id).ToList();
         var images = await _context.PropertyImages
             .Where(pi => propertyIds.Contains(pi.PropertyId))
@@ -99,7 +98,6 @@ public class PropertiesController : ControllerBase
             return NotFound();
         }
 
-        // Truy vấn hình ảnh từ bảng PropertyImage liên quan đến PropertyId
         var images = await _context.PropertyImages
             .Where(pi => pi.PropertyId == id)
             .Select(pi => new
@@ -109,7 +107,6 @@ public class PropertiesController : ControllerBase
             })
             .ToListAsync();
 
-        // Gắn danh sách hình ảnh vào đối tượng Property
         var propertyResponse = new
         {
             property.Id,

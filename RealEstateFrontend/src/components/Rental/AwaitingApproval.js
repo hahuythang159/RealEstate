@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useIntl } from 'react-intl';
 
 function AwaitingApproval() {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ function AwaitingApproval() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [currentUserRole, setCurrentUserRole] = useState(null);
+  const intl = useIntl();
 
   useEffect(() => {
     const fetchRentals = async () => {
@@ -19,7 +21,9 @@ function AwaitingApproval() {
 
         const response = await fetch('/api/rentals');
         if (!response.ok) {
-          throw new Error('Lỗi khi lấy danh sách hợp đồng.');
+          throw new Error(
+            intl.formatMessage({ id: 'awaitingApproval.fetch.error' })
+          );
         }
         const data = await response.json();
 
@@ -28,8 +32,9 @@ function AwaitingApproval() {
         );
         setRentals(pendingRentals);
       } catch (error) {
-        console.error('Error fetching rentals:', error);
-        message.error('Có lỗi xảy ra khi lấy danh sách hợp đồng.');
+        message.error(
+          intl.formatMessage({ id: 'awaitingApproval.fetch.error' })
+        );
       } finally {
         setLoading(false);
       }
@@ -42,17 +47,19 @@ function AwaitingApproval() {
     try {
       const response = await fetch('/api/users');
       if (!response.ok) {
-        throw new Error('Lỗi khi lấy danh sách người dùng.');
+        throw new Error(
+          intl.formatMessage({ id: 'awaitingApproval.usersFetch.error' })
+        );
       }
       const data = await response.json();
       setUsers(data);
     } catch (error) {
-      console.error('Error fetching users:', error);
-      message.error('Có lỗi xảy ra khi lấy danh sách người dùng.');
+      message.error(
+        intl.formatMessage({ id: 'awaitingApproval.usersFetch.error' })
+      );
     }
   };
 
-  // Approve rental
   const handleApprove = async (rentalId) => {
     setLoading(true);
     try {
@@ -62,25 +69,26 @@ function AwaitingApproval() {
       const responseData = await response.json();
 
       if (!response.ok) {
-        console.error('Error approving rental:', responseData);
-
-        throw new Error('Lỗi khi duyệt hợp đồng.');
+        throw new Error(
+          intl.formatMessage({ id: 'awaitingApproval.approve.error' })
+        );
       }
       message.success(
-        'Hợp đồng đã được duyệt thành công và email đã được gửi.'
+        intl.formatMessage({ id: 'awaitingApproval.approve.success' })
       );
 
       setRentals((prevRentals) =>
         prevRentals.filter((rental) => rental.id !== rentalId)
       );
     } catch (error) {
-      console.error('Error approving rental:', error);
-      message.error('Có lỗi xảy ra khi duyệt hợp đồng.');
+      message.error(
+        intl.formatMessage({ id: 'awaitingApproval.approve.error' })
+      );
     } finally {
       setLoading(false);
     }
   };
-  // Cancel rental
+
   const handleCancel = async (rentalId) => {
     setLoading(true);
     try {
@@ -90,17 +98,21 @@ function AwaitingApproval() {
       const responseData = await response.json();
 
       if (!response.ok) {
-        console.error('Error canceling rental:', responseData);
-        throw new Error('Lỗi khi huỷ hợp đồng.');
+        throw new Error(
+          intl.formatMessage({ id: 'awaitingApproval.cancel.error' })
+        );
       }
-      message.success('Hợp đồng đã bị huỷ và email thông báo đã được gửi.');
+      message.success(
+        intl.formatMessage({ id: 'awaitingApproval.cancel.success' })
+      );
 
       setRentals((prevRentals) =>
         prevRentals.filter((rental) => rental.id !== rentalId)
       );
     } catch (error) {
-      console.error('Error canceling rental:', error);
-      message.error('Có lỗi xảy ra khi huỷ hợp đồng.');
+      message.error(
+        intl.formatMessage({ id: 'awaitingApproval.cancel.error' })
+      );
     } finally {
       setLoading(false);
     }
@@ -108,12 +120,12 @@ function AwaitingApproval() {
 
   const columns = [
     {
-      title: 'ID',
+      title: intl.formatMessage({ id: 'awaitingApproval.column.id' }),
       dataIndex: 'id',
       key: 'id',
     },
     {
-      title: 'Người thuê',
+      title: intl.formatMessage({ id: 'awaitingApproval.column.tenant' }),
       dataIndex: 'tenantId',
       key: 'tenantId',
       render: (text) => {
@@ -122,50 +134,56 @@ function AwaitingApproval() {
       },
     },
     {
-      title: 'Ngày bắt đầu',
+      title: intl.formatMessage({ id: 'awaitingApproval.column.startDate' }),
       dataIndex: 'startDate',
       key: 'startDate',
       render: (text) => new Date(text).toLocaleString(),
     },
     {
-      title: 'Ngày kết thúc',
+      title: intl.formatMessage({ id: 'awaitingApproval.column.endDate' }),
       dataIndex: 'endDate',
       key: 'endDate',
       render: (text) => new Date(text).toLocaleString(),
     },
     {
-      title: 'Trạng thái',
+      title: intl.formatMessage({ id: 'awaitingApproval.column.status' }),
       dataIndex: 'status',
       key: 'status',
     },
-    ...(currentUserRole === 'Owner' ? [{
-      title: 'Hành động',
-      key: 'action',
-      render: (text, record) => (
-        <>
-          <Button
-            type="primary"
-            onClick={() => handleApprove(record.id)}
-            disabled={loading}
-            style={{ marginRight: 8 }}
-          >
-            Duyệt
-          </Button>
-          <Button
-            type="danger"
-            onClick={() => handleCancel(record.id)}
-            disabled={loading}
-          >
-            Huỷ
-          </Button>
-        </>
-      ),
-    }] : []),
+    ...(currentUserRole === 'Owner'
+      ? [
+          {
+            title: intl.formatMessage({ id: 'awaitingApproval.column.action' }),
+            key: 'action',
+            render: (text, record) => (
+              <>
+                <Button
+                  type="primary"
+                  onClick={() => handleApprove(record.id)}
+                  disabled={loading}
+                  style={{ marginRight: 8 }}
+                >
+                  {intl.formatMessage({
+                    id: 'awaitingApproval.button.approve',
+                  })}
+                </Button>
+                <Button
+                  type="danger"
+                  onClick={() => handleCancel(record.id)}
+                  disabled={loading}
+                >
+                  {intl.formatMessage({ id: 'awaitingApproval.button.cancel' })}
+                </Button>
+              </>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>Danh sách hợp đồng đang chờ duyệt</h2>
+      <h2>{intl.formatMessage({ id: 'awaitingApproval.title' })}</h2>
       <Table
         columns={columns}
         dataSource={rentals}

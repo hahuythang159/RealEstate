@@ -68,7 +68,6 @@ const MyPropertyList = () => {
                     message.error('Không thể ẩn bất động sản: ' + errorText);
                 }
             } catch (error) {
-                // Nếu có lỗi xảy ra, khôi phục lại cập nhật
                 setProperties(properties);
                 message.error('Lỗi khi ẩn bất động sản: ' + error.message);
             } finally {

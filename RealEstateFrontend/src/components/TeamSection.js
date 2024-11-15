@@ -1,8 +1,11 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import TeamMemberCard from './TeamMemberCard';
 import './TeamSection.css';
 
 const TeamSection = () => {
+  const intl = useIntl();
+
   const teamMembers = [
     {
       name: 'Janny Mari',
@@ -24,13 +27,12 @@ const TeamSection = () => {
   return (
     <section className="team-section">
       <div className="team-header">
-        <h5>Team Member</h5>
-        <h2>Gặp gỡ các chủ bất động sản tuyệt vời</h2>
-        <p>
-          HomeMates giúp bạn dễ dàng tạo website giao dịch bất động sản. Với
-          chức năng Đăng ký, Đăng nhập, Đăng tin bất động sản.
-        </p>
-        <button className="view-all-btn">View All Team</button>
+        <h5>{intl.formatMessage({ id: 'team_section_header' })}</h5>
+        <h2>{intl.formatMessage({ id: 'team_section_title' })}</h2> 
+        <p>{intl.formatMessage({ id: 'team_section_description' })}</p> 
+        <button className="view-all-btn">
+          {intl.formatMessage({ id: 'team_section_view_all' })}
+        </button>
       </div>
       <div className="team-members">
         {teamMembers.map((member, index) => (

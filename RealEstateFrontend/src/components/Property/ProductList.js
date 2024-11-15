@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Spin, message, Pagination } from 'antd';
+import { useIntl } from 'react-intl'; // Import useIntl
 import ProductCard from './ProductCard';
 
 const ProductList = () => {
+    const intl = useIntl(); // Use intl to fetch translations
+
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -18,21 +21,21 @@ const ProductList = () => {
                         const data = await response.json();
                         setProperties(data);
                     } else {
-                        message.error('Không thể tải danh sách bất động sản: ' + response.statusText);
+                        message.error(intl.formatMessage({ id: 'error_fetching_properties' }) + response.statusText);
                     }
                 } catch (error) {
-                    message.error('Lỗi khi tải bất động sản: ' + error.message);
+                    message.error(intl.formatMessage({ id: 'error_loading_properties' }) + error.message);
                 } finally {
                     setLoading(false);
                 }
             } else {
-                message.error('Không tìm thấy userId trong localStorage');
+                message.error(intl.formatMessage({ id: 'error_no_user_id' }));
                 setLoading(false);
             }
         };
 
         fetchProperties();
-    }, []);
+    }, [intl]); // Re-run when the locale changes
 
     const handleDeleteProperty = (propertyId) => {
         setProperties((prev) => prev.filter((property) => property.id !== propertyId));

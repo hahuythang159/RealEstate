@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useIntl } from 'react-intl';
 import './RegisterForm.css';
 
 const RegisterForm = () => {
@@ -13,6 +14,16 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const intl = useIntl();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.email) {
+      setEmail(location.state.email);
+      console.log('Email đã được cập nhật:', location.state.email);
+    }
+  }, [location.state]);
 
   const isValidPhoneNumber = (phoneNumber) => {
     const phoneRegex = /(03|05|07|08|09|01[2|6|8|9])\d{8}/;
@@ -22,10 +33,10 @@ const RegisterForm = () => {
   const handleRegister = async (values) => {
     setLoading(true);
 
-    const { userName, password, confirmPassword, email, phoneNumber, role } = values;
-
+    const emailToSend = email || values.email;
+    const { userName, password, confirmPassword, phoneNumber, role } = values;
     if (password !== confirmPassword) {
-      setError('Mật khẩu và mật khẩu xác nhận không khớp.');
+      setError(intl.formatMessage({ id: 'error.passwordMismatch' }));
       setLoading(false);
       return;
     }
@@ -40,7 +51,7 @@ const RegisterForm = () => {
           userName,
           password,
           confirmPassword,
-          email,
+          email: emailToSend,
           phoneNumber,
           role,
           isTwoFactorEnabled: false,
@@ -50,16 +61,22 @@ const RegisterForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || 'Đăng ký thất bại.');
-        message.error(errorData.message || 'Đăng ký thất bại.');
+        setError(
+          errorData.message ||
+            intl.formatMessage({ id: 'error.registerFailed' })
+        );
+        message.error(
+          errorData.message ||
+            intl.formatMessage({ id: 'error.registerFailed' })
+        );
       } else {
         setError('');
-        message.success('Đăng ký thành công');
+        message.success(intl.formatMessage({ id: 'success.register' }));
         navigate('/');
       }
     } catch (err) {
-      setError('Có lỗi xảy ra, vui lòng thử lại sau.');
-      message.error('Có lỗi xảy ra, vui lòng thử lại sau.');
+      setError(intl.formatMessage({ id: 'error.serverError' }));
+      message.error(intl.formatMessage({ id: 'error.serverError' }));
     } finally {
       setLoading(false);
     }
@@ -67,33 +84,56 @@ const RegisterForm = () => {
 
   return (
     <div className="register-container">
-      <h2>Đăng Ký</h2>
+      <h2>{intl.formatMessage({ id: 'register.title' })}</h2>
       <Form
         name="register"
         onFinish={handleRegister}
-        initialValues={{ role: 'Tenant' }}
+        initialValues={{ email: email, role: 'Tenant' }}
         layout="vertical"
       >
         <Form.Item
-          label="Tên người dùng"
+          label={intl.formatMessage({ id: 'register.userNameLabel' })}
           name="userName"
-          rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'register.userNameError' }),
+            },
+          ]}
         >
-          <Input value={userName} onChange={(e) => setUserName(e.target.value)} />
+          <Input
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Mật khẩu"
+          label={intl.formatMessage({ id: 'register.passwordLabel' })}
           name="password"
-          rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'register.passwordError' }),
+            },
+          ]}
         >
-          <Input.Password value={password} onChange={(e) => setPassword(e.target.value)} />
+          <Input.Password
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </Form.Item>
 
         <Form.Item
-          label="Xác nhận mật khẩu"
+          label={intl.formatMessage({ id: 'register.confirmPasswordLabel' })}
           name="confirmPassword"
-          rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu!' }]}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({
+                id: 'register.confirmPasswordError',
+              }),
+            },
+          ]}
         >
           <Input.Password
             value={confirmPassword}
@@ -102,43 +142,71 @@ const RegisterForm = () => {
         </Form.Item>
 
         <Form.Item
-          label="Email"
+          label={intl.formatMessage({ id: 'register.emailLabel' })}
           name="email"
-          rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ!' }]}
-        >
-          <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-        </Form.Item>
-
-        <Form.Item
-          label="Số điện thoại"
-          name="phoneNumber"
           rules={[
-            { required: true, message: 'Vui lòng nhập số điện thoại!' },
             {
-              validator: (_, value) =>
-                isValidPhoneNumber(value) ? Promise.resolve() : Promise.reject('Số điện thoại không hợp lệ'),
+              required: !location.state?.email,
+              type: 'email',
+              message: intl.formatMessage({ id: 'register.emailError' }),
             },
           ]}
         >
-          <Input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+          {location.state?.email ? (
+            // Nếu có email từ state, hiển thị email và không cho phép chỉnh sửa
+            <Input value={email} disabled />
+          ) : (
+            // Nếu không có email, cho phép người dùng nhập
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+          )}
         </Form.Item>
 
-        <Form.Item label="Vai trò" name="role">
+        <Form.Item
+          label={intl.formatMessage({ id: 'register.phoneLabel' })}
+          name="phoneNumber"
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'register.phoneError' }),
+            },
+            {
+              validator: (_, value) =>
+                isValidPhoneNumber(value)
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      intl.formatMessage({ id: 'register.phoneInvalid' })
+                    ),
+            },
+          ]}
+        >
+          <Input
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={intl.formatMessage({ id: 'register.roleLabel' })}
+          name="role"
+        >
           <Select value={role} onChange={(value) => setRole(value)}>
-            <Select.Option value="Owner">Chủ bất động sản</Select.Option>
-            <Select.Option value="Tenant">Người thuê</Select.Option>
-            <Select.Option value="Manager">Quản lý</Select.Option>
+            <Select.Option value="Owner">
+              {intl.formatMessage({ id: 'register.roleOwner' })}
+            </Select.Option>
+            <Select.Option value="Tenant">
+              {intl.formatMessage({ id: 'register.roleTenant' })}
+            </Select.Option>
+            <Select.Option value="Manager">
+              {intl.formatMessage({ id: 'register.roleManager' })}
+            </Select.Option>
           </Select>
         </Form.Item>
 
         <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            loading={loading}
-          >
-            {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+          <Button type="primary" htmlType="submit" block loading={loading}>
+            {loading
+              ? intl.formatMessage({ id: 'register.loading' })
+              : intl.formatMessage({ id: 'register.submit' })}
           </Button>
         </Form.Item>
 

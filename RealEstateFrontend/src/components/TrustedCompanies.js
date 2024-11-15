@@ -1,13 +1,17 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
+import { useIntl } from 'react-intl';
 import './TrustedCompanies.css';
 
 const TrustedCompanies = () => {
   const navigate = useNavigate();
+  const intl = useIntl();
+
   const handleVisitClick = () => {
     navigate('/visit');
   };
+
   return (
     <div className="trusted-companies">
       <Helmet>
@@ -18,19 +22,16 @@ const TrustedCompanies = () => {
       </Helmet>
       <div className="trusted-companies-content">
         <h1>
-          1,230+ Công ty
-          <br />
-          tin tưởng chúng tôi
+          {intl.formatMessage({ id: 'trusted_companies_title' })}
         </h1>
         <p>
-          Biến những ngôi nhà thành giấc mơ với tư cách là đại lý bất động sản
-          mà bạn mong muốn. Bạn có thể tin cậy vào chúng tôi để giúp bạn tìm
-          được một ngôi nhà an toàn. 745.000 ngôi nhà và căn hộ để bán, cho thuê
-          hoặc thế chấp.
+          {intl.formatMessage({ id: 'trusted_companies_description' })}
         </p>
       </div>
       <div className="trusted-companies-button-container">
-        <button className="visit-button" onClick={handleVisitClick}>Yêu cầu ghé thăm →</button>
+        <button className="visit-button" onClick={handleVisitClick}>
+          {intl.formatMessage({ id: 'visit_button_text' })}
+        </button>
       </div>
 
       <div className="trusted-companies-logos">

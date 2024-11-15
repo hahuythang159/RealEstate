@@ -1,42 +1,16 @@
-.App {
-  text-align: center;
-}
 body {
   overflow-x: hidden;
   overflow-y: scroll;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.fas {
+  transition: transform 0.2s ease-in-out;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.fas.active {
+  transform: scale(1.2); /* Tăng kích thước khi active */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.fixed-circle {
+  transition: background-color 0.3s ease;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}

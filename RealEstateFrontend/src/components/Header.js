@@ -1,14 +1,11 @@
 import React from 'react';
 import { Layout, Button, Space } from 'antd';
-import {
-  LogoutOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
-const AppHeader = ({ logo, isDarkMode }) => {
+const AppHeader = ({ logo, isDarkMode}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const role = localStorage.getItem('role');
@@ -56,18 +53,6 @@ const AppHeader = ({ logo, isDarkMode }) => {
     <Header style={headerStyle}>
       <div
         style={{
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          width: '100%',
-          height: '3px',
-          background: `linear-gradient(90deg, ${isDarkMode ? '#e0282e' : '#1677FF'} 0%, #ffffff 100%)`,
-          zIndex: -1,
-        }}
-      ></div>
-
-      <div
-        style={{
           color: isDarkMode ? '#fff' : '#000',
           fontSize: '30px',
           cursor: 'pointer',
@@ -85,8 +70,6 @@ const AppHeader = ({ logo, isDarkMode }) => {
         />
       </div>
       
-
-     
       <Space>
         <Button
           icon={<UserOutlined />}
@@ -97,16 +80,6 @@ const AppHeader = ({ logo, isDarkMode }) => {
             borderRadius: '25px',
             transition: 'all 0.3s ease',
           }}
-          onMouseEnter={(e) =>
-            (e.target.style.backgroundColor = isDarkMode
-              ? '#1890ff'
-              : '#40a9ff')
-          }
-          onMouseLeave={(e) =>
-            (e.target.style.backgroundColor = isDarkMode
-              ? '#262626'
-              : '#f0f2f5')
-          }
         >
           {role === 'Owner' && 'Owner Dashboard'}
           {role === 'Tenant' && 'Tenant Dashboard'}
@@ -122,16 +95,6 @@ const AppHeader = ({ logo, isDarkMode }) => {
             borderRadius: '25px',
             transition: 'all 0.3s ease',
           }}
-          onMouseEnter={(e) =>
-            (e.target.style.backgroundColor = isDarkMode
-              ? '#40a9ff'
-              : '#ff4d4f')
-          }
-          onMouseLeave={(e) =>
-            (e.target.style.backgroundColor = isDarkMode
-              ? '#1890ff'
-              : '#f5222d')
-          }
         >
           Logout
         </Button>

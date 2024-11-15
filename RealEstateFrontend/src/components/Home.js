@@ -1,24 +1,14 @@
+// src/pages/Home.js
 import React, { useEffect, useState } from 'react';
-import {
-  Row,
-  Col,
-  Pagination,
-  Select,
-  Button,
-} from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
-import PropertyCard from './Property/PropertyCard';
+import Filters from '../components/Filters';
+import PropertyList from '../components/PropertyList';
+import ImageCarousel from '../components/ImageCarousel';
+import TrustedCompanies from '../components/TrustedCompanies';
+import HeroSection from '../components/HeroSection';
+import TeamSection from '../components/TeamSection';
+import Testimonials from '../components/Testimonials';
 import Footer from '../pages/Footer';
-import TrustedCompanies from './TrustedCompanies';
-import HeroSection from './HeroSection';
-import TeamSection from './TeamSection';
-import Testimonials from './Testimonials';
-import ImageCarousel from './ImageCarousel';
-import GitHubGlobe  from './GitHubGlobe';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
-import './fadeInOut.css';
-
-const { Option } = Select;
 
 const Home = () => {
   const [properties, setProperties] = useState([]);
@@ -36,26 +26,6 @@ const Home = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
-  const isGitHubGlobe = useIntersectionObserver({
-    target: '.git-hubGlobea',
-  });
-  const isImageCarouselVisible = useIntersectionObserver({
-    target: '.image-carousel1',
-  });
-  const isHeroSectionVisible = useIntersectionObserver({
-    target: '.hero-section1',
-  });
-  const isTestimonialsVisible = useIntersectionObserver({
-    target: '.testimonials-section1',
-  });
-  const isTrustedCompaniesVisible = useIntersectionObserver({
-    target: '.trusted-companies1',
-  });
-  const isTeamSectionVisible = useIntersectionObserver({
-    target: '.team-section1',
-  });
-  const isFooterVisible = useIntersectionObserver({ target: '.footer1' });
-
   useEffect(() => {
     const fetchProvinces = async () => {
       const response = await fetch('https://provinces.open-api.vn/api/p/');
@@ -65,13 +35,10 @@ const Home = () => {
     fetchProvinces();
   }, []);
 
-  // Lấy danh sách huyện khi chọn tỉnh
   useEffect(() => {
     if (selectedProvince) {
       const fetchDistricts = async () => {
-        const response = await fetch(
-          `https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`
-        );
+        const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`);
         const data = await response.json();
         setDistricts(data.districts);
         setWards([]);
@@ -86,13 +53,10 @@ const Home = () => {
     }
   }, [selectedProvince]);
 
-  // Lấy danh sách xã khi chọn huyện
   useEffect(() => {
     if (selectedDistrict) {
       const fetchWards = async () => {
-        const response = await fetch(
-          `https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`
-        );
+        const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`);
         const data = await response.json();
         setWards(data.wards);
       };
@@ -115,271 +79,58 @@ const Home = () => {
       if (selectedWard) query.append('wardId', selectedWard);
 
       const response = await fetch(`/api/properties?${query.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('Đã xảy ra lỗi khi lấy dữ liệu');
-      }
       const data = await response.json();
-      const filteredProperties = data.filter(
-        (property) =>
-          !property.rentals ||
-          !property.rentals.some((rental) => rental.status === 'Approved')
-      );
-      setProperties(filteredProperties);
-      setTotal(filteredProperties.length);
+      setProperties(data);
+      setTotal(data.length);
     } catch (error) {
-      console.error('Lỗi:', error);
+      console.error('Error fetching properties:', error);
     }
   };
 
   useEffect(() => {
     fetchProperties();
-  }, [
-    minPrice,
-    maxPrice,
-    bedrooms,
-    bathrooms,
-    selectedProvince,
-    selectedDistrict,
-    selectedWard,
-  ]);
+  }, [minPrice, maxPrice, bedrooms, bathrooms, selectedProvince, selectedDistrict, selectedWard]);
 
-  const paginatedProperties = properties.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const paginatedProperties = properties.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handlePageChange = (page, pageSize) => {
     setCurrentPage(page);
     setPageSize(pageSize);
   };
 
-  const handleFilterChange = () => {
-    fetchProperties();
-    setCurrentPage(1);
-  };
-
   return (
-    <>
-    
-    <div
-        className={`.git-hubGlobea ${isGitHubGlobe ? 'fade-in' : 'fade-out'}`}
-      >
-        <GitHubGlobe />
-      </div>
-      <div
-        className={`image-carousel1 ${isImageCarouselVisible ? 'fade-in' : 'fade-out'}`}
-      >
-        <ImageCarousel />
-      </div>
-      <div
-        className={`trusted-companies1 ${isTrustedCompaniesVisible ? 'fade-in' : 'fade-out'}`}
-      >
-        <TrustedCompanies />
-      </div>
-      <div
-        className={`hero-section1 ${isHeroSectionVisible ? 'fade-in' : 'fade-out'}`}
-      >
-        <HeroSection />
-      </div>
-      <div
-        className={`team-section1 ${isTeamSectionVisible ? 'fade-in' : 'fade-out'}`}
-      >
-        <TeamSection />
-      </div>
-
-      <Row gutter={[16, 16]} style={{ paddingTop: 20 }}>
-        <Col xs={24} sm={8} md={6}>
-          <Select
-            placeholder="Chọn tỉnh"
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              setSelectedProvince(value);
-              setSelectedDistrict(null);
-              setSelectedWard(null);
-            }}
-          >
-            {provinces.map((province) => (
-              <Option key={province.code} value={province.code}>
-                {province.name}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col xs={24} sm={8} md={6}>
-          <Select
-            placeholder="Chọn huyện"
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              setSelectedDistrict(value);
-              setSelectedWard(null);
-            }}
-            disabled={!selectedProvince}
-          >
-            {districts.map((district) => (
-              <Option key={district.code} value={district.code}>
-                {district.name}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col xs={24} sm={8} md={6}>
-          <Select
-            placeholder="Chọn xã"
-            style={{ width: '100%' }}
-            onChange={(value) => setSelectedWard(value)}
-            disabled={!selectedDistrict}
-          >
-            {wards.map((ward) => (
-              <Option key={ward.code} value={ward.code}>
-                {ward.name}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Select
-            placeholder="Chọn khoảng giá"
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              switch (value) {
-                case 'below1':
-                  setMinPrice(0);
-                  setMaxPrice(1000000);
-                  break;
-                case '1to2':
-                  setMinPrice(1000000);
-                  setMaxPrice(2000000);
-                  break;
-                case '2to4':
-                  setMinPrice(2000000);
-                  setMaxPrice(4000000);
-                  break;
-                case '4to6':
-                  setMinPrice(4000000);
-                  setMaxPrice(6000000);
-                  break;
-                case '6to8':
-                  setMinPrice(6000000);
-                  setMaxPrice(8000000);
-                  break;
-                case '8to10':
-                  setMinPrice(8000000);
-                  setMaxPrice(10000000);
-                  break;
-                case 'above10':
-                  setMinPrice(10000000);
-                  setMaxPrice(null);
-                  break;
-                default:
-                  setMinPrice(null);
-                  setMaxPrice(null);
-              }
-            }}
-          >
-            <Option value="below1">Giá dưới 1 triệu</Option>
-            <Option value="1to2">Giá 1 - 2 triệu</Option>
-            <Option value="2to4">Giá 2 - 4 triệu</Option>
-            <Option value="4to6">Giá 4 - 6 triệu</Option>
-            <Option value="6to8">Giá 6 - 8 triệu</Option>
-            <Option value="8to10">Giá 8 - 10 triệu</Option>
-            <Option value="above10">Giá trên 10 triệu</Option>
-          </Select>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Select
-            placeholder="Chọn số phòng ngủ"
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              if (value === 'above4') {
-                setBedrooms(4);
-              } else {
-                setBedrooms(value);
-              }
-            }}
-          >
-            <Option value={1}>1 phòng ngủ</Option>
-            <Option value={2}>2 phòng ngủ</Option>
-            <Option value={3}>3 phòng ngủ</Option>
-            <Option value="above4">Trên 4 phòng ngủ</Option>
-          </Select>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Select
-            placeholder="Chọn số phòng tắm"
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              if (value === 'above4') {
-                setBathrooms(4);
-              } else {
-                setBathrooms(value);
-              }
-            }}
-          >
-            <Option value={1}>1 phòng tắm</Option>
-            <Option value={2}>2 phòng tắm</Option>
-            <Option value={3}>3 phòng tắm</Option>
-            <Option value="above4">Trên 4 phòng tắm</Option>
-          </Select>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Button
-            type="primary"
-            icon={<FilterOutlined />}
-            onClick={handleFilterChange}
-            style={{ width: '100%' }}
-          >
-            Áp dụng bộ lọc
-          </Button>
-        </Col>
-      </Row>
-      <Row gutter={[16, 32]} style={{ paddingTop: 50, paddingLeft: 50 }}>
-        {paginatedProperties.length === 0 ? (
-          <Col span={24} style={{ textAlign: 'center' }}>
-            <img
-              src="/images/anh1.jpg"
-              alt="No results"
-              style={{ width: '50%', marginBottom: 20 }}
-            />
-            <p>Không có bất động sản nào để hiển thị.</p>
-          </Col>
-        ) : (
-          paginatedProperties.map((property) => (
-            <Col
-              xs={24}
-              sm={12}
-              md={8}
-              lg={6}
-              key={property.id}
-              className="property-card"
-            >
-              <PropertyCard property={property} />
-            </Col>
-          ))
-        )}
-      </Row>
-      {total > pageSize && (
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={total}
-          onChange={handlePageChange}
-          style={{ marginTop: 20, textAlign: 'center' }}
-        />
-      )}
-      <div
-        className={`testimonials-section1 ${isTestimonialsVisible ? 'fade-in' : 'fade-out'}`}
-      >
-        <Testimonials />
-      </div>
-
-      <div className={`footer1 ${isFooterVisible ? 'fade-in' : 'fade-out'}`}>
-        <Footer />
-      </div>
-    </>
+    <div>
+      <ImageCarousel />
+      <TrustedCompanies />
+      <HeroSection />
+      <TeamSection />
+      <Filters 
+        provinces={provinces}
+        districts={districts}
+        wards={wards}
+        selectedProvince={selectedProvince}
+        selectedDistrict={selectedDistrict}
+        selectedWard={selectedWard}
+        setSelectedProvince={setSelectedProvince}
+        setSelectedDistrict={setSelectedDistrict}
+        setSelectedWard={setSelectedWard}
+        setMinPrice={setMinPrice}
+        setMaxPrice={setMaxPrice}
+        setBedrooms={setBedrooms}
+        setBathrooms={setBathrooms}
+        handleFilterChange={fetchProperties}
+      />
+      <PropertyList
+        properties={properties}
+        paginatedProperties={paginatedProperties}
+        total={total}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        handlePageChange={handlePageChange}
+      />      
+      <Testimonials />
+      <Footer />
+    </div>
   );
 };
 

@@ -17,7 +17,6 @@
     justify-content: space-between; /* Căn chỉnh các thẻ Card đều */
     width: 100; /* Điều chỉnh chiều rộng của thẻ card */
     margin: 50px;  /* Khoảng cách giữa các thẻ */
-    
   }
   
   .property-card .ant-card {

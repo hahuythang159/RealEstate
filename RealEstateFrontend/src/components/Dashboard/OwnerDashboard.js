@@ -8,12 +8,14 @@ import {
   DashboardOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet } from 'react-router-dom';
+import { useIntl } from 'react-intl';
 
 const { Sider, Content } = Layout;
 
 const OwnerDashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const intl = useIntl(); // Sử dụng useIntl để lấy bản dịch
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -50,35 +52,35 @@ const OwnerDashboard = () => {
             icon={<DashboardOutlined />}
             onClick={() => navigate('/owner/add-property')}
           >
-            Thêm bất động sản
+            {intl.formatMessage({ id: 'add_property' })}
           </Menu.Item>
           <Menu.Item
             key="2"
             icon={<HomeOutlined />}
             onClick={() => navigate('/owner/my-product')}
           >
-            Quản lý bất động sản
+            {intl.formatMessage({ id: 'manage_property' })}
           </Menu.Item>
           <Menu.Item
             key="3"
             icon={<FileSyncOutlined />}
             onClick={() => navigate('/owner/approval')}
           >
-            Danh sách hợp đồng
+            {intl.formatMessage({ id: 'contract_list' })}
           </Menu.Item>
           <Menu.Item
             key="4"
             icon={<FileProtectOutlined />}
             onClick={() => navigate('/owner/approved')}
           >
-            Hợp đồng đã duyệt
+            {intl.formatMessage({ id: 'approved_contracts' })}
           </Menu.Item>
           <Menu.Item
             key="5"
             icon={<UserOutlined />}
             onClick={() => navigate('/owner/profile')}
           >
-            Hồ sơ của tôi
+            {intl.formatMessage({ id: 'my_profile' })}
           </Menu.Item>
         </Menu>
       </Sider>

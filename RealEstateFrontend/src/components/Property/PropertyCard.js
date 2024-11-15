@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, notification } from 'antd';
+import { Card, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/PropertyCard.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';

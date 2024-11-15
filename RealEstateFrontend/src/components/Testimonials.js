@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useIntl } from 'react-intl';  // Import useIntl
 import './Testimonials.css';
 
 const testimonialsData = [
@@ -47,6 +48,7 @@ const testimonialsData = [
 ];
 
 const Testimonials = () => {
+  const intl = useIntl();  // Sử dụng hook useIntl để lấy các chuỗi dịch
   const testimonialsWrapperRef = useRef(null);
   const testimonialsRef = useRef([]);
 
@@ -77,15 +79,9 @@ const Testimonials = () => {
   return (
     <div className="testimonials-container">
       <div className="title-section">
-        <p>Testimonials</p>
-        <h1>Các khách hàng đã nói gì?</h1>
-        <p>
-          Đọc những gì khách hàng hài lòng nói về sản phẩm/dịch vụ của chúng
-          tôi. Chúng tôi tự hào cung cấp dịch vụ khách hàng đặc biệt và đánh giá
-          cao phản hồi của họ. Chúng tôi luôn đánh giá cao mọi phản hồi để có
-          thể cải thiện hơn trong tương lai. Cảm ơn quý khách đã tin tưởng và
-          ủng hộ chúng tôi!
-        </p>
+        <p>{intl.formatMessage({ id: 'testimonials_header' })}</p>  {/* Dịch header "Testimonials" */}
+        <h1>{intl.formatMessage({ id: 'testimonials_title' })}</h1>  {/* Dịch tiêu đề "Các khách hàng đã nói gì?" */}
+        <p>{intl.formatMessage({ id: 'testimonials_description' })}</p>  {/* Dịch mô tả */}
       </div>
       <div className="testimonials-section">
         <div className="testimonials-wrapper" ref={testimonialsWrapperRef}>
@@ -101,7 +97,7 @@ const Testimonials = () => {
                   <img src={testimonial.image} alt={testimonial.name} />
                   <div>
                     <strong>{testimonial.name}</strong>
-                    <span>{testimonial.position}</span>
+                    <span>{intl.formatMessage({ id: `testimonial_position_${index + 1}` })}</span> {/* Dịch vị trí của từng khách hàng */}
                   </div>
                 </div>
               </div>

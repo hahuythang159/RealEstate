@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, message, Modal } from 'antd';
+import { useIntl } from 'react-intl';
 
 function ApprovedRentals() {
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null);
+  const intl = useIntl();
 
   useEffect(() => {
     const fetchRentals = async () => {
@@ -13,20 +15,20 @@ function ApprovedRentals() {
       try {
         const response = await fetch('/api/rentals/approved');
         if (!response.ok) {
-          throw new Error('Lỗi khi lấy danh sách hợp đồng đã duyệt.');
+          throw new Error(intl.formatMessage({ id: 'error.fetchApprovedRentals' }));
         }
         const data = await response.json();
         setRentals(data);
       } catch (error) {
         console.error('Error fetching rentals:', error);
-        message.error('Có lỗi xảy ra khi lấy danh sách hợp đồng đã duyệt.');
+        message.error(intl.formatMessage({ id: 'error.fetchApprovedRentals' }));
       } finally {
         setLoading(false);
       }
     };
 
     fetchRentals();
-  }, []);
+  }, [intl]);
 
   const handleViewDetails = (rental) => {
     setSelectedRental(rental);
@@ -45,33 +47,32 @@ function ApprovedRentals() {
 
   const columns = [
     {
-      title: 'Mã Hợp Đồng',
+      title: intl.formatMessage({ id: 'contract.id' }),
       dataIndex: 'id',
       key: 'id',
     },
-    
     {
-      title: 'Tên Bất Động Sản',
+      title: intl.formatMessage({ id: 'property.name' }),
       dataIndex: 'propertyName',
       key: 'propertyName',
     },
     {
-      title: 'Tên Chủ Sở Hữu',
+      title: intl.formatMessage({ id: 'owner.name' }),
       dataIndex: 'ownerName',
       key: 'ownerName',
     },
     {
-      title: 'Người thuê',
+      title: intl.formatMessage({ id: 'tenant.name' }),
       dataIndex: 'tenantName',
       key: 'tenantName',
     },
     {
-      title: 'Trạng thái',
+      title: intl.formatMessage({ id: 'status' }),
       dataIndex: 'status',
       key: 'status',
     },
     {
-      title: 'Hành động',
+      title: intl.formatMessage({ id: 'actions' }),
       key: 'action',
       render: (text, record) => (
         <Button
@@ -79,7 +80,7 @@ function ApprovedRentals() {
           onClick={() => handleViewDetails(record)}
           disabled={loading}
         >
-          Xem Chi Tiết
+          {intl.formatMessage({ id: 'view.details' })}
         </Button>
       ),
     },
@@ -87,7 +88,7 @@ function ApprovedRentals() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>Danh sách hợp đồng đã duyệt</h2>
+      <h2>{intl.formatMessage({ id: 'approvedRentals.title' })}</h2>
       <Table
         columns={columns}
         dataSource={rentals}
@@ -96,7 +97,7 @@ function ApprovedRentals() {
       />
 
       <Modal
-        title="Chi tiết hợp đồng"
+        title={intl.formatMessage({ id: 'modal.contractDetails' })}
         visible={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
@@ -104,27 +105,27 @@ function ApprovedRentals() {
         {selectedRental && (
           <div>
             <p>
-              <strong>Mã Hợp Đồng:</strong> {selectedRental.id}
+              <strong>{intl.formatMessage({ id: 'contract.id' })}:</strong> {selectedRental.id}
             </p>
             <p>
-              <strong>Người Thuê:</strong> {selectedRental.tenantName}
+              <strong>{intl.formatMessage({ id: 'tenant.name' })}:</strong> {selectedRental.tenantName}
             </p>
             <p>
-              <strong>Bất Động Sản:</strong> {selectedRental.propertyName}
+              <strong>{intl.formatMessage({ id: 'property.name' })}:</strong> {selectedRental.propertyName}
             </p>
             <p>
-              <strong>Chủ Sở Hữu:</strong> {selectedRental.ownerName}
+              <strong>{intl.formatMessage({ id: 'owner.name' })}:</strong> {selectedRental.ownerName}
             </p>
             <p>
-              <strong>Ngày bắt đầu:</strong>{' '}
+              <strong>{intl.formatMessage({ id: 'start.date' })}:</strong>{' '}
               {new Date(selectedRental.startDate).toLocaleString()}
             </p>
             <p>
-              <strong>Ngày kết thúc:</strong>{' '}
+              <strong>{intl.formatMessage({ id: 'end.date' })}:</strong>{' '}
               {new Date(selectedRental.endDate).toLocaleString()}
             </p>
             <p>
-              <strong>Trạng thái:</strong> {selectedRental.status}
+              <strong>{intl.formatMessage({ id: 'status' })}:</strong> {selectedRental.status}
             </p>
           </div>
         )}

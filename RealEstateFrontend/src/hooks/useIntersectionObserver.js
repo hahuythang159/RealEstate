@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 
-// Custom hook để kiểm tra khi nào phần tử xuất hiện trong viewport
 const useIntersectionObserver = (options) => {
   const [isVisible, setIsVisible] = useState(false);
 

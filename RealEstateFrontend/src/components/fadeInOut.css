@@ -1,8 +1,8 @@
-.image-carousel1,.hero-section1, .testimonials-section1, .trusted-companies1, .team-section1, .footer1,.git-hubGlobea {
+.image-carousel1,.hero-section1, .testimonials-section1, .trusted-companies1, .team-section1, .footer1 {
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
 }
-.git-hubGlobea.fade-in,
+
 .image-carousel1.fade-in,
 .hero-section1.fade-in,
 .testimonials-section1.fade-in,
@@ -12,7 +12,6 @@
   opacity: 1;
 }
 
-.git-hubGlobea.fade-out,
 .image-carousel1.fade-out,
 .hero-section1.fade-out,
 .testimonials-section1.fade-out,
@@ -21,3 +20,4 @@
 .footer1.fade-out {
   opacity: 0;
 }
+

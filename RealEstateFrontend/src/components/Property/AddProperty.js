@@ -10,6 +10,7 @@ import {
   Upload,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { useIntl } from 'react-intl';
 
 const { Option } = Select;
 
@@ -40,6 +41,7 @@ const AddProperty = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
+  const intl = useIntl();
   const navigate = useNavigate();
 
   // Fetch danh sách tỉnh từ API
@@ -124,51 +126,44 @@ const AddProperty = () => {
   const handleUploadChange = ({ fileList }) => {
     setImageFiles(fileList);
   };
-  
 
   const handleSubmit = async (values) => {
     setError('');
     setSuccess('');
-  
+
     if (!selectedCity || !selectedDistrict || !selectedWard) {
       setError('Vui lòng chọn tỉnh/thành phố, quận/huyện và phường/xã.');
       return;
     }
-  
+
     // Tạo FormData và thêm tất cả dữ liệu cùng file ảnh
     const formData = new FormData();
-    
+
     // Thêm các thuộc tính của Property vào FormData
     formData.append('Property.OwnerId', property.ownerId);
     formData.append('Property.ProvinceId', selectedCity);
     formData.append('Property.DistrictId', selectedDistrict);
     formData.append('Property.WardId', selectedWard);
-    
+
     // Thêm các trường dữ liệu khác vào formData
     Object.entries(values).forEach(([key, value]) => {
       formData.append(`Property.${key}`, value);
     });
-  
-    // Thêm các file ảnh vào FormData
+
     imageFiles.forEach((file) => {
-      formData.append('Images', file.originFileObj); // Gửi danh sách các ảnh với cùng key 'Images'
+      formData.append('Images', file.originFileObj);
     });
-  
-    // Log formData để kiểm tra
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
-    }
-  
+
     try {
       const response = await fetch('/api/properties', {
         method: 'POST',
         body: formData,
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-        console.log("Backend error:", errorData);
-  
+        console.log('Backend error:', errorData);
+
         setError(
           errorData.errors
             ? Object.values(errorData.errors).flat().join(', ')
@@ -176,31 +171,27 @@ const AddProperty = () => {
         );
         return;
       }
-  
       const data = await response.json();
-      console.log(data);
-  
       setSuccess('Thêm bất động sản thành công với ID: ' + data.id);
       message.success('Thêm bất động sản thành công!');
       navigate('/owner/my-product');
     } catch (err) {
-      console.error('Catch error:', err);
       setError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
   return (
     <div>
-      <h2>Thêm Bất Động Sản</h2>
+      <h2>{intl.formatMessage({ id: 'add_property' })}</h2>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
-          label="Nhập tiêu đề"
+          label={intl.formatMessage({ id: 'title' })}
           name="title"
           rules={[{ required: true, message: 'Hãy nhập tiêu đề' }]}
         >
           <Input onChange={handleChange} />
         </Form.Item>
 
-        <Form.Item label="Thành phố">
+        <Form.Item label={intl.formatMessage({ id: 'city' })}>
           <Select
             value={selectedCity}
             onChange={handleCityChange}
@@ -214,7 +205,7 @@ const AddProperty = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Quận/Huyện">
+        <Form.Item label={intl.formatMessage({ id: 'district' })}>
           <Select
             value={selectedDistrict}
             onChange={handleDistrictChange}
@@ -228,7 +219,7 @@ const AddProperty = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Phường/Xã">
+        <Form.Item label={intl.formatMessage({ id: 'ward' })}>
           <Select
             value={selectedWard}
             onChange={(value) => setSelectedWard(value)}
@@ -243,7 +234,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Địa chỉ cụ thể"
+          label={intl.formatMessage({ id: 'address' })}
           name="address"
           rules={[{ required: true, message: 'Hãy nhập số nhà/ tên đường' }]}
         >
@@ -251,7 +242,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Mô tả"
+          label={intl.formatMessage({ id: 'description' })}
           name="description"
           rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
         >
@@ -259,7 +250,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Giá"
+          label={intl.formatMessage({ id: 'price' })}
           required
           name="price"
           rules={[{ required: true, message: 'Vui lòng nhập số tiền' }]}
@@ -272,7 +263,7 @@ const AddProperty = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Hình ảnh" required>
+        <Form.Item label={intl.formatMessage({ id: 'uploadImages' })} required>
           <Upload
             listType="picture-card"
             fileList={imageFiles}
@@ -290,7 +281,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Phòng ngủ"
+          label={intl.formatMessage({ id: 'bedrooms' })}
           required
           name="bedrooms"
           rules={[{ required: true, message: 'Vui lòng nhập số phòng ngủ' }]}
@@ -304,7 +295,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Phòng tắm"
+          label={intl.formatMessage({ id: 'bathrooms' })}
           required
           name="bathrooms"
           rules={[{ required: true, message: 'Vui lòng nhập số phòng tắm' }]}
@@ -318,7 +309,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Diện tích (m²)"
+          label={intl.formatMessage({ id: 'area' })}
           required
           name="area"
           rules={[{ required: true, message: 'Vui lòng nhập diện tích' }]}
@@ -332,7 +323,7 @@ const AddProperty = () => {
         </Form.Item>
 
         <Form.Item
-          label="Loại bất động sản"
+          label={intl.formatMessage({ id: 'propertyType' })}
           required
           name="propertyType"
           rules={[
@@ -351,7 +342,7 @@ const AddProperty = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Tình trạng nội thất" name="interior">
+        <Form.Item label={intl.formatMessage({ id: 'interior' })} name="interior">
           <Select
             onChange={(value) => setProperty({ ...property, interior: value })}
           >

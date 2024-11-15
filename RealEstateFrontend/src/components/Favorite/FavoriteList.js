@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { message, Row, Col, Spin, Typography } from 'antd';
-import PropertyCard from '../Property/PropertyCard'; // Cập nhật đường dẫn này
+import { useIntl } from 'react-intl';
+import PropertyCard from '../Property/PropertyCard';
 
 const { Paragraph } = Typography;
 
 const Favorites = () => {
+    const { formatMessage } = useIntl();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const userId = localStorage.getItem('userId');
@@ -34,25 +36,24 @@ const Favorites = () => {
         fetchFavorites();
     }, [userId]);
 
-    console.log('favorites', favorites);
-
     return (
         <div>
-            <h2>Danh Sách Bất Động Sản Yêu Thích</h2>
-            {loading ? (<Spin tip="Đang tải..." />) 
-            : (favorites.length === 0 
-                ? (<Typography.Text type="danger">Không có bất động sản nào trong danh sách yêu thích.</Typography.Text>) 
+            <h2>{formatMessage({ id: 'favoritesTitle' })}</h2>
+            {loading ? (
+                <Spin tip={formatMessage({ id: 'loadingMessage' })} />
+            ) : (favorites.length === 0
+                ? (<Typography.Text type="danger">{formatMessage({ id: 'noFavorites' })}</Typography.Text>)
                 : (
-                <Row gutter={[16, 16]}>
-                    {favorites.map(item => (
-                        item && (
-                            <Col span={6} key={item.propertyId}>
-                                <PropertyCard property={item} />
-                            </Col>
-                        )
-                    ))}
-                </Row>
-            ))}
+                    <Row gutter={[16, 16]}>
+                        {favorites.map(item => (
+                            item && (
+                                <Col span={6} key={item.propertyId}>
+                                    <PropertyCard property={item} />
+                                </Col>
+                            )
+                        ))}
+                    </Row>
+                ))}
         </div>
     );
 };

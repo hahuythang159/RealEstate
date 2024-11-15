@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Google.Apis.Auth;
+
 
 [Route("api/[controller]")]
 [ApiController]
@@ -97,10 +99,10 @@ public class UsersController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Sub, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role) 
+            new Claim(ClaimTypes.Role, user.Role)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this_is_a_very_long_secret_key_1234567890123456")); 
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this_is_a_very_long_secret_key_1234567890123456"));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
@@ -216,6 +218,57 @@ public class UsersController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Avatar đã được cập nhật thành công." });
+    }
+
+    [HttpPost("google-login")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleDto)
+    {
+        try
+        {
+            var payload = await ValidateGoogleToken(googleDto.IdToken);
+            if (payload == null)
+            {
+                return BadRequest(new { message = "Mã token Google không hợp lệ." });
+            }
+            var email = payload.Email;
+
+            // Kiểm tra xem email có tồn tại trong hệ thống không
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return Ok(new { email, isNewUser = true });
+            }
+
+            if (!user.IsActive)
+            {
+                return BadRequest(new { message = "Tài khoản đã bị vô hiệu hóa." });
+            }
+
+            var token = GenerateJwtToken(user);
+            return Ok(new { message = "Đăng nhập thành công.", token, role = user.Role, userId = user.Id });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Lỗi máy chủ: " + ex.Message);
+        }
+    }
+
+    private async Task<GoogleJsonWebSignature.Payload> ValidateGoogleToken(string idToken)
+    {
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new List<string> { "" }
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+            return payload;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private bool UserExists(Guid id)

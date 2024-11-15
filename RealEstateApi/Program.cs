@@ -35,6 +35,7 @@ builder.Services.AddHostedService<ContractExpirationService>();
 
 // Cấu hình xác thực JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -49,7 +50,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]))
         };
     });
-
+builder.Services.AddAuthentication().AddGoogle(options =>
+{
+    options.ClientId = "";
+    options.ClientSecret = "";
+});
 // CORS configuration
 builder.Services.AddCors(options =>
 {
@@ -142,8 +147,8 @@ app.MapHub<ChatHub>("/chathub");
 app.UseStaticFiles();
 app.MapControllers();
 
-builder.Logging.AddConsole();  
-builder.Logging.AddDebug();   
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 app.Run();
 

@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Form, Input, message, List } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useIntl } from 'react-intl';
 import 'dayjs/locale/vi';
-
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -27,16 +27,19 @@ const PropertyDetail = () => {
   const [newComment, setNewComment] = useState('');
   const [owner, setOwner] = useState(null);
 
+  const intl = useIntl(); // Lấy đối tượng intl từ react-intl
+
   const fetchProperty = async () => {
     try {
       const response = await fetch(`/api/properties/${id}`);
-      if (!response.ok) throw new Error('Không thể lấy thông tin bất động sản');
+      if (!response.ok)
+        throw new Error(intl.formatMessage({ id: 'fetch_property_error' }));
       const data = await response.json();
       setProperty(data);
       setImages(data.images || []);
       await fetchOwner(data.ownerId);
     } catch (error) {
-      message.error(`Không thể lấy thông tin bất động sản: ${error.message}`);
+      message.error(intl.formatMessage({ id: 'fetch_property_error' }));
     } finally {
       setLoading(false);
     }
@@ -46,11 +49,11 @@ const PropertyDetail = () => {
     try {
       const response = await fetch(`/api/users/${ownerId}`);
       if (!response.ok)
-        throw new Error(`Lỗi ${response.status}: ${response.statusText}`);
+        throw new Error(intl.formatMessage({ id: 'fetch_owner_error' }));
       const ownerData = await response.json();
       setOwner(ownerData);
     } catch (error) {
-      message.error(`Không thể lấy thông tin chủ sở hữu: ${error.message}`);
+      message.error(intl.formatMessage({ id: 'fetch_owner_error' }));
     }
   };
 
@@ -88,13 +91,13 @@ const PropertyDetail = () => {
     if (userRole === 'Tenant') {
       navigate(`/add-rental`, { state: { propertyId: id } });
     } else {
-      message.error('Bạn không có quyền tạo hợp đồng.');
+      message.error(intl.formatMessage({ id: 'create_rental_error' }));
     }
   };
 
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) {
-      message.error('Vui lòng nhập nội dung bình luận');
+      message.error(intl.formatMessage({ id: 'empty_comment_error' }));
       return;
     }
 
@@ -114,9 +117,9 @@ const PropertyDetail = () => {
       const newCommentFromServer = await response.json();
       setComments([...comments, newCommentFromServer]);
       setNewComment('');
-      message.success('Bình luận đã được gửi');
+      message.success(intl.formatMessage({ id: 'comment_success' }));
     } else {
-      message.error('Gửi bình luận thất bại');
+      message.error(intl.formatMessage({ id: 'comment_error' }));
     }
   };
 
@@ -124,7 +127,7 @@ const PropertyDetail = () => {
     <div style={{ padding: '20px' }}>
       {property ? (
         <Card
-          title="Chi tiết Bất động sản"
+          title={intl.formatMessage({ id: 'property_detail' })}
           bordered={true}
           style={{ maxWidth: '600px', margin: 'auto' }}
         >
@@ -144,51 +147,59 @@ const PropertyDetail = () => {
 
           <h3>{property.title}</h3>
           <p>
-            <strong>Giá:</strong> {property.price} VNĐ
+            <strong>{intl.formatMessage({ id: 'price1' })}:</strong>{' '}
+            {property.price} VNĐ
           </p>
           <p>
-            <strong>Diện tích:</strong> {property.area} m²
+            <strong>{intl.formatMessage({ id: 'area1' })}:</strong>{' '}
+            {property.area} m²
           </p>
           <p>
-            <strong>Phòng ngủ:</strong> {property.bedrooms}
+            <strong>{intl.formatMessage({ id: 'bedrooms1' })}:</strong>{' '}
+            {property.bedrooms}
           </p>
           <p>
-            <strong>Phòng tắm:</strong> {property.bathrooms}
+            <strong>{intl.formatMessage({ id: 'bathrooms1' })}:</strong>{' '}
+            {property.bathrooms}
           </p>
           <p>
-            <strong>Địa chỉ:</strong> {property.address}, {ward}, {district},{' '}
-            {province}
+            <strong>{intl.formatMessage({ id: 'address1' })}:</strong>{' '}
+            {property.address}, {ward}, {district}, {province}
           </p>
           <p>
-            <strong>Mô tả:</strong> {property.description}
+            <strong>{intl.formatMessage({ id: 'description' })}:</strong>{' '}
+            {property.description}
           </p>
           <p>
-            <strong>Loại hình sử dụng:</strong> {property.propertyType}
+            <strong>{intl.formatMessage({ id: 'property_type' })}:</strong>{' '}
+            {property.propertyType}
           </p>
           <p>
-            <strong>Tình trạng nội thất:</strong> {property.interior}
+            <strong>{intl.formatMessage({ id: 'interior_condition' })}:</strong>{' '}
+            {property.interior}
           </p>
           <p>
-            <strong>Thời gian đăng:</strong>{' '}
-            {dayjs(property.postedDate).format('DD/MM/YYYY HH:mm')}
-            <br />({dayjs(property.postedDate).fromNow()})
+            <strong>{intl.formatMessage({ id: 'posted_date' })}:</strong>{' '}
+            {dayjs(property.postedDate).format('DD/MM/YYYY HH:mm')} (
+            {dayjs(property.postedDate).fromNow()})
           </p>
 
           {owner && (
             <p>
-              <strong>Chủ sở hữu:</strong> {owner.userName}
+              <strong>{intl.formatMessage({ id: 'owner' })}:</strong>{' '}
+              {owner.userName}
             </p>
           )}
 
           <div style={{ marginTop: '20px' }}>
             {userRole === 'Tenant' && (
               <Button type="primary" onClick={handleCreateRental}>
-                Tạo hợp đồng thuê
+                {intl.formatMessage({ id: 'create_rental' })}
               </Button>
             )}
           </div>
 
-          <h3>Bình luận</h3>
+          <h3>{intl.formatMessage({ id: 'comments' })}</h3>
           <div>
             {comments.length > 0 ? (
               comments.map((comment) => (
@@ -232,7 +243,7 @@ const PropertyDetail = () => {
                 </div>
               ))
             ) : (
-              <p>Chưa có bình luận.</p>
+              <p>{intl.formatMessage({ id: 'no_comments' })}</p>
             )}
           </div>
 
@@ -245,20 +256,20 @@ const PropertyDetail = () => {
               <Input.TextArea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Viết bình luận..."
+                placeholder={intl.formatMessage({ id: 'comment_placeholder' })}
                 rows={2}
                 style={{ width: '400px' }}
               />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">
-                Gửi bình luận
+                {intl.formatMessage({ id: 'submit_comment' })}
               </Button>
             </Form.Item>
           </Form>
         </Card>
       ) : (
-        <p>Loading...</p>
+        <p>{intl.formatMessage({ id: 'loading' })}</p>
       )}
     </div>
   );

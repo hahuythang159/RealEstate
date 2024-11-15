@@ -11,10 +11,12 @@ import {
   Upload,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { useIntl } from 'react-intl';
 
 const { Option } = Select;
 
 const ProfilePage = () => {
+  const { formatMessage } = useIntl();
   const [currentUser, setCurrentUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -26,13 +28,13 @@ const ProfilePage = () => {
   const fetchCurrentUser = async () => {
     const userId = localStorage.getItem('userId');
     if (!userId) {
-      message.error('Không thể lấy ID người dùng.');
+      message.error(formatMessage({ id: 'fetchError' }));
       return;
     }
 
     try {
       const response = await fetch(`/api/users/${userId}`);
-      if (!response.ok) throw new Error('Không thể tải thông tin cá nhân');
+      if (!response.ok) throw new Error(formatMessage({ id: 'loadError' }));
       const data = await response.json();
       setCurrentUser(data);
     } catch (error) {
@@ -56,13 +58,11 @@ const ProfilePage = () => {
       });
 
       if (response.ok) {
-        message.success('Thông tin cá nhân đã được chỉnh sửa thành công!');
+        message.success(formatMessage({ id: 'updateSuccess' }));
         fetchCurrentUser();
       } else {
         const errorText = await response.text();
-        throw new Error(
-          errorText || 'Có lỗi xảy ra khi chỉnh sửa thông tin cá nhân!'
-        );
+        throw new Error(errorText || formatMessage({ id: 'updateError' }));
       }
     } catch (error) {
       message.error(error.message);
@@ -86,14 +86,18 @@ const ProfilePage = () => {
       });
 
       if (response.ok) {
-        message.success('Avatar đã được cập nhật!');
+        message.success(formatMessage({ id: 'avatarUploadSuccess' }));
         fetchCurrentUser();
       } else {
         const errorText = await response.text();
-        message.error(`Có lỗi khi tải lên avatar: ${errorText}`);
+        message.error(
+          `${formatMessage({ id: 'avatarUploadError' })}: ${errorText}`
+        );
       }
     } catch (error) {
-      message.error(`Có lỗi khi tải lên avatar: ${error.message}`);
+      message.error(
+        `${formatMessage({ id: 'avatarUploadError' })}: ${error.message}`
+      );
     }
 
     return false;
@@ -104,7 +108,7 @@ const ProfilePage = () => {
       const values = await form.validateFields();
       await updateUser(values);
     } catch (error) {
-      message.error('Lỗi khi chỉnh sửa thông tin!');
+      message.error(formatMessage({ id: 'editError' }));
     }
   };
 
@@ -116,64 +120,80 @@ const ProfilePage = () => {
     <>
       {currentUser && (
         <div style={{ marginTop: '20px' }}>
-          <h2>Thông Tin Cá Nhân</h2>
+          <h2>{formatMessage({ id: 'userProfile' })}</h2>
           <Avatar src={currentUser.avatar} size={100} />
           <p>
-            <strong>Tên Người Dùng:</strong> {currentUser.userName}
+            <strong>{formatMessage({ id: 'userName' })}:</strong>{' '}
+            {currentUser.userName}
           </p>
           <p>
-            <strong>Email:</strong> {currentUser.email}
+            <strong>{formatMessage({ id: 'email' })}:</strong>{' '}
+            {currentUser.email}
           </p>
           <p>
-            <strong>Số Điện Thoại:</strong> {currentUser.phoneNumber}
+            <strong>{formatMessage({ id: 'phoneNumber' })}:</strong>{' '}
+            {currentUser.phoneNumber}
           </p>
           <p>
-            <strong>Vai Trò:</strong> {currentUser.role}
+            <strong>{formatMessage({ id: 'role' })}:</strong> {currentUser.role}
           </p>
           <p>
-            <strong>Trạng Thái:</strong>{' '}
-            {currentUser.isActive ? 'Hoạt Động' : 'Vô hiệu hoá'}
+            <strong>{formatMessage({ id: 'status' })}:</strong>{' '}
+            {currentUser.isActive
+              ? formatMessage({ id: 'active' })
+              : formatMessage({ id: 'inactive' })}
           </p>
           <Upload beforeUpload={handleUploadAvatar} showUploadList={false}>
-            <Button icon={<UploadOutlined />}>Tải lên Avatar</Button>
+            <Button icon={<UploadOutlined />}>
+              {formatMessage({ id: 'uploadAvatar' })}
+            </Button>
           </Upload>
           <Button type="primary" onClick={handleEdit}>
-            Chỉnh Sửa
+            {formatMessage({ id: 'edit' })}
           </Button>
         </div>
       )}
 
       <Modal
-        title="Chỉnh Sửa Thông Tin Cá Nhân"
+        title={formatMessage({ id: 'editProfile' })}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="userName" label="Tên Người Dùng">
+          <Form.Item name="userName" label={formatMessage({ id: 'userName' })}>
             <Input />
           </Form.Item>
-          <Form.Item name="email" label="Email">
+          <Form.Item name="email" label={formatMessage({ id: 'email' })}>
             <Input />
           </Form.Item>
-          <Form.Item name="phoneNumber" label="Số Điện Thoại">
+          <Form.Item
+            name="phoneNumber"
+            label={formatMessage({ id: 'phoneNumber' })}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="role" label="Vai Trò">
-            <Select placeholder="Chọn vai trò" disabled>
-              <Option value="Manager">Quản lý</Option>
-              <Option value="Tenant">Người thuê</Option>
-              <Option value="Owner">Chủ bất động sản</Option>
+          <Form.Item name="role" label={formatMessage({ id: 'role' })}>
+            <Select placeholder={formatMessage({ id: 'role' })} disabled>
+              <Option value="Manager">
+                {formatMessage({ id: 'roleManager' })}
+              </Option>
+              <Option value="Tenant">
+                {formatMessage({ id: 'roleTenant' })}
+              </Option>
+              <Option value="Owner">
+                {formatMessage({ id: 'roleOwner' })}
+              </Option>
             </Select>
           </Form.Item>
           <Form.Item
             name="isActive"
-            label="Trạng Thái Hoạt Động"
+            label={formatMessage({ id: 'status' })}
             valuePropName="checked"
           >
             <Switch
-              checkedChildren="Hoạt Động"
-              unCheckedChildren="Vô hiệu hoá"
+              checkedChildren={formatMessage({ id: 'active' })}
+              unCheckedChildren={formatMessage({ id: 'inactive' })}
             />
           </Form.Item>
         </Form>
