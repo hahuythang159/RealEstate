@@ -263,7 +263,8 @@
   "select_price_range": "Chọn khoảng giá",
   "select_bedrooms": "Chọn số phòng ngủ",
   "select_bathrooms": "Chọn số phòng tắm",
-  "apply_filter": "Áp dụng bộ lọc",
+  "select_interior": "Chọn nội thất",
+  "apply_filter": "Xoá bộ lọc",
   "below_1_million": "Giá dưới 1 triệu",
   "1_to_2_million": "Giá 1 - 2 triệu",
   "2_to_4_million": "Giá 2 - 4 triệu",
@@ -278,5 +279,8 @@
   "bathroom_1": "1 phòng tắm",
   "bathroom_2": "2 phòng tắm",
   "bathroom_3": "3 phòng tắm",
-  "bathroom_above_4": "Trên 4 phòng tắm"
+  "bathroom_above_4": "Trên 4 phòng tắm",
+  "luxury_interior": "Nội thất cao cấp",
+  "basic_interior": "Nội thất cơ bản",
+  "no_interior": "Không có nội thất"
 }

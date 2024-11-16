@@ -22,13 +22,15 @@ public class PropertiesController : ControllerBase
     // GET: api/properties
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Property>>> GetProperties(
-        [FromQuery] decimal? minPrice,
-        [FromQuery] decimal? maxPrice,
-        [FromQuery] int? bedrooms,
-        [FromQuery] int? bathrooms,
-        [FromQuery] int? provinceId,
-        [FromQuery] int? districtId,
-        [FromQuery] int? wardId)
+    [FromQuery] decimal? minPrice,
+    [FromQuery] decimal? maxPrice,
+    [FromQuery] int? bedrooms,
+    [FromQuery] int? bathrooms,
+    [FromQuery] int? provinceId,
+    [FromQuery] int? districtId,
+    [FromQuery] int? wardId,
+    [FromQuery] string? interior
+)
     {
         var query = _context.Properties
             .Include(p => p.Province)
@@ -46,6 +48,7 @@ public class PropertiesController : ControllerBase
         if (provinceId.HasValue) query = query.Where(p => p.ProvinceId == provinceId.Value);
         if (districtId.HasValue) query = query.Where(p => p.DistrictId == districtId.Value);
         if (wardId.HasValue) query = query.Where(p => p.WardId == wardId.Value);
+        if (!string.IsNullOrEmpty(interior)) query = query.Where(p => p.Interior == interior);
 
         var properties = await query.ToListAsync();
 

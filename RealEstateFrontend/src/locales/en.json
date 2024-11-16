@@ -263,7 +263,8 @@
   "select_price_range": "Select Price Range",
   "select_bedrooms": "Select Bedrooms",
   "select_bathrooms": "Select Bathrooms",
-  "apply_filter": "Apply Filter",
+  "select_interior": "Select Interior",
+  "apply_filter": "Delete Filter",
   "below_1_million": "Below 1 Million",
   "1_to_2_million": "1 - 2 Million",
   "2_to_4_million": "2 - 4 Million",
@@ -278,5 +279,8 @@
   "bathroom_1": "1 Bathroom",
   "bathroom_2": "2 Bathrooms",
   "bathroom_3": "3 Bathrooms",
-  "bathroom_above_4": "Above 4 Bathrooms"
+  "bathroom_above_4": "Above 4 Bathrooms",
+  "luxury_interior": "High-end Furniture",
+  "basic_interior": "Basic Furniture",
+  "no_interior": "No Furniture"
 }

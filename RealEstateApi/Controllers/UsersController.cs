@@ -219,7 +219,7 @@ public class UsersController : ControllerBase
 
         return Ok(new { message = "Avatar đã được cập nhật thành công." });
     }
-
+    
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleDto)
     {

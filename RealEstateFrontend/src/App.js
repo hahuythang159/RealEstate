@@ -32,6 +32,7 @@ import ProductList from './components/Property/ProductList';
 import VisitPage from './components/VisitPage';
 import TrustedCompanies from './components/TrustedCompanies';
 import PriceChart from './components/PriceChart';
+import ThemeAndLanguageSwitcher from './components/ThemeAndLanguageSwitcher';
 
 // Import các dashboard theo vai trò
 import OwnerDashboard from './components/Dashboard/OwnerDashboard';
@@ -58,8 +59,8 @@ const App = () => {
   const role = localStorage.getItem('role');
   const [locale, setLocale] = useState('vi');
 
-  const renderDashboard = (Component, requiredRole) => {
-    return role === requiredRole ? (
+  const renderDashboard = (Component, allowedRoles) => {
+    return allowedRoles.includes(role) ? (
       <Component />
     ) : (
       <Navigate to="/access-denied" />
@@ -91,47 +92,14 @@ const App = () => {
           },
         }}
       >
-        <div
-          className={`fixed-circle ${isDarkMode ? 'dark-mode' : 'light-mode'}`}
-          style={{
-            padding: '10px',
-            display: 'flex',
-            gap: '15px',
-            paddingLeft: '1350px',
-            backgroundColor: isDarkMode ? '#333' : '#ffff',
-            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <i
-            className={`fas ${isDarkMode ? 'fa-moon' : 'fa-sun'} ${isDarkMode ? 'active' : ''}`}
-            onClick={handleClick}
-            style={{
-              fontSize: '15px',
-              cursor: 'pointer',
-              color: isDarkMode ? '#fff' : '#FFD700',
-            }}
-          />
-          <i
-            className={`fas fa-language ${locale === 'vi' ? 'active' : ''}`}
-            onClick={handleLocaleChange}
-            style={{
-              fontSize: '15px',
-              cursor: 'pointer',
-              gap: '5px',
-              position: 'relative',
-            }}
-          >
-            <i
-              style={{
-                marginLeft: '2px',
-                fontSize: '12px',
-                position: 'absolute',
-              }}
-            >
-              {locale === 'vi' ? 'VN' : 'GB'}
-            </i>
-          </i>
-        </div>
+         <div>
+        <ThemeAndLanguageSwitcher
+          isDarkMode={isDarkMode}
+          locale={locale}
+          onThemeToggle={handleClick}
+          onLocaleChange={handleLocaleChange}
+        />
+      </div>
         <Router>
           <AppHeader logo={logo} isDarkMode={isDarkMode} />
           <Routes>

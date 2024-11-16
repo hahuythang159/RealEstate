@@ -8,7 +8,6 @@ import HeroSection from '../components/HeroSection';
 import TeamSection from '../components/TeamSection';
 import Testimonials from '../components/Testimonials';
 import Footer from '../pages/Footer';
-import useIntersectionObserver from '../hooks/useIntersectionObserver';
 
 const Home = () => {
   const [properties, setProperties] = useState([]);
@@ -25,6 +24,7 @@ const Home = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [interior, setInterior] = useState(null);   
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -77,6 +77,7 @@ const Home = () => {
       if (selectedProvince) query.append('provinceId', selectedProvince);
       if (selectedDistrict) query.append('districtId', selectedDistrict);
       if (selectedWard) query.append('wardId', selectedWard);
+      if (interior) query.append('interior', interior);
 
       const response = await fetch(`/api/properties?${query.toString()}`);
       const data = await response.json();
@@ -89,7 +90,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [minPrice, maxPrice, bedrooms, bathrooms, selectedProvince, selectedDistrict, selectedWard]);
+  }, [minPrice, maxPrice, bedrooms, bathrooms, selectedProvince, selectedDistrict, selectedWard, interior]);
 
   const paginatedProperties = properties.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
@@ -118,6 +119,7 @@ const Home = () => {
         setMaxPrice={setMaxPrice}
         setBedrooms={setBedrooms}
         setBathrooms={setBathrooms}
+        setInterior={setInterior}
         handleFilterChange={fetchProperties}
       />
       <PropertyList

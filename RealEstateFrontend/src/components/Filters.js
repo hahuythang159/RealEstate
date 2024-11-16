@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Select, Button } from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
+import { ClearOutlined  } from '@ant-design/icons';
 import { useIntl } from 'react-intl';
 
 const { Option } = Select;
@@ -19,9 +19,23 @@ const Filters = ({
   setMaxPrice,
   setBedrooms,
   setBathrooms,
+  setInterior,
   handleFilterChange
 }) => {
   const intl = useIntl();
+  const handleClearFilters = () => {
+    setSelectedProvince(null);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    setMinPrice(null);
+    setMaxPrice(null);
+    setBedrooms(null);
+    setBathrooms(null);
+    setInterior(null);
+
+    // Gọi lại hàm lọc (reload dữ liệu) sau khi reset bộ lọc
+    handleFilterChange();
+  };
 
   return (
     <Row gutter={[16, 16]} style={{ paddingTop: 20 }}>
@@ -170,12 +184,25 @@ const Filters = ({
         </Select>
       </Col>
 
+      {/* Chọn nội thất */}
+      <Col xs={24} sm={12} md={6}>
+        <Select
+          placeholder={intl.formatMessage({ id: 'select_interior' })}
+          style={{ width: '100%' }}
+          onChange={(value) => setInterior(value)}
+        >
+          <Option value="Nội thất cao cấp">{intl.formatMessage({ id: 'luxury_interior' })}</Option>
+          <Option value="Nội thất cơ bản">{intl.formatMessage({ id: 'basic_interior' })}</Option>
+          <Option value="Không có nội thất">{intl.formatMessage({ id: 'no_interior' })}</Option>
+        </Select>
+      </Col> 
+
       {/* Áp dụng bộ lọc */}
       <Col xs={24} sm={12} md={6}>
         <Button
-          type="primary"
-          icon={<FilterOutlined />}
-          onClick={handleFilterChange}
+          type="default"
+          icon={<ClearOutlined />}
+          onClick={handleClearFilters}
           style={{ width: '100%' }}
         >
           {intl.formatMessage({ id: 'apply_filter' })}
