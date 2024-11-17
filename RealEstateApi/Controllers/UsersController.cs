@@ -186,44 +186,44 @@ public class UsersController : ControllerBase
 
     // POST: api/users/upload-avatar
     [HttpPost("upload-avatar/{userId}")]
-public async Task<IActionResult> UploadAvatar(Guid userId, IFormFile avatar)
-{
-    if (avatar == null || avatar.Length == 0)
+    public async Task<IActionResult> UploadAvatar(Guid userId, IFormFile avatar)
     {
-        return BadRequest("No file uploaded.");
+        if (avatar == null || avatar.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        // Kiểm tra loại file, kích thước, v.v...
+        var fileExtension = Path.GetExtension(avatar.FileName);
+        if (fileExtension != ".jpg" && fileExtension != ".png")
+        {
+            return BadRequest("Invalid file type. Only .jpg and .png are allowed.");
+        }
+
+        // Tạo tên file duy nhất để tránh trùng lặp
+        var fileName = Guid.NewGuid().ToString() + fileExtension;
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars", fileName);
+
+        // Lưu tệp tin vào thư mục
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await avatar.CopyToAsync(stream);
+        }
+
+        // Cập nhật đường dẫn avatar cho user
+        user.AvatarUrl = $"/avatars/{fileName}";
+
+        _context.Entry(user).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { AvatarPath = user.AvatarUrl });
     }
-
-    var user = await _context.Users.FindAsync(userId);
-    if (user == null)
-    {
-        return NotFound("User not found.");
-    }
-
-    // Kiểm tra loại file, kích thước, v.v...
-    var fileExtension = Path.GetExtension(avatar.FileName);
-    if (fileExtension != ".jpg" && fileExtension != ".png")
-    {
-        return BadRequest("Invalid file type. Only .jpg and .png are allowed.");
-    }
-
-    // Tạo tên file duy nhất để tránh trùng lặp
-    var fileName = Guid.NewGuid().ToString() + fileExtension; // Tên file ngẫu nhiên
-    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars", fileName);
-
-    // Lưu tệp tin vào thư mục
-    using (var stream = new FileStream(filePath, FileMode.Create))
-    {
-        await avatar.CopyToAsync(stream);
-    }
-
-    // Cập nhật đường dẫn avatar cho user
-    user.AvatarUrl = $"/avatars/{fileName}"; // Đường dẫn tương đối cho frontend
-
-    _context.Entry(user).State = EntityState.Modified;
-    await _context.SaveChangesAsync();
-
-    return Ok(new { AvatarPath = user.AvatarUrl });
-}
 
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleDto)

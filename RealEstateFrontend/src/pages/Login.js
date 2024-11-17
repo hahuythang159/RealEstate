@@ -87,7 +87,7 @@ const Login = () => {
             case 'Owner':
             case 'Tenant':
             case 'Manager':
-              navigate('/'); // Adjust this to the correct path for your application
+              navigate('/');
               break;
             default:
               navigate('/');
@@ -112,9 +112,26 @@ const Login = () => {
       <div className="form-container-login">
         {' '}
         {/* Lớp chứa form đăng nhập */}
-        <Title level={2}>
-          <FormattedMessage id="login.title" defaultMessage="Đăng Nhập" />
+        <Title level={3}>
+          <FormattedMessage id="login.title" defaultMessage="Welcome Back" />
         </Title>
+        <Form.Item>
+          <GoogleOAuthProvider clientId="942288651749-7o3kthjiu74glonrhk53ejikgr26lj0m.apps.googleusercontent.com">
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginFailure}
+              useOneTap
+            />
+          </GoogleOAuthProvider>
+        </Form.Item>
+        <div className="or-login-with">
+          <span>
+            <FormattedMessage
+              id="login.orLoginWith"
+              defaultMessage="or Login with"
+            />
+          </span>
+        </div>
         <Form
           name="login-form"
           onFinish={handleLogin}
@@ -159,15 +176,6 @@ const Login = () => {
                 defaultMessage="Đăng ký tài khoản"
               />
             </Button>
-          </Form.Item>
-          <Form.Item>
-            <GoogleOAuthProvider clientId="942288651749-7o3kthjiu74glonrhk53ejikgr26lj0m.apps.googleusercontent.com">
-              <GoogleLogin
-                onSuccess={handleGoogleLoginSuccess}
-                onError={handleGoogleLoginFailure}
-                useOneTap
-              />
-            </GoogleOAuthProvider>
           </Form.Item>
         </Form>
       </div>

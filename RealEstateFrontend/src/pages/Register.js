@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, message } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  Row,
+  Col,
+  message,
+  Typography,
+} from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import './RegisterForm.css';
+
+const { Title } = Typography;
 
 const RegisterForm = () => {
   const [userName, setUserName] = useState('');
@@ -15,13 +26,11 @@ const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const intl = useIntl();
-
   const location = useLocation();
 
   useEffect(() => {
     if (location.state?.email) {
       setEmail(location.state.email);
-      console.log('Email đã được cập nhật:', location.state.email);
     }
   }, [location.state]);
 
@@ -32,9 +41,8 @@ const RegisterForm = () => {
 
   const handleRegister = async (values) => {
     setLoading(true);
-
-    const emailToSend = email || values.email;
     const { userName, password, confirmPassword, phoneNumber, role } = values;
+    const emailToSend = email || values.email;
     if (password !== confirmPassword) {
       setError(intl.formatMessage({ id: 'error.passwordMismatch' }));
       setLoading(false);
@@ -85,28 +93,61 @@ const RegisterForm = () => {
   return (
     <div className="register-container">
       <div className="form-container-register">
-        <h2>{intl.formatMessage({ id: 'register.title' })}</h2>
+        <Title level={3}>
+          <FormattedMessage id="register.title" defaultMessage="Register" />
+        </Title>
         <Form
           name="register"
           onFinish={handleRegister}
           initialValues={{ email: email, role: 'Tenant' }}
           layout="vertical"
         >
-          <Form.Item
-            label={intl.formatMessage({ id: 'register.userNameLabel' })}
-            name="userName"
-            rules={[
-              {
-                required: true,
-                message: intl.formatMessage({ id: 'register.userNameError' }),
-              },
-            ]}
-          >
-            <Input
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-            />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={intl.formatMessage({ id: 'register.userNameLabel' })}
+                name="userName"
+                rules={[
+                  {
+                    required: true,
+                    message: intl.formatMessage({
+                      id: 'register.userNameError',
+                    }),
+                  },
+                ]}
+              >
+                <Input
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={intl.formatMessage({ id: 'register.phoneLabel' })}
+                name="phoneNumber"
+                rules={[
+                  {
+                    required: true,
+                    message: intl.formatMessage({ id: 'register.phoneError' }),
+                  },
+                  {
+                    validator: (_, value) =>
+                      isValidPhoneNumber(value)
+                        ? Promise.resolve()
+                        : Promise.reject(
+                            intl.formatMessage({ id: 'register.phoneInvalid' })
+                          ),
+                  },
+                ]}
+              >
+                <Input
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item
             label={intl.formatMessage({ id: 'register.passwordLabel' })}
@@ -142,66 +183,48 @@ const RegisterForm = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            label={intl.formatMessage({ id: 'register.emailLabel' })}
-            name="email"
-            rules={[
-              {
-                required: !location.state?.email,
-                type: 'email',
-                message: intl.formatMessage({ id: 'register.emailError' }),
-              },
-            ]}
-          >
-            {location.state?.email ? (
-              // Nếu có email từ state, hiển thị email và không cho phép chỉnh sửa
-              <Input value={email} disabled />
-            ) : (
-              // Nếu không có email, cho phép người dùng nhập
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-            )}
-          </Form.Item>
-
-          <Form.Item
-            label={intl.formatMessage({ id: 'register.phoneLabel' })}
-            name="phoneNumber"
-            rules={[
-              {
-                required: true,
-                message: intl.formatMessage({ id: 'register.phoneError' }),
-              },
-              {
-                validator: (_, value) =>
-                  isValidPhoneNumber(value)
-                    ? Promise.resolve()
-                    : Promise.reject(
-                        intl.formatMessage({ id: 'register.phoneInvalid' })
-                      ),
-              },
-            ]}
-          >
-            <Input
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={intl.formatMessage({ id: 'register.roleLabel' })}
-            name="role"
-          >
-            <Select value={role} onChange={(value) => setRole(value)}>
-              <Select.Option value="Owner">
-                {intl.formatMessage({ id: 'register.roleOwner' })}
-              </Select.Option>
-              <Select.Option value="Tenant">
-                {intl.formatMessage({ id: 'register.roleTenant' })}
-              </Select.Option>
-              <Select.Option value="Manager">
-                {intl.formatMessage({ id: 'register.roleManager' })}
-              </Select.Option>
-            </Select>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={intl.formatMessage({ id: 'register.emailLabel' })}
+                name="email"
+                rules={[
+                  {
+                    required: !location.state?.email,
+                    type: 'email',
+                    message: intl.formatMessage({ id: 'register.emailError' }),
+                  },
+                ]}
+              >
+                {location.state?.email ? (
+                  <Input value={email} disabled />
+                ) : (
+                  <Input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                )}
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={intl.formatMessage({ id: 'register.roleLabel' })}
+                name="role"
+              >
+                <Select value={role} onChange={(value) => setRole(value)}>
+                  <Select.Option value="Owner">
+                    {intl.formatMessage({ id: 'register.roleOwner' })}
+                  </Select.Option>
+                  <Select.Option value="Tenant">
+                    {intl.formatMessage({ id: 'register.roleTenant' })}
+                  </Select.Option>
+                  <Select.Option value="Manager">
+                    {intl.formatMessage({ id: 'register.roleManager' })}
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={loading}>
@@ -210,6 +233,7 @@ const RegisterForm = () => {
                 : intl.formatMessage({ id: 'register.submit' })}
             </Button>
           </Form.Item>
+
           <Form.Item>
             <Button
               type="link"

@@ -1,5 +1,5 @@
 {
-  "login.title": "Đăng Nhập",
+  "login.title": "Chào mừng trở lại",
   "login.emailLabel": "Email",
   "login.passwordLabel": "Mật khẩu",
   "login.emailRequired": "Vui lòng nhập email của bạn!",
@@ -9,6 +9,7 @@
   "login.success": "Đăng nhập thành công!",
   "login.error": "Đăng nhập thất bại. Vui lòng thử lại.",
   "login.registerButton": "Đăng ký tài khoản",
+  "login.orLoginWith": "hoặc Đăng nhập với",
 
   "register.title": "Đăng Ký",
   "register.userNameLabel": "Tên người dùng",
@@ -179,7 +180,8 @@
   "property_info": "Thông tin bất động sản",
   "rental_months_label": "Số tháng thuê",
   "rental_months_error": "Vui lòng nhập số tháng thuê!",
-  "rental_months_invalid": "Số tháng thuê phải lớn hơn hoặc bằng 1!",
+  "rental_months_invalid": "Số tháng thuê phải lớn hơn hoặc bằng 3!",
+  "rental_months_max_error": "Thời gian thuê không thể vượt quá 24 tháng!",
   "start_date_label": "Ngày bắt đầu",
   "view_terms_button": "Xem điều khoản",
   "terms_modal_title": "Điều khoản hợp đồng",
