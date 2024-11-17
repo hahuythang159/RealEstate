@@ -31,7 +31,8 @@
   "error.passwordMismatch": "Mật khẩu và mật khẩu xác nhận không khớp.",
   "error.registerFailed": "Đăng ký thất bại.",
   "error.serverError": "Có lỗi xảy ra, vui lòng thử lại sau.",
-  "success.register": "Đăng ký thành công",
+  "success.register": "Đăng ký thành công, vui lòng đăng nhập lại để tiếp tục!",
+  "register.alreadyHaveAccount": "Đã có tài khoản? Đăng nhập",
 
   "awaitingApproval.title": "Danh sách hợp đồng đang chờ duyệt",
   "awaitingApproval.column.id": "ID",
@@ -82,7 +83,7 @@
   "roleTenant": "Người thuê",
   "roleOwner": "Chủ bất động sản",
   "editError": "Lỗi khi chỉnh sửa thông tin!",
-  
+
   "favoritesTitle": "Danh Sách Bất Động Sản Yêu Thích",
   "loadingMessage": "Đang tải...",
   "noFavorites": "Không có bất động sản nào trong danh sách yêu thích.",
@@ -118,7 +119,6 @@
     "wardRequired": "Vui lòng chọn xã/phường"
   },
 
-
   "add_property": "Thêm bất động sản",
   "manage_property": "Quản lý bất động sản",
   "contract_list": "Danh sách hợp đồng",
@@ -139,7 +139,7 @@
   "user_edited_successfully": "Người dùng đã được chỉnh sửa thành công!",
   "error_editing_user": "Có lỗi xảy ra khi chỉnh sửa người dùng!",
   "error_fetching_users": "Lỗi khi lấy danh sách người dùng!",
-  
+
   "canceled_rentals": "Danh Sách Hợp Đồng Đã Bị Huỷ",
   "contract_id": "Mã Hợp Đồng",
   "tenant_name": "Tên Người Thuê",
@@ -150,7 +150,6 @@
   "contract_details": "Chi Tiết Hợp Đồng",
   "contract_not_found": "Không có dữ liệu hợp đồng.",
   "fetch_error": "Không thể tải danh sách hợp đồng đã huỷ.",
-
 
   "property_detail": "Chi tiết Bất động sản",
   "price1": "Giá",
@@ -256,7 +255,7 @@
   "testimonial_position_6": "Giám đốc Phát triển Sản phẩm, Microsoft",
 
   "no_properties_message": "Không có bất động sản nào để hiển thị.",
-  
+
   "select_province": "Chọn tỉnh",
   "select_district": "Chọn huyện",
   "select_ward": "Chọn xã",

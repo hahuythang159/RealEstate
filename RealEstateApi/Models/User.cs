@@ -10,8 +10,8 @@ public class User
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    public byte[]? Avatar { get; set; }
-
+    public string AvatarUrl { get; set; } = string.Empty;
+    
     [Required]
     [StringLength(50, MinimumLength = 3, ErrorMessage = "Tên người dùng phải từ 3 đến 50 ký tự")]
     public string UserName { get; set; } = string.Empty;
@@ -36,7 +36,7 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
 
-    public virtual ICollection<Rental>? Rentals { get; set; } = new List<Rental>(); 
+    public virtual ICollection<Rental>? Rentals { get; set; } = new List<Rental>();
     public virtual ICollection<Comment>? UserComments { get; set; } = new List<Comment>();
     public virtual ICollection<Favorite> UserFavorites { get; set; } = new List<Favorite>();
     [JsonIgnore]

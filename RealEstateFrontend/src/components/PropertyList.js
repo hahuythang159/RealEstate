@@ -3,12 +3,19 @@ import { Row, Col, Pagination } from 'antd';
 import { useIntl } from 'react-intl';
 import PropertyCard from './Property/PropertyCard';
 
-const PropertyList = ({ properties, paginatedProperties, total, pageSize, currentPage, handlePageChange }) => {
-  const intl = useIntl(); 
+const PropertyList = ({
+  properties,
+  paginatedProperties,
+  total,
+  pageSize,
+  currentPage,
+  handlePageChange,
+}) => {
+  const intl = useIntl();
 
   return (
     <>
-      <Row gutter={[16, 32]} style={{ paddingTop: 50, paddingLeft: 50 }}>
+      <Row gutter={[16, 16]} style={{ paddingTop: 50, paddingLeft: 50 }}>
         {paginatedProperties.length === 0 ? (
           <Col span={24} style={{ textAlign: 'center' }}>
             <img

@@ -1,4 +1,3 @@
-// src/pages/Home.js
 import React, { useEffect, useState } from 'react';
 import Filters from '../components/Filters';
 import PropertyList from '../components/PropertyList';
@@ -12,7 +11,7 @@ import Footer from '../pages/Footer';
 const Home = () => {
   const [properties, setProperties] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(12);
   const [total, setTotal] = useState(0);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
@@ -24,7 +23,7 @@ const Home = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-  const [interior, setInterior] = useState(null);   
+  const [interior, setInterior] = useState(null);
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -38,7 +37,9 @@ const Home = () => {
   useEffect(() => {
     if (selectedProvince) {
       const fetchDistricts = async () => {
-        const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`);
+        const response = await fetch(
+          `https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`
+        );
         const data = await response.json();
         setDistricts(data.districts);
         setWards([]);
@@ -56,7 +57,9 @@ const Home = () => {
   useEffect(() => {
     if (selectedDistrict) {
       const fetchWards = async () => {
-        const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`);
+        const response = await fetch(
+          `https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`
+        );
         const data = await response.json();
         setWards(data.wards);
       };
@@ -90,9 +93,21 @@ const Home = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [minPrice, maxPrice, bedrooms, bathrooms, selectedProvince, selectedDistrict, selectedWard, interior]);
+  }, [
+    minPrice,
+    maxPrice,
+    bedrooms,
+    bathrooms,
+    selectedProvince,
+    selectedDistrict,
+    selectedWard,
+    interior,
+  ]);
 
-  const paginatedProperties = properties.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedProperties = properties.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const handlePageChange = (page, pageSize) => {
     setCurrentPage(page);
@@ -105,7 +120,7 @@ const Home = () => {
       <TrustedCompanies />
       <HeroSection />
       <TeamSection />
-      <Filters 
+      <Filters
         provinces={provinces}
         districts={districts}
         wards={wards}
@@ -129,7 +144,7 @@ const Home = () => {
         pageSize={pageSize}
         currentPage={currentPage}
         handlePageChange={handlePageChange}
-      />      
+      />
       <Testimonials />
       <Footer />
     </div>

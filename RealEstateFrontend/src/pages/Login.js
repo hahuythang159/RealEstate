@@ -66,7 +66,7 @@ const Login = () => {
         },
         body: JSON.stringify({ idToken: response.credential }),
       });
-  
+
       if (!res.ok) {
         const errorData = await res.json();
         message.error(errorData.message || 'Google login failed.');
@@ -79,9 +79,9 @@ const Login = () => {
           localStorage.setItem('userId', data.userId);
           localStorage.setItem('role', data.role);
           localStorage.setItem('token', data.token);
-  
+
           message.success('Login successful.');
-  
+
           // Redirecting based on the role
           switch (data.role) {
             case 'Owner':
@@ -101,7 +101,7 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const handleGoogleLoginFailure = () => {
     message.error('Google login failed. Please try again.');
@@ -109,64 +109,68 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <Title level={2}>
-        <FormattedMessage id="login.title" defaultMessage="Đăng Nhập" />
-      </Title>
-      <Form
-        name="login-form"
-        onFinish={handleLogin}
-        layout="vertical"
-        style={{ maxWidth: 400, margin: '0 auto' }}
-      >
-        <Form.Item
-          name="email"
-          label={intl.formatMessage({ id: 'login.emailLabel' })}
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({ id: 'login.emailRequired' }),
-            },
-          ]}
+      <div className="form-container-login">
+        {' '}
+        {/* Lớp chứa form đăng nhập */}
+        <Title level={2}>
+          <FormattedMessage id="login.title" defaultMessage="Đăng Nhập" />
+        </Title>
+        <Form
+          name="login-form"
+          onFinish={handleLogin}
+          layout="vertical"
+          style={{ maxWidth: 400, margin: '0 auto' }}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          label={intl.formatMessage({ id: 'login.passwordLabel' })}
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({ id: 'login.passwordRequired' }),
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            {loading
-              ? intl.formatMessage({ id: 'login.loading' })
-              : intl.formatMessage({ id: 'login.button' })}
-          </Button>
-        </Form.Item>
-        <Form.Item>
-          <Button type="link" onClick={() => navigate('/register')} block>
-            <FormattedMessage
-              id="login.registerButton"
-              defaultMessage="Đăng ký tài khoản"
-            />
-          </Button>
-        </Form.Item>
-        <Form.Item>
-          <GoogleOAuthProvider clientId="942288651749-7o3kthjiu74glonrhk53ejikgr26lj0m.apps.googleusercontent.com">
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={handleGoogleLoginFailure}
-              useOneTap
-            />
-          </GoogleOAuthProvider>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            name="email"
+            label={intl.formatMessage({ id: 'login.emailLabel' })}
+            rules={[
+              {
+                required: true,
+                message: intl.formatMessage({ id: 'login.emailRequired' }),
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label={intl.formatMessage({ id: 'login.passwordLabel' })}
+            rules={[
+              {
+                required: true,
+                message: intl.formatMessage({ id: 'login.passwordRequired' }),
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading} block>
+              {loading
+                ? intl.formatMessage({ id: 'login.loading' })
+                : intl.formatMessage({ id: 'login.button' })}
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button type="link" onClick={() => navigate('/register')} block>
+              <FormattedMessage
+                id="login.registerButton"
+                defaultMessage="Đăng ký tài khoản"
+              />
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <GoogleOAuthProvider clientId="942288651749-7o3kthjiu74glonrhk53ejikgr26lj0m.apps.googleusercontent.com">
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginFailure}
+                useOneTap
+              />
+            </GoogleOAuthProvider>
+          </Form.Item>
+        </Form>
+      </div>
     </div>
   );
 };

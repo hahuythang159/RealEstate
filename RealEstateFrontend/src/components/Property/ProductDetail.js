@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card,
-  Descriptions,
-  Button,
-  Form,
-  Input,
-  message,
-  Select,
-  List,
-} from 'antd';
+import { Card, Button, Form, Input, message, Select, Carousel } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useIntl } from 'react-intl'; // Import useIntl
+import { useIntl } from 'react-intl';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
+const baseUrl = 'http://localhost:5034/';
 
 const { Option } = Select;
 
 const PropertyDetail = () => {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
+  const [images, setImages] = useState([]);
   const [editing, setEditing] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -33,12 +26,13 @@ const PropertyDetail = () => {
   const [province, setProvince] = useState(null);
   const userId = localStorage.getItem('userId');
   const [comments, setComments] = useState([]);
-  const intl = useIntl(); // Use intl to fetch translations
+  const intl = useIntl();
 
   const fetchProperty = async () => {
     const response = await fetch(`/api/properties/${id}`);
     const data = await response.json();
     setProperty(data);
+    setImages(data.images || []);
     form.setFieldsValue(data);
   };
 
@@ -136,11 +130,16 @@ const PropertyDetail = () => {
           bordered={true}
           style={{ maxWidth: '600px', margin: 'auto' }}
         >
-          <img
-            src={property.imageUrl}
-            alt={property.title}
-            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
-          />
+          <Carousel autoplay>
+            {images.map((image) => (
+              <img
+                key={image.id}
+                src={`${baseUrl}${image.imageUrl}`}
+                alt="Ảnh bất động sản"
+                style={{ width: '100%', height: '50px', objectFit: 'cover' }}
+              />
+            ))}
+          </Carousel>
           <h3>{property.title}</h3>
           <p>
             <strong>{intl.formatMessage({ id: 'price1' })}:</strong>{' '}
@@ -273,8 +272,9 @@ const PropertyDetail = () => {
                 <div
                   key={comment.id}
                   style={{
-                    marginBottom: '15px',
+                    marginBottom: '20px',
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'flex-start',
                   }}
                 >
@@ -282,27 +282,37 @@ const PropertyDetail = () => {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      marginRight: '10px',
+                      marginBottom: '8px',
                     }}
                   >
                     <img
-                      src={comment.avatar}
-                      alt="Avatar"
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        marginRight: '10px',
-                      }}
+                      src={`${baseUrl}${comment.avatarUrl}`}
+                      alt={comment.userName}
+                      width="40"
+                      height="40"
                     />
-                    <div style={{ fontWeight: 'bold' }}>{comment.userName}</div>
+                    <div style={{ fontWeight: 'bold', marginRight: '10px' }}>
+                      {comment.userName}
+                    </div>
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: 'gray',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      {dayjs(comment.createdAt).fromNow()}
+                    </p>
                   </div>
+
                   <div
                     style={{
                       backgroundColor: '#f1f1f1',
-                      padding: '10px',
+                      padding: '12px',
                       borderRadius: '8px',
-                      flexGrow: 1,
+                      width: '100%',
+                      maxWidth: 'calc(100% - 60px)',
+                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
                     }}
                   >
                     {comment.content}

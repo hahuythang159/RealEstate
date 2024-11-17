@@ -25,32 +25,3 @@
     color: #6c757d;
     font-size: 0.9rem;
 }
-.contact-icon {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: transparent;
-    color: #f8f9fa;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: none;  /* Loại bỏ đổ bóng */
-    font-size: 24px;   /* Đảm bảo kích thước icon chính xác */
-}
-
-.contact-icon i { /* Điều chỉnh size của icon */
-    font-size: 24px;  /* Tăng kích thước icon */
-    color: #f8f9fa; /* Màu mặc định */
-}
-
-.contact-icon i.fa-heart {
-    transition: color 0.3s ease;
-}
-
-.contact-icon i.fa-heart:hover {
-    color: red;  /* Màu khi hover */
-}

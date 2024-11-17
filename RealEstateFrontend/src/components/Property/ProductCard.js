@@ -1,41 +1,71 @@
 import React, { useState } from 'react';
-import { Card, Button } from 'antd';
+import { Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { EyeOutlined } from '@ant-design/icons';
-import { useIntl } from 'react-intl';
+import '../../styles/ProductCard.css';
 
-const ProductCard = ({ property, onDelete }) => {
-    const navigate = useNavigate();
-    const [isHovered, setIsHovered] = useState(false);
-    const intl = useIntl();
+const ProductCard = ({ property }) => {
+  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
 
-    const handleViewDetails = () => {
-        navigate(`/product/${property.id}`);
-    };
+  const handleViewDetails = () => {
+    navigate(`/product/${property.id}`);
+  };
 
-    return (
-        <Card
-            hoverable
-            style={{
-                width: 300,
-                transition: 'transform 0.2s',
-                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-            }}
-            cover={<img alt={property.title} src={property.imageUrl} style={{ height: 200, objectFit: 'cover' }} />}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <Card.Meta title={property.title} description={`${property.address}`} />
-            <p><strong>{intl.formatMessage({ id: 'price1' })}:</strong> {property.price} VNĐ</p>
-            <p><strong>{intl.formatMessage({ id: 'area1' })}:</strong> {property.area} m²</p>
-            <p><strong>{intl.formatMessage({ id: 'property_type' })}:</strong> {property.propertyType}</p>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                <Button type="primary" icon={<EyeOutlined />} onClick={handleViewDetails}>
-                    {intl.formatMessage({ id: 'view_details' })}
-                </Button>
-            </div>
-        </Card>
-    );
+  const baseURL = 'http://localhost:5034/';
+  const defaultImage = '/images/nullRealEstate.jpg';
+
+  return (
+    <Card
+      hoverable
+      style={{
+        width: '100%',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        position: 'relative',
+        transition: 'all 0.3s ease-in-out',
+        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+        backgroundColor: '#ffffff',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      }}
+      cover={
+        <img
+          alt="Property"
+          src={
+            property.images && property.images.length > 0
+              ? `${baseURL}${property.images[0].imageUrl}`
+              : defaultImage
+          }
+          style={{
+            height: '200px',
+            width: '100%',
+            objectFit: 'cover',
+            transition: 'transform 0.3s ease-in-out',
+          }}
+          onClick={handleViewDetails}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        />
+      }
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div
+        style={{
+          padding: '15px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          minHeight: '100px',
+          gap: '10px',
+        }}
+      >
+        <div className="member-info">
+          <h3 style={{ margin: 0 }}>{property.title}</h3>
+          <p style={{ paddingTop: 20, margin: 0 }}>{property.price} VNĐ</p>
+        </div>
+      </div>
+    </Card>
+  );
 };
 
 export default ProductCard;

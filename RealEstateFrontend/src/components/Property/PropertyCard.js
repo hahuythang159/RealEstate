@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/PropertyCard.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+const baseURL = 'http://localhost:5034/';
+
 const PropertyCard = ({ property, userId }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -70,17 +72,18 @@ const PropertyCard = ({ property, userId }) => {
     }
   };
 
-  const baseURL = 'http://localhost:5034/';
-
   return (
     <Card
       hoverable
       style={{
-        width: 100,
-        transition: 'transform 0.3s ease-in-out',
-        transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-        backgroundColor: '#f8f9fa',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        width: '100%',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        position: 'relative',
+        transition: 'all 0.3s ease-in-out',
+        transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+        backgroundColor: '#ffffff',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
       }}
       cover={
         <img
@@ -90,33 +93,41 @@ const PropertyCard = ({ property, userId }) => {
               ? `${baseURL}${property.images[0].imageUrl}`
               : '/path/to/default-image.jpg'
           }
-          style={{ height: '66%', objectFit: 'cover' }}
+          style={{
+            height: '200px',
+            width: '100%',
+            objectFit: 'cover',
+            transition: 'transform 0.3s ease-in-out',
+          }}
           onClick={handleViewDetails}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         />
       }
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div className="contact-icon" onClick={handleFavorite}>
+        <i
+          className={isFavorited ? 'fa-solid fa-heart' : 'fa-regular fa-heart'}
+          style={{
+            color: isFavorited ? 'red' : '#ccc',
+          }}
+        ></i>
+      </div>
       <div
         style={{
-          padding: '10px',
-          height: '34%',
+          padding: '15px',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
+          minHeight: '100px',
+          gap: '10px',
         }}
       >
         <div className="member-info">
-          <h3>{property.title}</h3>
-          <p>{property.price} VNĐ</p>
-        </div>
-        <div className="contact-icon" onClick={handleFavorite}>
-          <i
-            className={
-              isFavorited ? 'fa-solid fa-heart' : 'fa-regular fa-heart'
-            }
-            style={{ fontSize: '24px', color: isFavorited ? 'red' : 'gray' }}
-          ></i>
+          <h3 style={{ margin: 0 }}>{property.title}</h3>
+          <p style={{ paddingTop: 20, margin: 0 }}>{property.price} VNĐ</p>
         </div>
       </div>
     </Card>

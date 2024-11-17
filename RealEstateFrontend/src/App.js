@@ -42,7 +42,6 @@ import AccessDenied from './pages/AccessDenied';
 import viMessages from './locales/vi.json';
 import enMessages from './locales/en.json';
 import { IntlProvider } from 'react-intl';
-
 import { useState } from 'react';
 import { ConfigProvider, theme } from 'antd';
 
@@ -92,15 +91,13 @@ const App = () => {
           },
         }}
       >
-         <div>
-        <ThemeAndLanguageSwitcher
-          isDarkMode={isDarkMode}
-          locale={locale}
-          onThemeToggle={handleClick}
-          onLocaleChange={handleLocaleChange}
-        />
-      </div>
         <Router>
+          <ThemeAndLanguageSwitcher
+            isDarkMode={isDarkMode}
+            locale={locale}
+            onThemeToggle={handleClick}
+            onLocaleChange={handleLocaleChange}
+          />
           <AppHeader logo={logo} isDarkMode={isDarkMode} />
           <Routes>
             <Route element={renderDashboard(TenantDashboard, 'Tenant')}>

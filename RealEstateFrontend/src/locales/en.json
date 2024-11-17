@@ -10,7 +10,6 @@
   "login.error": "Login failed. Please try again.",
   "login.registerButton": "Register an account",
 
-
   "register.title": "Register",
   "register.userNameLabel": "Username",
   "register.userNameError": "Please enter your username!",
@@ -32,7 +31,8 @@
   "error.passwordMismatch": "Password and confirmation do not match.",
   "error.registerFailed": "Registration failed.",
   "error.serverError": "An error occurred, please try again later.",
-  "success.register": "Registration successful",
+  "success.register": "Registration successful, please login again",
+  "register.alreadyHaveAccount": "Already have an account? Login",
 
   "awaitingApproval.title": "Pending Approval Contracts",
   "awaitingApproval.column.id": "ID",
@@ -210,7 +210,6 @@
   "error_fetching_properties": "Unable to load property list: ",
   "error_loading_properties": "Error loading properties: ",
   "error_no_user_id": "UserId not found in localStorage",
-
 
   "delete": "Delete",
   "update_success": "Update successful!",

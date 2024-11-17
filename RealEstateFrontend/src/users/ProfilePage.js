@@ -36,6 +36,7 @@ const ProfilePage = () => {
       const response = await fetch(`/api/users/${userId}`);
       if (!response.ok) throw new Error(formatMessage({ id: 'loadError' }));
       const data = await response.json();
+      console.log(data);
       setCurrentUser(data);
     } catch (error) {
       message.error(error.message);
@@ -71,36 +72,36 @@ const ProfilePage = () => {
     }
   };
 
-  const handleUploadAvatar = async (file) => {
+  const uploadAvatar = async (file) => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      message.error(formatMessage({ id: 'userNotFound' }));
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('avatar', file);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/users/upload-avatar', {
+      const response = await fetch(`/api/users/upload-avatar/${userId}`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       });
 
       if (response.ok) {
+        const data = await response.json();
+        // Cập nhật avatar mới cho người dùng
+        setCurrentUser({
+          ...currentUser,
+          avatar: data.AvatarPath, // Cập nhật đường dẫn ảnh avatar mới
+        });
         message.success(formatMessage({ id: 'avatarUploadSuccess' }));
-        fetchCurrentUser();
       } else {
-        const errorText = await response.text();
-        message.error(
-          `${formatMessage({ id: 'avatarUploadError' })}: ${errorText}`
-        );
+        throw new Error(formatMessage({ id: 'avatarUploadFailed' }));
       }
     } catch (error) {
-      message.error(
-        `${formatMessage({ id: 'avatarUploadError' })}: ${error.message}`
-      );
+      message.error(error.message);
     }
-
-    return false;
   };
 
   const handleOk = async () => {
@@ -121,7 +122,15 @@ const ProfilePage = () => {
       {currentUser && (
         <div style={{ marginTop: '20px' }}>
           <h2>{formatMessage({ id: 'userProfile' })}</h2>
-          <Avatar src={currentUser.avatar} size={100} />
+          <Avatar
+            src={
+              currentUser.avatarUrl
+                ? currentUser.avatarUrl
+                : '/default-avatar.png'
+            }
+            size={100}
+          />
+
           <p>
             <strong>{formatMessage({ id: 'userName' })}:</strong>{' '}
             {currentUser.userName}
@@ -143,7 +152,14 @@ const ProfilePage = () => {
               ? formatMessage({ id: 'active' })
               : formatMessage({ id: 'inactive' })}
           </p>
-          <Upload beforeUpload={handleUploadAvatar} showUploadList={false}>
+          <Upload
+            beforeUpload={async (file) => {
+              await uploadAvatar(file);
+              return false; // Prevent default upload behavior
+            }}
+            showUploadList={false}
+            accept="image/*"
+          >
             <Button icon={<UploadOutlined />}>
               {formatMessage({ id: 'uploadAvatar' })}
             </Button>

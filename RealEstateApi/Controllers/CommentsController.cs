@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RealEstateApi.Models; 
+using RealEstateApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,7 +13,7 @@ namespace RealEstateApi.Controllers
     [ApiController]
     public class CommentsController : ControllerBase
     {
-        private readonly RealEstateContext _context; 
+        private readonly RealEstateContext _context;
         private readonly IHubContext<ChatHub> _hubContext;
 
         public CommentsController(RealEstateContext context, IHubContext<ChatHub> hubContext)
@@ -26,21 +26,21 @@ namespace RealEstateApi.Controllers
         public async Task<ActionResult<IEnumerable<CommentDto>>> GetComments(Guid propertyId)
         {
             var comments = await _context.Comments
-                .Where(c => c.PropertyId == propertyId)
-                .Join(_context.Users, 
-                    c => c.UserId, 
-                    u => u.Id, 
-                    (c, u) => new CommentDto
-                    {
-                        Id = c.Id,
-                        PropertyId = c.PropertyId,
-                        UserId = c.UserId,
-                        Avatar = u.Avatar != null ? Convert.ToBase64String(u.Avatar) : null,                        
-                        UserName = u.UserName,
-                        Content = c.Content,
-                        CreatedAt = c.CreatedAt
-                    })
-                .ToListAsync();
+            .Where(c => c.PropertyId == propertyId)
+            .Join(_context.Users,
+                c => c.UserId,
+                u => u.Id,
+                (c, u) => new CommentDto
+                {
+                    Id = c.Id,
+                    PropertyId = c.PropertyId,
+                    UserId = c.UserId,
+                    AvatarUrl = u.AvatarUrl,
+                    UserName = u.UserName,
+                    Content = c.Content,
+                    CreatedAt = c.CreatedAt
+                })
+            .ToListAsync();
 
             return Ok(comments);
         }
@@ -78,7 +78,7 @@ namespace RealEstateApi.Controllers
                     Id = comment.Id,
                     PropertyId = comment.PropertyId,
                     UserId = comment.UserId,
-                    Avatar = user?.Avatar != null ? Convert.ToBase64String(user.Avatar) : null,  
+                    AvatarUrl = user?.AvatarUrl,
                     UserName = user?.UserName, // Trả về tên người dùng
                     Content = comment.Content,
                     CreatedAt = comment.CreatedAt
