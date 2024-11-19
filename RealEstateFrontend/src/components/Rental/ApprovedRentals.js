@@ -15,7 +15,9 @@ function ApprovedRentals() {
       try {
         const response = await fetch('/api/rentals/approved');
         if (!response.ok) {
-          throw new Error(intl.formatMessage({ id: 'error.fetchApprovedRentals' }));
+          throw new Error(
+            intl.formatMessage({ id: 'error.fetchApprovedRentals' })
+          );
         }
         const data = await response.json();
         setRentals(data);
@@ -101,20 +103,26 @@ function ApprovedRentals() {
         visible={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
+        okButtonProps={{ style: { marginRight: 8 } }}
+        cancelButtonProps={{ style: { marginLeft: 8 } }}
       >
         {selectedRental && (
           <div>
             <p>
-              <strong>{intl.formatMessage({ id: 'contract.id' })}:</strong> {selectedRental.id}
+              <strong>{intl.formatMessage({ id: 'contract.id' })}:</strong>{' '}
+              {selectedRental.id}
             </p>
             <p>
-              <strong>{intl.formatMessage({ id: 'tenant.name' })}:</strong> {selectedRental.tenantName}
+              <strong>{intl.formatMessage({ id: 'tenant.name' })}:</strong>{' '}
+              {selectedRental.tenantName}
             </p>
             <p>
-              <strong>{intl.formatMessage({ id: 'property.name' })}:</strong> {selectedRental.propertyName}
+              <strong>{intl.formatMessage({ id: 'property.name' })}:</strong>{' '}
+              {selectedRental.propertyName}
             </p>
             <p>
-              <strong>{intl.formatMessage({ id: 'owner.name' })}:</strong> {selectedRental.ownerName}
+              <strong>{intl.formatMessage({ id: 'owner.name' })}:</strong>{' '}
+              {selectedRental.ownerName}
             </p>
             <p>
               <strong>{intl.formatMessage({ id: 'start.date' })}:</strong>{' '}
@@ -125,7 +133,8 @@ function ApprovedRentals() {
               {new Date(selectedRental.endDate).toLocaleString()}
             </p>
             <p>
-              <strong>{intl.formatMessage({ id: 'status' })}:</strong> {selectedRental.status}
+              <strong>{intl.formatMessage({ id: 'status' })}:</strong>{' '}
+              {selectedRental.status}
             </p>
           </div>
         )}

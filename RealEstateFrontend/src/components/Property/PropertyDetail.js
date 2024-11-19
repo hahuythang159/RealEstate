@@ -220,8 +220,15 @@ const PropertyDetail = () => {
                       alt={comment.userName}
                       width="40" // Chỉnh kích thước avatar nếu cần
                       height="40"
+                      style={{ borderRadius: '50%' }}
                     />
-                    <div style={{ fontWeight: 'bold', marginRight: '10px' }}>
+                    <div
+                      style={{
+                        fontWeight: 'bold',
+                        marginRight: '10px',
+                        marginLeft: '10px',
+                      }}
+                    >
                       {comment.userName}
                     </div>
                     <p

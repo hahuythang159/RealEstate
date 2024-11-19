@@ -339,7 +339,7 @@ public class PropertiesController : ControllerBase
     public async Task<ActionResult<IEnumerable<PropertyTypeAveragePrice>>> GetAveragePriceByPropertyType()
     {
         var averagePrices = await _context.Properties
-            .GroupBy(p => p.PropertyType)
+            .GroupBy(p => p.PropertyType ?? "Không xác định")
             .Select(g => new PropertyTypeAveragePrice
             {
                 PropertyType = g.Key,
@@ -348,6 +348,41 @@ public class PropertiesController : ControllerBase
             .ToListAsync();
 
         return Ok(averagePrices);
+    }
+
+    // GET: api/properties/average-price-by-month
+    [HttpGet("average-price-by-month")]
+    public async Task<ActionResult<IEnumerable<MonthlyAveragePrice>>> GetAveragePriceByMonth()
+    {
+        var monthlyAveragePrices = await _context.Properties
+            .GroupBy(p => new { p.PostedDate.Year, p.PostedDate.Month })
+            .Select(g => new MonthlyAveragePrice
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                AveragePrice = g.Average(p => p.Price)
+            })
+            .OrderBy(m => m.Year).ThenBy(m => m.Month)
+            .ToListAsync();
+
+        return Ok(monthlyAveragePrices);
+    }
+    
+    // GET: api/properties/average-price-by-year
+    [HttpGet("average-price-by-year")]
+    public async Task<ActionResult<IEnumerable<YearlyAveragePrice>>> GetAveragePriceByYear()
+    {
+        var yearlyAveragePrices = await _context.Properties
+            .GroupBy(p => p.PostedDate.Year)
+            .Select(g => new YearlyAveragePrice
+            {
+                Year = g.Key,
+                AveragePrice = g.Average(p => p.Price)
+            })
+            .OrderBy(y => y.Year)
+            .ToListAsync();
+
+        return Ok(yearlyAveragePrices);
     }
 
     private bool PropertyExists(Guid id)

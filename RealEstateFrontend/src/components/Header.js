@@ -1,11 +1,15 @@
 import React from 'react';
 import { Layout, Button, Space } from 'antd';
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  LogoutOutlined,
+  UserOutlined,
+  LineChartOutlined,
+} from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
-const AppHeader = ({ logo, isDarkMode}) => {
+const AppHeader = ({ logo, isDarkMode }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const role = localStorage.getItem('role');
@@ -31,7 +35,7 @@ const AppHeader = ({ logo, isDarkMode}) => {
     position: 'relative',
     boxShadow: isDarkMode
       ? '0 2px 10px rgba(255, 255, 255, 0.1)'
-      : '0 2px 10px rgba(0, 0, 0, 0.1)', 
+      : '0 2px 10px rgba(0, 0, 0, 0.1)',
     transition: 'all 0.3s ease',
   };
 
@@ -47,6 +51,10 @@ const AppHeader = ({ logo, isDarkMode}) => {
 
   const handleLogoClick = () => {
     navigate('/');
+  };
+
+  const handleChartRedirect = () => {
+    navigate('/chart');
   };
 
   return (
@@ -69,8 +77,20 @@ const AppHeader = ({ logo, isDarkMode}) => {
           }}
         />
       </div>
-      
+
       <Space>
+        <Button
+          icon={<LineChartOutlined />}
+          onClick={handleChartRedirect}
+          style={{
+            backgroundColor: isDarkMode ? '#262626' : '#f0f2f5',
+            color: isDarkMode ? '#fff' : '#000',
+            borderRadius: '25px',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          Price Chart
+        </Button>
         <Button
           icon={<UserOutlined />}
           onClick={handleRoleRedirect}
