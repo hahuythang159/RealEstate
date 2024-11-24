@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace RealEstateApi.Migrations
 {
     [DbContext(typeof(RealEstateContext))]
-    [Migration("20241111020843_PropertyTypeAveragePrice")]
-    partial class PropertyTypeAveragePrice
+    [Migration("20241124032010_AddReview1")]
+    partial class AddReview1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,11 +129,6 @@ namespace RealEstateApi.Migrations
                     b.Property<int?>("DistrictId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("Interior")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -185,6 +180,27 @@ namespace RealEstateApi.Migrations
                     b.HasIndex("WardId");
 
                     b.ToTable("Properties");
+                });
+
+            modelBuilder.Entity("PropertyImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("PropertyImages");
                 });
 
             modelBuilder.Entity("Province", b =>
@@ -271,27 +287,31 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PropertyId")
+                    b.Property<Guid?>("PropertyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("ReviewerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TargetUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ReviewerId");
+
+                    b.HasIndex("TargetUserId");
 
                     b.ToTable("Reviews");
                 });
@@ -302,8 +322,9 @@ namespace RealEstateApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<byte[]>("Avatar")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -439,6 +460,17 @@ namespace RealEstateApi.Migrations
                     b.Navigation("Ward");
                 });
 
+            modelBuilder.Entity("PropertyImage", b =>
+                {
+                    b.HasOne("Property", "Property")
+                        .WithMany("Images")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("RealEstateApi.Models.Comment", b =>
                 {
                     b.HasOne("User", "User")
@@ -471,21 +503,25 @@ namespace RealEstateApi.Migrations
 
             modelBuilder.Entity("Review", b =>
                 {
-                    b.HasOne("Property", "Property")
+                    b.HasOne("Property", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("PropertyId");
+
+                    b.HasOne("User", "Reviewer")
+                        .WithMany("ReviewsWritten")
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("User", "User")
-                        .WithMany("Reviews")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("User", "TargetUser")
+                        .WithMany("ReviewsReceived")
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Property");
+                    b.Navigation("Reviewer");
 
-                    b.Navigation("User");
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("Ward", b =>
@@ -508,6 +544,8 @@ namespace RealEstateApi.Migrations
 
             modelBuilder.Entity("Property", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Rentals");
 
                     b.Navigation("Reviews");
@@ -528,7 +566,9 @@ namespace RealEstateApi.Migrations
 
                     b.Navigation("Rentals");
 
-                    b.Navigation("Reviews");
+                    b.Navigation("ReviewsReceived");
+
+                    b.Navigation("ReviewsWritten");
 
                     b.Navigation("UserComments");
 

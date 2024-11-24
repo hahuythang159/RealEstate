@@ -284,27 +284,31 @@ namespace RealEstateApi.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PropertyId")
+                    b.Property<Guid?>("PropertyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("ReviewerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TargetUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ReviewerId");
+
+                    b.HasIndex("TargetUserId");
 
                     b.ToTable("Reviews");
                 });
@@ -496,21 +500,25 @@ namespace RealEstateApi.Migrations
 
             modelBuilder.Entity("Review", b =>
                 {
-                    b.HasOne("Property", "Property")
+                    b.HasOne("Property", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("PropertyId");
+
+                    b.HasOne("User", "Reviewer")
+                        .WithMany("ReviewsWritten")
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("User", "User")
-                        .WithMany("Reviews")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("User", "TargetUser")
+                        .WithMany("ReviewsReceived")
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Property");
+                    b.Navigation("Reviewer");
 
-                    b.Navigation("User");
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("Ward", b =>
@@ -555,7 +563,9 @@ namespace RealEstateApi.Migrations
 
                     b.Navigation("Rentals");
 
-                    b.Navigation("Reviews");
+                    b.Navigation("ReviewsReceived");
+
+                    b.Navigation("ReviewsWritten");
 
                     b.Navigation("UserComments");
 

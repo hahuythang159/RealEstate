@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,16 +18,31 @@ public class ReviewsController : ControllerBase
 
     // GET: api/reviews
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Review>>> GetReviews()
+    public async Task<ActionResult<IEnumerable<Review>>> GetReviews([FromQuery] Guid? propertyId)
     {
-        return await _context.Reviews.ToListAsync();
+        if (propertyId.HasValue)
+        {
+            return await _context.Reviews
+                .Include(r => r.Reviewer)
+                .Include(r => r.TargetUser)
+                .ToListAsync();
+        }
+
+        return await _context.Reviews
+            .Include(r => r.Reviewer)
+            .Include(r => r.TargetUser)
+            .ToListAsync();
     }
 
-    // GET: api/reviews/5
+    // GET: api/reviews/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<Review>> GetReview(Guid id)
     {
-        var review = await _context.Reviews.FindAsync(id);
+        var review = await _context.Reviews
+            .Include(r => r.Reviewer)
+            .Include(r => r.TargetUser)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
         if (review == null)
         {
             return NotFound();
@@ -44,60 +60,66 @@ public class ReviewsController : ControllerBase
             return BadRequest("Review cannot be null.");
         }
 
+        if (string.IsNullOrWhiteSpace(review.Comment))
+        {
+            return BadRequest("Comment cannot be empty.");
+        }
+
+        if (review.TargetUserId == Guid.Empty || review.ReviewerId == Guid.Empty)
+        {
+            return BadRequest("Invalid user information.");
+        }
+
+        review.Id = Guid.NewGuid();
+        review.CreatedAt = DateTime.Now;
+
         _context.Reviews.Add(review);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetReview), new { id = review.Id }, review);
     }
 
-    // PUT: api/reviews/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutReview(Guid id, Review review)
+
+    // GET: api/reviews/user/{userId}
+    [HttpGet("user/{userId}")]
+    public async Task<ActionResult<IEnumerable<object>>> GetReviewsForUser(Guid userId)
     {
-        if (id != review.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(review).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ReviewExists(id))
+        var reviews = await _context.Reviews
+            .Where(r => r.TargetUserId == userId)
+            .Include(r => r.Reviewer)
+            .Select(r => new
             {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
+                r.Id,
+                r.Rating,
+                r.Comment,
+                r.CreatedAt,
+                ReviewerName = r.Reviewer.UserName,
+                ReviewerAvatarUrl = r.Reviewer.AvatarUrl
+            })
+            .ToListAsync();
+
+        if (!reviews.Any())
+        {
+            return NotFound("No reviews found for the specified user.");
         }
 
-        return NoContent();
+        return Ok(reviews);
     }
 
-    // DELETE: api/reviews/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteReview(Guid id)
+    // GET: api/reviews/user/{userId}/average
+    [HttpGet("user/{userId}/average")]
+    public async Task<ActionResult<double>> GetAverageRatingForUser(Guid userId)
     {
-        var review = await _context.Reviews.FindAsync(id);
-        if (review == null)
+        var reviews = await _context.Reviews
+            .Where(r => r.TargetUserId == userId)
+            .ToListAsync();
+
+        if (!reviews.Any())
         {
-            return NotFound();
+            return NotFound("No reviews found for the specified user.");
         }
 
-        _context.Reviews.Remove(review);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    private bool ReviewExists(Guid id)
-    {
-        return _context.Reviews.Any(e => e.Id == id);
+        double averageRating = reviews.Average(r => r.Rating);
+        return Ok(averageRating);
     }
 }

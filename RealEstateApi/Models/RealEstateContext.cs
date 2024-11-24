@@ -21,9 +21,6 @@ public class RealEstateContext : DbContext
     public DbSet<Ward> Wards { get; set; }
     public DbSet<PropertyImage> PropertyImages { get; set; }
 
-
-
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Property>()
@@ -71,6 +68,19 @@ public class RealEstateContext : DbContext
             .WithOne(pi => pi.Property)
             .HasForeignKey(pi => pi.PropertyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.Reviewer)
+            .WithMany(u => u.ReviewsWritten)
+            .HasForeignKey(r => r.ReviewerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.TargetUser)
+            .WithMany(u => u.ReviewsReceived)
+            .HasForeignKey(r => r.TargetUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+            
     }
 }
 

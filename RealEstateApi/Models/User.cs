@@ -11,7 +11,7 @@ public class User
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public string AvatarUrl { get; set; } = string.Empty;
-    
+
     [Required]
     [StringLength(50, MinimumLength = 3, ErrorMessage = "Tên người dùng phải từ 3 đến 50 ký tự")]
     public string UserName { get; set; } = string.Empty;
@@ -28,7 +28,7 @@ public class User
     [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
     public string PhoneNumber { get; set; } = string.Empty;
 
-    public bool IsTwoFactorEnabled { get; set; } = false; // 2FA
+    public bool IsTwoFactorEnabled { get; set; } = false;
 
     public bool IsActive { get; set; } = true;
 
@@ -36,16 +36,14 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
 
-    public virtual ICollection<Rental>? Rentals { get; set; } = new List<Rental>();
-    public virtual ICollection<Comment>? UserComments { get; set; } = new List<Comment>();
-    public virtual ICollection<Favorite> UserFavorites { get; set; } = new List<Favorite>();
+    public virtual ICollection<Rental>? Rentals { get; set; }
+    public virtual ICollection<Comment>? UserComments { get; set; }
+    public virtual ICollection<Favorite>? UserFavorites { get; set; }
+    public virtual ICollection<Booking>? Bookings { get; set; }
+    public virtual ICollection<Review> ReviewsWritten { get; set; } = new List<Review>();
+    public virtual ICollection<Review> ReviewsReceived { get; set; } = new List<Review>();
+
+
     [JsonIgnore]
     public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
-
-
-
-    // Thêm mối quan hệ nếu cần
-    public ICollection<Review> Reviews { get; set; } = new List<Review>(); // Đánh giá của người dùng
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>(); // Đặt chỗ của người dùng
-
 }

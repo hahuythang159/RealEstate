@@ -8,16 +8,15 @@ namespace RealEstateApi.Models
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public Guid  UserId { get; set; } // Khóa ngoại đến người dùng
+        public Guid  UserId { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string FullName { get; set; } // Tên đầy đủ của người thuê
+        public string FullName { get; set; }
 
         [Required]
         [DataType(DataType.PhoneNumber)]
-        public string PhoneNumber { get; set; } // Số điện thoại của người thuê
+        public string PhoneNumber { get; set; }
 
-        // Thêm các thuộc tính khác nếu cần
     }
 }

@@ -32,9 +32,25 @@ public class RentalsController : ControllerBase
 
     // GET: api/rentals
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Rental>>> GetRentals()
+    public async Task<ActionResult<IEnumerable<object>>> GetRentals()
     {
-        return await _context.Rentals.Include(r => r.Property).Include(r => r.Tenant).ToListAsync();
+        var rentals = await _context.Rentals
+            .Include(r => r.Property) // Bao gồm Property để truy cập OwnerId
+            .Include(r => r.Tenant)   // Bao gồm Tenant nếu cần hiển thị thông tin Tenant
+            .Select(r => new
+            {
+                r.Id,
+                r.PropertyId,
+                r.TenantId,
+                r.StartDate,
+                r.EndDate,
+                r.Status,
+                r.RentPrice,
+                PropertyOwnerId = r.Property.OwnerId
+            })
+            .ToListAsync();
+
+        return Ok(rentals);
     }
 
     // GET: api/rentals/5
@@ -156,7 +172,6 @@ public class RentalsController : ControllerBase
 
     // GET: api/rentals/pending
     [HttpGet("pending")]
-    [Authorize(Roles = "Owner")]
     public async Task<ActionResult<IEnumerable<Rental>>> GetPendingRentals()
     {
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -169,7 +184,7 @@ public class RentalsController : ControllerBase
                 .Include(r => r.Tenant)
                 .ToListAsync();
 
-            return pendingRentals;
+            return Ok(pendingRentals);
         }
 
         return BadRequest("User ID không hợp lệ.");
@@ -222,7 +237,9 @@ public class RentalsController : ControllerBase
         {
             rental.Id,
             tenantName = rental.Tenant?.UserName,        // Lấy tên người thuê
+            tenantId = rental.Tenant?.Id,                // Lấy ID của tenant
             propertyName = rental.Property?.Address,     // Lấy tên bất động sản
+            ownerId = rental.Property?.Owner?.Id,        // Lấy ID của chủ sở hữu
             ownerName = rental.Property?.Owner?.UserName, // Lấy tên chủ sở hữu
             startDate = rental.StartDate,
             endDate = rental.EndDate,
@@ -231,9 +248,6 @@ public class RentalsController : ControllerBase
 
         return Ok(rentalsWithDetails);
     }
-
-
-
 
     // PATCH: api/rentals/{id}/approve
     [HttpPatch("{id}/approve")]
@@ -273,6 +287,7 @@ public class RentalsController : ControllerBase
             return StatusCode(500, new { message = "Có lỗi xảy ra khi duyệt hợp đồng: " + ex.ToString() });
         }
     }
+
     // PATCH: api/rentals/{id}/cancel
     [HttpPatch("{id}/cancel")]
     public async Task<IActionResult> CancelRental(Guid id)

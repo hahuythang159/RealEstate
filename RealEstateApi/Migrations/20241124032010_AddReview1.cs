@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RealEstateApi.Migrations
 {
     /// <inheritdoc />
-    public partial class FixCascadeDeleteBehavior : Migration
+    public partial class AddReview1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,7 +29,7 @@ namespace RealEstateApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Avatar = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -141,7 +141,6 @@ namespace RealEstateApi.Migrations
                     ProvinceId = table.Column<int>(type: "int", nullable: true),
                     DistrictId = table.Column<int>(type: "int", nullable: true),
                     WardId = table.Column<int>(type: "int", nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Bedrooms = table.Column<int>(type: "int", nullable: false),
                     Bathrooms = table.Column<int>(type: "int", nullable: false),
                     Area = table.Column<double>(type: "float", nullable: false),
@@ -211,6 +210,25 @@ namespace RealEstateApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PropertyImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    PropertyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PropertyImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PropertyImages_Properties_PropertyId",
+                        column: x => x.PropertyId,
+                        principalTable: "Properties",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Rentals",
                 columns: table => new
                 {
@@ -243,11 +261,12 @@ namespace RealEstateApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PropertyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TargetUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Comment = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PropertyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -256,14 +275,19 @@ namespace RealEstateApi.Migrations
                         name: "FK_Reviews_Properties_PropertyId",
                         column: x => x.PropertyId,
                         principalTable: "Properties",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Reviews_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Reviews_Users_ReviewerId",
+                        column: x => x.ReviewerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Users_TargetUserId",
+                        column: x => x.TargetUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -317,6 +341,11 @@ namespace RealEstateApi.Migrations
                 column: "WardId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PropertyImages_PropertyId",
+                table: "PropertyImages",
+                column: "PropertyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Rentals_PropertyId",
                 table: "Rentals",
                 column: "PropertyId");
@@ -332,9 +361,14 @@ namespace RealEstateApi.Migrations
                 column: "PropertyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_UserId",
+                name: "IX_Reviews_ReviewerId",
                 table: "Reviews",
-                column: "UserId");
+                column: "ReviewerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_TargetUserId",
+                table: "Reviews",
+                column: "TargetUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Wards_DistrictId",
@@ -353,6 +387,9 @@ namespace RealEstateApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Favorites");
+
+            migrationBuilder.DropTable(
+                name: "PropertyImages");
 
             migrationBuilder.DropTable(
                 name: "Rentals");

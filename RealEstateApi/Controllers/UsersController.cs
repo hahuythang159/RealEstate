@@ -119,14 +119,22 @@ public class UsersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> GetUser(Guid id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users
+            .Include(u => u.Rentals)
+            .Include(u => u.UserComments)
+            .Include(u => u.UserFavorites)
+            .Include(u => u.ReviewsWritten)
+            .Include(u => u.Bookings)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user == null)
         {
-            return NotFound();
+            return NotFound("User not found");
         }
 
-        return user;
+        return Ok(user);
     }
+
 
     // PUT: api/users/5
     [HttpPut("{id}")]
@@ -264,7 +272,7 @@ public class UsersController : ControllerBase
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings
             {
-                Audience = new List<string> { "" }
+                Audience = new List<string> { "942288651749-7o3kthjiu74glonrhk53ejikgr26lj0m.apps.googleusercontent.com" }
             };
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
