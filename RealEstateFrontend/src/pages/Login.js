@@ -32,6 +32,7 @@ const Login = () => {
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('role', data.role);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('currentUser', JSON.stringify(data));
 
         message.success(intl.formatMessage({ id: 'login.success' }));
 
@@ -79,6 +80,7 @@ const Login = () => {
           localStorage.setItem('userId', data.userId);
           localStorage.setItem('role', data.role);
           localStorage.setItem('token', data.token);
+          localStorage.setItem('currentUser', JSON.stringify(data));
 
           message.success('Login successful.');
 

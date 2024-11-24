@@ -9,6 +9,7 @@ function AwaitingApproval() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [currentUserRole, setCurrentUserRole] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const intl = useIntl();
 
   useEffect(() => {
@@ -17,7 +18,9 @@ function AwaitingApproval() {
       try {
         await fetchUsers();
         const role = localStorage.getItem('role');
+        const userId = localStorage.getItem('userId');
         setCurrentUserRole(role);
+        setCurrentUserId(userId);
 
         const response = await fetch('/api/rentals');
         if (!response.ok) {
@@ -27,9 +30,20 @@ function AwaitingApproval() {
         }
         const data = await response.json();
 
-        const pendingRentals = data.filter(
-          (rental) => rental.status === 'PendingApproval'
-        );
+        // Lọc dữ liệu dựa trên role
+        const pendingRentals =
+          role === 'Owner'
+            ? data.filter(
+                (rental) =>
+                  rental.status === 'PendingApproval' &&
+                  rental.propertyOwnerId === userId
+              )
+            : data.filter(
+                (rental) =>
+                  rental.status === 'PendingApproval' &&
+                  rental.tenantId === userId
+              );
+
         setRentals(pendingRentals);
       } catch (error) {
         message.error(
@@ -66,8 +80,6 @@ function AwaitingApproval() {
       const response = await fetch(`/api/rentals/${rentalId}/approve`, {
         method: 'PATCH',
       });
-      const responseData = await response.json();
-
       if (!response.ok) {
         throw new Error(
           intl.formatMessage({ id: 'awaitingApproval.approve.error' })
@@ -95,8 +107,6 @@ function AwaitingApproval() {
       const response = await fetch(`/api/rentals/${rentalId}/cancel`, {
         method: 'PATCH',
       });
-      const responseData = await response.json();
-
       if (!response.ok) {
         throw new Error(
           intl.formatMessage({ id: 'awaitingApproval.cancel.error' })

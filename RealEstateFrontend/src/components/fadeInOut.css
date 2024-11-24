@@ -1,4 +1,9 @@
-.image-carousel1,.hero-section1, .testimonials-section1, .trusted-companies1, .team-section1, .footer1 {
+.image-carousel1,
+.hero-section1,
+.testimonials-section1,
+.trusted-companies1,
+.team-section1,
+.footer1 {
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
 }
@@ -20,4 +25,3 @@
 .footer1.fade-out {
   opacity: 0;
 }
-

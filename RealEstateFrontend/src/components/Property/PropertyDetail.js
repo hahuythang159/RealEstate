@@ -121,6 +121,9 @@ const PropertyDetail = () => {
       message.error(intl.formatMessage({ id: 'comment_error' }));
     }
   };
+  const handleAvatarClick = (commentUserId) => {
+    navigate(`/user/${commentUserId}`);
+  };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -218,9 +221,10 @@ const PropertyDetail = () => {
                     <img
                       src={`${baseUrl}${comment.avatarUrl}`}
                       alt={comment.userName}
-                      width="40" // Chỉnh kích thước avatar nếu cần
+                      width="40"
                       height="40"
                       style={{ borderRadius: '50%' }}
+                      onClick={() => handleAvatarClick(comment.userId)}
                     />
                     <div
                       style={{

@@ -46,6 +46,25 @@ function AddRental() {
   };
 
   useEffect(() => {
+    if (propertyDetail) {
+      fetch(`https://provinces.open-api.vn/api/p/${propertyDetail.provinceId}`)
+        .then((response) => response.json())
+        .then((data) => setProvince(data.name))
+        .catch((error) => console.error('Error fetching province:', error));
+
+      fetch(`https://provinces.open-api.vn/api/d/${propertyDetail.districtId}`)
+        .then((response) => response.json())
+        .then((data) => setDistrict(data.name))
+        .catch((error) => console.error('Error fetching district:', error));
+
+      fetch(`https://provinces.open-api.vn/api/w/${propertyDetail.wardId}`)
+        .then((response) => response.json())
+        .then((data) => setWard(data.name))
+        .catch((error) => console.error('Error fetching ward:', error));
+    }
+  }, [propertyDetail]);
+
+  useEffect(() => {
     const fetchPropertyDetail = async () => {
       if (rentalData.propertyId) {
         try {

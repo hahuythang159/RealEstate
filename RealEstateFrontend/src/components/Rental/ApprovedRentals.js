@@ -7,23 +7,46 @@ function ApprovedRentals() {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const intl = useIntl();
 
   useEffect(() => {
     const fetchRentals = async () => {
       setLoading(true);
       try {
+        const role = localStorage.getItem('role');
+        const userId = localStorage.getItem('userId');
+        setCurrentUserRole(role);
+        setCurrentUserId(userId);
+
         const response = await fetch('/api/rentals/approved');
         if (!response.ok) {
           throw new Error(
-            intl.formatMessage({ id: 'error.fetchApprovedRentals' })
+            intl.formatMessage({ id: 'awaitingApproval.fetch.error' })
           );
         }
         const data = await response.json();
-        setRentals(data);
+
+        // Lọc dữ liệu chỉ cho phép tenant và owner thấy rental của họ
+        let filteredRentals = [];
+        if (role === 'Manager') {
+          filteredRentals = data; // Manager có thể thấy tất cả rental đã duyệt
+        } else if (role === 'Owner') {
+          filteredRentals = data.filter(
+            (rental) => rental.ownerId === userId // Chủ sở hữu chỉ thấy bất động sản của mình
+          );
+        } else if (role === 'Tenant') {
+          filteredRentals = data.filter(
+            (rental) => rental.tenantId === userId // Tenant chỉ thấy bất động sản mà họ thuê
+          );
+        }
+
+        setRentals(filteredRentals);
       } catch (error) {
-        console.error('Error fetching rentals:', error);
-        message.error(intl.formatMessage({ id: 'error.fetchApprovedRentals' }));
+        message.error(
+          intl.formatMessage({ id: 'awaitingApproval.fetch.error' })
+        );
       } finally {
         setLoading(false);
       }

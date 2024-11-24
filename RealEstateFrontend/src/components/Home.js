@@ -7,6 +7,8 @@ import HeroSection from '../components/HeroSection';
 import TeamSection from '../components/TeamSection';
 import Testimonials from '../components/Testimonials';
 import Footer from '../pages/Footer';
+import useIntersectionObserver from '../hooks/useIntersectionObserver';
+import './fadeInOut.css';
 
 const Home = () => {
   const [properties, setProperties] = useState([]);
@@ -24,6 +26,23 @@ const Home = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [interior, setInterior] = useState(null);
+
+  const isImageCarouselVisible = useIntersectionObserver({
+    target: '.image-carousel1',
+  });
+  const isHeroSectionVisible = useIntersectionObserver({
+    target: '.hero-section1',
+  });
+  const isTestimonialsVisible = useIntersectionObserver({
+    target: '.testimonials-section1',
+  });
+  const isTrustedCompaniesVisible = useIntersectionObserver({
+    target: '.trusted-companies1',
+  });
+  const isTeamSectionVisible = useIntersectionObserver({
+    target: '.team-section1',
+  });
+  const isFooterVisible = useIntersectionObserver({ target: '.footer1' });
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -116,10 +135,26 @@ const Home = () => {
 
   return (
     <div>
-      <ImageCarousel />
-      <TrustedCompanies />
-      <HeroSection />
-      <TeamSection />
+      <div
+        className={`image-carousel1 ${isImageCarouselVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <ImageCarousel />
+      </div>
+      <div
+        className={`trusted-companies1 ${isTrustedCompaniesVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <TrustedCompanies />
+      </div>
+      <div
+        className={`hero-section1 ${isHeroSectionVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <HeroSection />
+      </div>
+      <div
+        className={`team-section1 ${isTeamSectionVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <TeamSection />
+      </div>
       <Filters
         provinces={provinces}
         districts={districts}
@@ -145,8 +180,14 @@ const Home = () => {
         currentPage={currentPage}
         handlePageChange={handlePageChange}
       />
-      <Testimonials />
-      <Footer />
+      <div
+        className={`testimonials-section1 ${isTestimonialsVisible ? 'fade-in' : 'fade-out'}`}
+      >
+        <Testimonials />
+      </div>
+      <div className={`footer1 ${isFooterVisible ? 'fade-in' : 'fade-out'}`}>
+        <Footer />
+      </div>
     </div>
   );
 };

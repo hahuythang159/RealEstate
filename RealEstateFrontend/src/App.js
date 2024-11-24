@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import UserList from './users/UserList';
 import ProfilePage from './users/ProfilePage';
+import UserReview from './users/UserReview';
 
 // Import các thành phần
 import AppHeader from './components/Header';
@@ -106,7 +107,6 @@ const App = () => {
               <Route path="/tenant/approval" element={<AwaitingApproval />} />
               <Route path="/tenant/approved" element={<ApprovedRentals />} />
             </Route>
-
             <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
               <Route path="/admin/users" element={<UserList />} />
               <Route
@@ -119,7 +119,6 @@ const App = () => {
                 element={<CanceledRentals />}
               />
             </Route>
-
             <Route element={renderDashboard(OwnerDashboard, 'Owner')}>
               <Route path="/owner/add-property" element={<AddProperty />} />
               <Route path="/owner/profile" element={<ProfilePage />} />
@@ -139,7 +138,7 @@ const App = () => {
             <Route path="/trust" element={<TrustedCompanies />} />
             <Route path="/visit" element={<VisitPage />} />
             <Route path="/chart" element={<PriceChart />} />
-
+            <Route path="/user/:userId" element={<UserReview />} />
             <Route
               path="*"
               element={<Navigate to={role ? `/${role}` : '/login'} />}

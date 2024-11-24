@@ -66,9 +66,11 @@ const RegisterForm = () => {
           isActive: true,
         }),
       });
+      console.log('Response:', response);
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Error Data:', errorData);
         setError(
           errorData.message ||
             intl.formatMessage({ id: 'error.registerFailed' })

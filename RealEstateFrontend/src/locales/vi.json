@@ -283,5 +283,19 @@
   "bathroom_above_4": "Trên 4 phòng tắm",
   "luxury_interior": "Nội thất cao cấp",
   "basic_interior": "Nội thất cơ bản",
-  "no_interior": "Không có nội thất"
+  "no_interior": "Không có nội thất",
+
+  "user.avatar": "Ảnh đại diện",
+  "user.averageRating": "Đánh giá trung bình",
+  "user.noRatings": "Chưa có đánh giá",
+  "user.postReview": "Đăng đánh giá của bạn",
+  "user.rating": "Đánh giá",
+  "user.comment": "Bình luận",
+  "user.postReviewButton": "Đăng đánh giá",
+  "user.reviews": "Đánh giá",
+  "user.noReviews": "Chưa có đánh giá nào.",
+  "user.loadMore": "Xem thêm bình luận",
+  "user.loggedOutError": "Người dùng chưa đăng nhập",
+  "user.postSuccess": "Đánh giá đã được đăng thành công",
+  "user.postError": "Lỗi khi đăng đánh giá"
 }

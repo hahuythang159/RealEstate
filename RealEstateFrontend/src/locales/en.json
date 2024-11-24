@@ -274,5 +274,19 @@
   "bathroom_above_4": "Above 4 Bathrooms",
   "luxury_interior": "High-end Furniture",
   "basic_interior": "Basic Furniture",
-  "no_interior": "No Furniture"
+  "no_interior": "No Furniture",
+
+  "user.avatar": "Avatar",
+  "user.averageRating": "Average Rating",
+  "user.noRatings": "No ratings yet",
+  "user.postReview": "Post Your Review",
+  "user.rating": "Rating",
+  "user.comment": "Comment",
+  "user.postReviewButton": "Post Review",
+  "user.reviews": "Reviews",
+  "user.noReviews": "No reviews yet.",
+  "user.loadMore": "Load more comments",
+  "user.loggedOutError": "User is not logged in",
+  "user.postSuccess": "Review posted successfully",
+  "user.postError": "Error posting review"
 }

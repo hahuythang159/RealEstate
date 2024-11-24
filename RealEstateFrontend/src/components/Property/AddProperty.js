@@ -174,7 +174,7 @@ const AddProperty = () => {
       const data = await response.json();
       setSuccess('Thêm bất động sản thành công với ID: ' + data.id);
       message.success('Thêm bất động sản thành công!');
-      navigate('/owner/my-product');
+      navigate('/owner/add-property');
     } catch (err) {
       setError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     }
@@ -342,7 +342,10 @@ const AddProperty = () => {
           </Select>
         </Form.Item>
 
-        <Form.Item label={intl.formatMessage({ id: 'interior' })} name="interior">
+        <Form.Item
+          label={intl.formatMessage({ id: 'interior' })}
+          name="interior"
+        >
           <Select
             onChange={(value) => setProperty({ ...property, interior: value })}
           >
