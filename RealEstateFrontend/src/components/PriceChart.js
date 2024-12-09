@@ -59,6 +59,10 @@ const PriceChart = () => {
           byMonthResponse.json(),
           byYearResponse.json(),
         ]);
+        const monthColors = byMonthData.map((_, index) => {
+          const hue = (index * 360) / byMonthData.length;
+          return `hsl(${hue}, 70%, 60%)`;
+        });
 
         setChartData({
           byType: {
@@ -92,9 +96,8 @@ const PriceChart = () => {
               {
                 label: 'Giá trung bình theo tháng',
                 data: byMonthData.map((item) => item.averagePrice),
-                backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                backgroundColor: monthColors,
                 borderColor: 'rgba(255, 206, 86, 1)',
-                borderWidth: 2,
               },
             ],
           },

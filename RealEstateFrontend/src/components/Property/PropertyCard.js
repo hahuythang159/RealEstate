@@ -91,7 +91,7 @@ const PropertyCard = ({ property, userId }) => {
           src={
             property.images && property.images.length > 0
               ? `${baseURL}${property.images[0].imageUrl}`
-              : '/path/to/default-image.jpg'
+              : '/images/nullRealEstate.jpg'
           }
           style={{
             height: '200px',

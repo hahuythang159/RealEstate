@@ -288,5 +288,18 @@
   "user.loadMore": "Load more comments",
   "user.loggedOutError": "User is not logged in",
   "user.postSuccess": "Review posted successfully",
-  "user.postError": "Error posting review"
+  "user.postError": "Error posting review",
+
+  "supportRequest": "Support Request",
+  "descriptionContact": "We are always ready to help you! Please fill out the form and we will contact you as soon as possible.",
+  "emailPlaceholder": "Enter your email here",
+  "emailLabel": "Your Email",
+  "emailRequired": "Please enter your email so we can contact you!",
+  "emailInvalid": "Invalid email! Please try again.",
+  "messageRequired": "Please tell us what you need!",
+  "messagePlaceholder": "Describe your request or issue",
+  "submitButtonContact": "Submit Request",
+  "sendingMessage": "🎉 Congratulations! Your request has been successfully sent. We will support you as soon as possible!",
+  "errorMessageContact": "😞 Sorry! Sending email failed, please try again!",
+  "formError": "Please check the information you entered! We need accurate information to assist you."
 }

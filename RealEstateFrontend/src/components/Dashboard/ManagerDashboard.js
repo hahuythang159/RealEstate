@@ -48,21 +48,13 @@ const AdminDashboard = () => {
           </Menu.Item>
           <Menu.Item
             key="2"
-            icon={<ApartmentOutlined />}
-            onClick={() => navigate('/admin/property-list')}
-          >
-            {intl.formatMessage({ id: 'manage_properties' })}{' '}
-            {/* Lấy bản dịch cho "Quản lý tài sản" */}
-          </Menu.Item>
-          <Menu.Item
-            key="3"
             icon={<FileProtectOutlined />}
             onClick={() => navigate('/admin/approved')}
           >
             {intl.formatMessage({ id: 'contract_list' })}{' '}
           </Menu.Item>
           <Menu.Item
-            key="4"
+            key="3"
             icon={<FileProtectOutlined />}
             onClick={() => navigate('/admin/canceled-rentals')}
           >

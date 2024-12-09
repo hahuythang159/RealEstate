@@ -31,15 +31,11 @@ function ApprovedRentals() {
         // Lọc dữ liệu chỉ cho phép tenant và owner thấy rental của họ
         let filteredRentals = [];
         if (role === 'Manager') {
-          filteredRentals = data; // Manager có thể thấy tất cả rental đã duyệt
+          filteredRentals = data;
         } else if (role === 'Owner') {
-          filteredRentals = data.filter(
-            (rental) => rental.ownerId === userId // Chủ sở hữu chỉ thấy bất động sản của mình
-          );
+          filteredRentals = data.filter((rental) => rental.ownerId === userId);
         } else if (role === 'Tenant') {
-          filteredRentals = data.filter(
-            (rental) => rental.tenantId === userId // Tenant chỉ thấy bất động sản mà họ thuê
-          );
+          filteredRentals = data.filter((rental) => rental.tenantId === userId);
         }
 
         setRentals(filteredRentals);
@@ -127,7 +123,7 @@ function ApprovedRentals() {
         onOk={handleModalOk}
         onCancel={handleModalCancel}
         okButtonProps={{ style: { marginRight: 8 } }}
-        cancelButtonProps={{ style: { marginLeft: 8 } }}
+        cancelButtonProps={{ style: { marginLeft: 8, marginBottom: '5px' } }}
       >
         {selectedRental && (
           <div>

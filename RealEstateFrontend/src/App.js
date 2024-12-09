@@ -47,6 +47,7 @@ import { useState } from 'react';
 import { ConfigProvider, theme } from 'antd';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import ContactForm from './components/ContactForm';
 
 const messages = {
   vi: viMessages,
@@ -109,10 +110,10 @@ const App = () => {
             </Route>
             <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
               <Route path="/admin/users" element={<UserList />} />
-              <Route
+              {/* <Route
                 path="/admin/property-list"
                 element={<AwaitingApproval />}
-              />
+              /> */}
               <Route path="/admin/approved" element={<ApprovedRentals />} />
               <Route
                 path="/admin/canceled-rentals"
@@ -139,6 +140,7 @@ const App = () => {
             <Route path="/visit" element={<VisitPage />} />
             <Route path="/chart" element={<PriceChart />} />
             <Route path="/user/:userId" element={<UserReview />} />
+            <Route path="/contact-us" element={<ContactForm />} />
             <Route
               path="*"
               element={<Navigate to={role ? `/${role}` : '/login'} />}

@@ -9,8 +9,12 @@ const HeroSection = () => {
   return (
     <section className="hero">
       <div className="hero-content">
-        <h2 className="subtitle">{intl.formatMessage({ id: 'hero_section_subtitle' })}</h2>
-        <h1 className="title">{intl.formatMessage({ id: 'hero_section_title' })}</h1>
+        <h2 className="subtitle">
+          {intl.formatMessage({ id: 'hero_section_subtitle' })}
+        </h2>
+        <h1 className="title">
+          {intl.formatMessage({ id: 'hero_section_title' })}
+        </h1>
         <div className="search-bar">
           <input
             type="text"

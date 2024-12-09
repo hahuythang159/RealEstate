@@ -4,6 +4,7 @@ import {
   LogoutOutlined,
   UserOutlined,
   LineChartOutlined,
+  ContactsOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -56,6 +57,9 @@ const AppHeader = ({ logo, isDarkMode }) => {
   const handleChartRedirect = () => {
     navigate('/chart');
   };
+  const handleContact = () => {
+    navigate('/contact-us');
+  };
 
   return (
     <Header style={headerStyle}>
@@ -79,6 +83,18 @@ const AppHeader = ({ logo, isDarkMode }) => {
       </div>
 
       <Space>
+        <Button
+          icon={<ContactsOutlined />}
+          onClick={handleContact}
+          style={{
+            backgroundColor: isDarkMode ? '#262626' : '#f0f2f5',
+            color: isDarkMode ? '#fff' : '#000',
+            borderRadius: '25px',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          Support
+        </Button>
         <Button
           icon={<LineChartOutlined />}
           onClick={handleChartRedirect}

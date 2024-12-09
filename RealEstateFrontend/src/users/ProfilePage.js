@@ -164,7 +164,11 @@ const ProfilePage = () => {
               {formatMessage({ id: 'uploadAvatar' })}
             </Button>
           </Upload>
-          <Button type="primary" onClick={handleEdit}>
+          <Button
+            type="primary"
+            onClick={handleEdit}
+            style={{ marginTop: '5px' }}
+          >
             {formatMessage({ id: 'edit' })}
           </Button>
         </div>
@@ -175,6 +179,8 @@ const ProfilePage = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        okButtonProps={{ style: { marginRight: 8 } }}
+        cancelButtonProps={{ style: { marginLeft: 8, marginBottom: 10 } }}
       >
         <Form form={form} layout="vertical">
           <Form.Item name="userName" label={formatMessage({ id: 'userName' })}>

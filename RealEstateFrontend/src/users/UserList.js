@@ -81,13 +81,21 @@ const UserList = () => {
           dataIndex="userName"
           key="userName"
         />
-        <Table.Column title={intl.formatMessage({ id: 'email' })} dataIndex="email" key="email" />
+        <Table.Column
+          title={intl.formatMessage({ id: 'email' })}
+          dataIndex="email"
+          key="email"
+        />
         <Table.Column
           title={intl.formatMessage({ id: 'phone_number' })}
           dataIndex="phoneNumber"
           key="phoneNumber"
         />
-        <Table.Column title={intl.formatMessage({ id: 'role' })} dataIndex="role" key="role" />
+        <Table.Column
+          title={intl.formatMessage({ id: 'role' })}
+          dataIndex="role"
+          key="role"
+        />
         <Table.Column
           title={intl.formatMessage({ id: 'active_status' })}
           key="isActive"
@@ -111,19 +119,30 @@ const UserList = () => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        okButtonProps={{ style: { marginRight: 8 } }}
+        cancelButtonProps={{ style: { marginLeft: 8, marginBottom: 10 } }}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="userName" label={intl.formatMessage({ id: 'user_name' })}>
+          <Form.Item
+            name="userName"
+            label={intl.formatMessage({ id: 'user_name' })}
+          >
             <Input disabled />
           </Form.Item>
           <Form.Item name="email" label={intl.formatMessage({ id: 'email' })}>
             <Input disabled />
           </Form.Item>
-          <Form.Item name="phoneNumber" label={intl.formatMessage({ id: 'phone_number' })}>
+          <Form.Item
+            name="phoneNumber"
+            label={intl.formatMessage({ id: 'phone_number' })}
+          >
             <Input disabled />
           </Form.Item>
           <Form.Item name="role" label={intl.formatMessage({ id: 'role' })}>
-            <Select placeholder={intl.formatMessage({ id: 'select_role' })} style={{ width: '100%' }}>
+            <Select
+              placeholder={intl.formatMessage({ id: 'select_role' })}
+              style={{ width: '100%' }}
+            >
               <Option value="Manager">Quản lý</Option>
               <Option value="Tenant">Người thuê</Option>
               <Option value="Owner">Chủ bất động sản</Option>

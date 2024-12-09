@@ -297,5 +297,18 @@
   "user.loadMore": "Xem thêm bình luận",
   "user.loggedOutError": "Người dùng chưa đăng nhập",
   "user.postSuccess": "Đánh giá đã được đăng thành công",
-  "user.postError": "Lỗi khi đăng đánh giá"
+  "user.postError": "Lỗi khi đăng đánh giá",
+
+  "supportRequest": "Yêu cầu hỗ trợ",
+  "descriptionContact": "Chúng tôi luôn sẵn sàng giúp đỡ bạn! Hãy điền vào form và chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.",
+  "emailPlaceholder": "Nhập email của bạn ở đây",
+  "emailLabel": "Email của bạn",
+  "emailRequired": "Vui lòng nhập email của bạn để chúng tôi có thể liên hệ!",
+  "emailInvalid": "Email không hợp lệ! Hãy thử lại.",
+  "messageRequired": "Hãy cho chúng tôi biết bạn cần gì!",
+  "messagePlaceholder": "Mô tả yêu cầu hoặc vấn đề của bạn",
+  "submitButtonContact": "Gửi yêu cầu",
+  "sendingMessage": "🎉 Chúc mừng! Yêu cầu của bạn đã được gửi thành công. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể!",
+  "errorMessageContact": "😞 Rất tiếc! Gửi email không thành công, vui lòng thử lại!",
+  "formError": "Vui lòng kiểm tra lại thông tin đã nhập! Chúng tôi cần thông tin chính xác để hỗ trợ bạn."
 }
