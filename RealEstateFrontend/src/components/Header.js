@@ -1,19 +1,64 @@
-import React from 'react';
-import { Layout, Button, Space } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Button, Space, Badge, Popover, List } from 'antd';
 import {
   LogoutOutlined,
   UserOutlined,
   LineChartOutlined,
   ContactsOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const { Header } = Layout;
 
 const AppHeader = ({ logo, isDarkMode }) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const role = localStorage.getItem('role');
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+  const [notificationsPerPage] = useState(5); // Number of notifications per page
+
+  // Fetch notifications with pagination
+  useEffect(() => {
+    axios
+      .get(
+        `/api/notifications?page=${currentPage}&limit=${notificationsPerPage}`
+      )
+      .then((response) => {
+        const sortedNotifications = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setNotifications(sortedNotifications);
+        setUnreadCount(
+          sortedNotifications.filter((notification) => !notification.isRead)
+            .length
+        );
+      })
+      .catch((error) => {
+        console.error('There was an error fetching the notifications!', error);
+      });
+  }, [currentPage]); // Rerun this effect whenever the page changes
+
+  const handleNotificationClick = (notification) => {
+    if (!notification.isRead) {
+      axios
+        .put(`/api/notifications/${notification.id}`, { isRead: true })
+        .then(() => {
+          setNotifications((prevNotifications) =>
+            prevNotifications.map((n) =>
+              n.id === notification.id ? { ...n, isRead: true } : n
+            )
+          );
+          setUnreadCount((prevUnreadCount) => Math.max(prevUnreadCount - 1, 0));
+        })
+        .catch((error) => {
+          console.error('Error marking notification as read', error);
+        });
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userId');
@@ -22,9 +67,19 @@ const AppHeader = ({ logo, isDarkMode }) => {
     navigate('/login');
   };
 
-  if (location.pathname === '/login' || location.pathname === '/register') {
-    return null;
-  }
+  const handleRoleRedirect = () => {
+    if (role === 'Owner') {
+      navigate('/owner/profile');
+    } else if (role === 'Tenant') {
+      navigate('/tenant/approval');
+    } else if (role === 'Manager') {
+      navigate('/admin/users');
+    }
+  };
+
+  const handleLoadMore = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
 
   const headerStyle = {
     backgroundColor: isDarkMode ? '#000' : '#fff',
@@ -40,27 +95,6 @@ const AppHeader = ({ logo, isDarkMode }) => {
     transition: 'all 0.3s ease',
   };
 
-  const handleRoleRedirect = () => {
-    if (role === 'Owner') {
-      navigate('/owner/profile');
-    } else if (role === 'Tenant') {
-      navigate('/tenant/approval');
-    } else if (role === 'Manager') {
-      navigate('/admin/users');
-    }
-  };
-
-  const handleLogoClick = () => {
-    navigate('/');
-  };
-
-  const handleChartRedirect = () => {
-    navigate('/chart');
-  };
-  const handleContact = () => {
-    navigate('/contact-us');
-  };
-
   return (
     <Header style={headerStyle}>
       <div
@@ -69,7 +103,7 @@ const AppHeader = ({ logo, isDarkMode }) => {
           fontSize: '30px',
           cursor: 'pointer',
         }}
-        onClick={handleLogoClick}
+        onClick={() => navigate('/')}
       >
         <img
           src={logo}
@@ -85,7 +119,7 @@ const AppHeader = ({ logo, isDarkMode }) => {
       <Space>
         <Button
           icon={<ContactsOutlined />}
-          onClick={handleContact}
+          onClick={() => navigate('/contact-us')}
           style={{
             backgroundColor: isDarkMode ? '#262626' : '#f0f2f5',
             color: isDarkMode ? '#fff' : '#000',
@@ -97,7 +131,7 @@ const AppHeader = ({ logo, isDarkMode }) => {
         </Button>
         <Button
           icon={<LineChartOutlined />}
-          onClick={handleChartRedirect}
+          onClick={() => navigate('/chart')}
           style={{
             backgroundColor: isDarkMode ? '#262626' : '#f0f2f5',
             color: isDarkMode ? '#fff' : '#000',
@@ -121,6 +155,57 @@ const AppHeader = ({ logo, isDarkMode }) => {
           {role === 'Tenant' && 'Tenant Dashboard'}
           {role === 'Manager' && 'Manager Dashboard'}
         </Button>
+
+        {/* Notification Icon with Popover and Badge */}
+        <Badge count={unreadCount} showZero>
+          <Popover
+            content={
+              <>
+                <List
+                  dataSource={notifications}
+                  renderItem={(notification) => (
+                    <List.Item
+                      onClick={() => handleNotificationClick(notification)}
+                      style={{
+                        cursor: 'pointer',
+                        backgroundColor: notification.isRead
+                          ? 'transparent'
+                          : '#f7f7f7',
+                        padding: '10px',
+                      }}
+                    >
+                      <p>{notification.message}</p>
+                      <p style={{ fontSize: '12px', color: 'gray' }}>
+                        {new Date(notification.createdAt).toLocaleString()}
+                      </p>
+                    </List.Item>
+                  )}
+                />
+                <Button
+                  style={{ width: '100%' }}
+                  onClick={handleLoadMore}
+                  disabled={notifications.length === 0}
+                >
+                  Load More
+                </Button>
+              </>
+            }
+            title="Notifications"
+            trigger="click"
+            placement="bottomRight"
+          >
+            <Button
+              icon={<BellOutlined />}
+              type="text"
+              style={{
+                backgroundColor: isDarkMode ? '#262626' : '#f0f2f5',
+                color: isDarkMode ? '#fff' : '#000',
+                borderRadius: '25px',
+                transition: 'all 0.3s ease',
+              }}
+            />
+          </Popover>
+        </Badge>
 
         <Button
           type="primary"

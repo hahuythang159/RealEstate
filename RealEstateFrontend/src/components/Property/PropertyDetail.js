@@ -14,7 +14,6 @@ const PropertyDetail = () => {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [images, setImages] = useState([]);
-  const [form] = Form.useForm();
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role');
   const [loading, setLoading] = useState(true);
@@ -22,8 +21,10 @@ const PropertyDetail = () => {
   const [district, setDistrict] = useState(null);
   const [province, setProvince] = useState(null);
   const userId = localStorage.getItem('userId');
+  const userName = localStorage.getItem('userName');
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [commentId, setCommentId] = useState('');
   const [owner, setOwner] = useState(null);
 
   const intl = useIntl();
@@ -65,7 +66,7 @@ const PropertyDetail = () => {
   useEffect(() => {
     fetchProperty();
     fetchComments();
-  }, [id]);
+  }, []);
 
   useEffect(() => {
     if (property) {
@@ -103,24 +104,46 @@ const PropertyDetail = () => {
     const commentData = {
       propertyId: id,
       userId: userId,
+      userName: userName,
       content: newComment,
+      commentId: commentId,
     };
 
-    const response = await fetch(`/api/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(commentData),
-    });
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commentData),
+      });
 
-    if (response.ok) {
-      const newCommentFromServer = await response.json();
-      setComments([...comments, newCommentFromServer]);
-      setNewComment('');
-      message.success(intl.formatMessage({ id: 'comment_success' }));
-    } else {
+      if (response.ok) {
+        const newCommentFromServer = await response.json();
+        setComments([...comments, newCommentFromServer]);
+        setNewComment('');
+        message.success(intl.formatMessage({ id: 'comment_success' }));
+
+        const notificationResponse = await fetch(
+          '/api/notifications/on-comment',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(commentData),
+          }
+        );
+
+        if (notificationResponse.ok) {
+          console.log('Notification sent successfully.');
+        } else {
+          console.error('Failed to send notification.');
+        }
+      } else {
+        message.error(intl.formatMessage({ id: 'comment_error' }));
+      }
+    } catch (error) {
       message.error(intl.formatMessage({ id: 'comment_error' }));
     }
   };
+
   const handleAvatarClick = (commentUserId) => {
     navigate(`/user/${commentUserId}`);
   };
@@ -204,6 +227,7 @@ const PropertyDetail = () => {
               comments.map((comment) => (
                 <div
                   key={comment.id}
+                  id={comment.commentId}
                   style={{
                     marginBottom: '20px',
                     display: 'flex',
