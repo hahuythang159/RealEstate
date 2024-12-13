@@ -9,7 +9,7 @@ import {
   Modal,
   Checkbox,
 } from 'antd';
-import { useIntl } from 'react-intl'; // Import useIntl
+import { useIntl } from 'react-intl';
 
 const { Title, Text } = Typography;
 

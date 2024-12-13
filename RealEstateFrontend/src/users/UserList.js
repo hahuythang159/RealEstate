@@ -140,6 +140,7 @@ const UserList = () => {
           </Form.Item>
           <Form.Item name="role" label={intl.formatMessage({ id: 'role' })}>
             <Select
+              disabled
               placeholder={intl.formatMessage({ id: 'select_role' })}
               style={{ width: '100%' }}
             >

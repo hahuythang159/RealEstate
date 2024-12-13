@@ -128,7 +128,6 @@ const App = () => {
               <Route path="/owner/my-properties" element={<MyPropertyList />} />
               <Route path="/owner/my-product" element={<ProductList />} />
             </Route>
-
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -141,6 +140,7 @@ const App = () => {
             <Route path="/chart" element={<PriceChart />} />
             <Route path="/user/:userId" element={<UserReview />} />
             <Route path="/contact-us" element={<ContactForm />} />
+
             <Route
               path="*"
               element={<Navigate to={role ? `/${role}` : '/login'} />}
