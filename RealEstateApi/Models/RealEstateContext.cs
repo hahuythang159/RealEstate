@@ -20,6 +20,8 @@ public class RealEstateContext : DbContext
     public DbSet<Province> Provinces { get; set; }
     public DbSet<Ward> Wards { get; set; }
     public DbSet<PropertyImage> PropertyImages { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
