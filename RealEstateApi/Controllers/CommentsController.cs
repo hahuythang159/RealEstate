@@ -45,7 +45,6 @@ namespace RealEstateApi.Controllers
             return Ok(comments);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> PostComment([FromBody] CommentDto commentDto)
         {
@@ -65,27 +64,53 @@ namespace RealEstateApi.Controllers
                     CreatedAt = DateTime.Now
                 };
 
-                // Thêm bình luận vào cơ sở dữ liệu
                 _context.Comments.Add(comment);
                 await _context.SaveChangesAsync();
 
-                // Lấy tên người dùng từ bảng Users
                 var user = await _context.Users.FindAsync(comment.UserId);
 
-                // Chuẩn bị phản hồi
+                // Chuẩn bị phản hồi cho client
                 var result = new CommentDto
                 {
                     Id = comment.Id,
                     PropertyId = comment.PropertyId,
                     UserId = comment.UserId,
                     AvatarUrl = user?.AvatarUrl,
-                    UserName = user?.UserName, // Trả về tên người dùng
+                    UserName = user?.UserName,
                     Content = comment.Content,
                     CreatedAt = comment.CreatedAt
                 };
 
-                // Gửi bình luận đến tất cả client
                 await _hubContext.Clients.All.SendAsync("ReceiveComment", result);
+
+                var property = await _context.Properties.FindAsync(commentDto.PropertyId);
+                if (property == null)
+                {
+                    return NotFound("Property not found.");
+                }
+
+                var owner = await _context.Users.FindAsync(property.OwnerId);
+                if (owner == null)
+                {
+                    return NotFound("Owner not found.");
+                }
+
+                // Tạo thông báo cho chủ sở hữu bất động sản
+                var notification = new Notification
+                {
+                    UserId = owner.Id,
+                    Message = $"Có bình luận mới từ: {user.UserName} về bất động sản của bạn với nội dung: {commentDto.Content}",
+                    CreatedAt = DateTime.Now,
+                    IsRead = false,
+                };
+
+                // Thêm thông báo vào cơ sở dữ liệu
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
+                // Gửi thông báo đến chủ sở hữu bất động sản qua SignalR
+                await _hubContext.Clients.User(owner.Id.ToString()).SendAsync("ReceiveNotification", notification);
+
                 return Ok(result);
             }
             catch (Exception ex)

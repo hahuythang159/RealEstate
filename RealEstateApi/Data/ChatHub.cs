@@ -3,30 +3,13 @@ using System.Threading.Tasks;
 
 public class ChatHub : Hub
 {
-    private static Dictionary<string, string> connectedUsers = new Dictionary<string, string>();
-
-    public override async Task OnConnectedAsync()
+    public async Task SendMessageToAll(string message)
     {
-        var userId = Context.ConnectionId;
-        connectedUsers[userId] = Context.UserIdentifier;
-
-        // Thông báo tới tất cả mọi người rằng user đã kết nối
-        await Clients.All.SendAsync("UserConnected", Context.UserIdentifier);
-
-        await base.OnConnectedAsync();
+        await Clients.All.SendAsync("ReceiveMessage", message);
     }
 
-    public override async Task OnDisconnectedAsync(Exception exception)
+    public async Task SendMessageToOwner(string ownerId, string message)
     {
-        var userId = Context.ConnectionId;
-
-        // Xóa người dùng đã ngắt kết nối
-        connectedUsers.Remove(userId);
-
-        // Thông báo tới tất cả mọi người rằng user đã ngắt kết nối
-        await Clients.All.SendAsync("UserDisconnected", Context.UserIdentifier);
-
-        await base.OnDisconnectedAsync(exception);
+        await Clients.User(ownerId).SendAsync("ReceiveNotification", message);
     }
 }
-
