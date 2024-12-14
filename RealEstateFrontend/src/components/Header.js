@@ -9,38 +9,66 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { HubConnectionBuilder } from '@microsoft/signalr';
 
 const { Header } = Layout;
 
 const AppHeader = ({ logo, isDarkMode }) => {
   const navigate = useNavigate();
   const role = localStorage.getItem('role');
-
+  const userId = localStorage.getItem('userId');
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
-  const [notificationsPerPage] = useState(5); // Number of notifications per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const [notificationsPerPage] = useState(5);
 
-  // Fetch notifications with pagination
+  // Kết nối SignalR để nhận thông báo
   useEffect(() => {
-    axios
-      .get(
-        `/api/notifications?page=${currentPage}&limit=${notificationsPerPage}`
-      )
-      .then((response) => {
-        const sortedNotifications = response.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setNotifications(sortedNotifications);
-        setUnreadCount(
-          sortedNotifications.filter((notification) => !notification.isRead)
-            .length
-        );
-      })
-      .catch((error) => {
-        console.error('There was an error fetching the notifications!', error);
-      });
-  }, [currentPage]); // Rerun this effect whenever the page changes
+    if (role === 'Owner') {
+      const connection = new HubConnectionBuilder().withUrl('/chathub').build();
+
+      connection
+        .start()
+        .then(() => {
+          console.log('SignalR connected');
+
+          connection.on('ReceiveNotification', (message) => {
+            setNotifications((prevNotifications) => [
+              message,
+              ...prevNotifications,
+            ]);
+            setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+          });
+        })
+        .catch((error) => console.error('SignalR connection error:', error));
+
+      return () => {
+        connection.stop();
+      };
+    }
+  }, [role]);
+
+  useEffect(() => {
+    if (role === 'Owner') {
+      axios
+        .get(
+          `/api/notifications?page=${currentPage}&limit=${notificationsPerPage}`
+        )
+        .then((response) => {
+          const sortedNotifications = response.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setNotifications(sortedNotifications);
+          setUnreadCount(
+            sortedNotifications.filter((notification) => !notification.isRead)
+              .length
+          );
+        })
+        .catch((error) => {
+          console.error('Error fetching notifications!', error);
+        });
+    }
+  }, [currentPage, role]);
 
   const handleNotificationClick = (notification) => {
     if (!notification.isRead) {
@@ -156,7 +184,6 @@ const AppHeader = ({ logo, isDarkMode }) => {
           {role === 'Manager' && 'Manager Dashboard'}
         </Button>
 
-        {/* Notification Icon with Popover and Badge */}
         <Badge count={unreadCount} showZero>
           <Popover
             content={
