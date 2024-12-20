@@ -16,13 +16,13 @@ import {
 import { UserOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
-import { useIntl } from 'react-intl'; // Import react-intl
+import { useIntl } from 'react-intl';
 
 const { Title, Paragraph } = Typography;
 
 function UserDetail() {
   const { userId } = useParams();
-  const intl = useIntl(); // Khởi tạo useIntl
+  const intl = useIntl();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(null);
@@ -114,6 +114,20 @@ function UserDetail() {
                 intl.formatMessage({ id: 'user.noRatings' })
               )}
             </Paragraph>
+
+            {user?.role === 'Owner' && (
+              <>
+                <Divider />
+                <Title level={5}>
+                  {intl.formatMessage({ id: 'ownerIntroduction' })}
+                </Title>
+                <Paragraph>{user?.ownerIntroduction}</Paragraph>
+                <Title level={5}>
+                  {intl.formatMessage({ id: 'ownerAdditionalInfo' })}
+                </Title>
+                <Paragraph>{user?.ownerAdditionalInfo}</Paragraph>
+              </>
+            )}
           </Card>
         </Col>
 
@@ -169,10 +183,10 @@ function UserDetail() {
             <Card key={review.id} style={{ marginBottom: '16px' }}>
               <Row gutter={[16, 16]} align="middle">
                 <Col>
-                  <Link to={`/user/${review.userId}`}>
+                  <Link to={`/user/${review.reviewerId}`}>
                     <Avatar
                       size="large"
-                      src={review.avatarUrl}
+                      src={review.reviewerAvatarUrl}
                       icon={<UserOutlined />}
                       style={{ cursor: 'pointer' }}
                     />
@@ -180,7 +194,7 @@ function UserDetail() {
                 </Col>
                 <Col flex="auto">
                   <Paragraph strong>
-                    {review.userName}{' '}
+                    {review.reviewerName}{' '}
                     <span style={{ color: 'gray', fontSize: '12px' }}>
                       - {moment(review.createdAt).format('DD/MM/YYYY HH:mm')}
                     </span>

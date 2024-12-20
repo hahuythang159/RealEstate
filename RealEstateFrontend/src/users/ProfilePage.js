@@ -18,15 +18,18 @@ const { Option } = Select;
 const ProfilePage = () => {
   const { formatMessage } = useIntl();
   const [currentUser, setCurrentUser] = useState(null);
+  const userId = localStorage.getItem('userId');
+  const userRole = localStorage.getItem('role');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchCurrentUser();
-  }, []);
+    if (userId) {
+      fetchCurrentUser(userId);
+    }
+  }, [userId]);
 
   const fetchCurrentUser = async () => {
-    const userId = localStorage.getItem('userId');
     if (!userId) {
       message.error(formatMessage({ id: 'fetchError' }));
       return;
@@ -36,7 +39,6 @@ const ProfilePage = () => {
       const response = await fetch(`/api/users/${userId}`);
       if (!response.ok) throw new Error(formatMessage({ id: 'loadError' }));
       const data = await response.json();
-      console.log(data);
       setCurrentUser(data);
     } catch (error) {
       message.error(error.message);
@@ -50,12 +52,18 @@ const ProfilePage = () => {
 
   const updateUser = async (values) => {
     try {
+      const updatedUser = {
+        ...values,
+        id: currentUser.id,
+        avatar: currentUser.avatar,
+      };
+
       const response = await fetch(`/api/users/${currentUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...values, id: currentUser.id }),
+        body: JSON.stringify(updatedUser),
       });
 
       if (response.ok) {
@@ -73,7 +81,6 @@ const ProfilePage = () => {
   };
 
   const uploadAvatar = async (file) => {
-    const userId = localStorage.getItem('userId');
     if (!userId) {
       message.error(formatMessage({ id: 'userNotFound' }));
       return;
@@ -90,10 +97,9 @@ const ProfilePage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Cập nhật avatar mới cho người dùng
         setCurrentUser({
           ...currentUser,
-          avatar: data.AvatarPath, // Cập nhật đường dẫn ảnh avatar mới
+          avatarUrl: data.avatarUrl,
         });
         message.success(formatMessage({ id: 'avatarUploadSuccess' }));
       } else {
@@ -152,10 +158,22 @@ const ProfilePage = () => {
               ? formatMessage({ id: 'active' })
               : formatMessage({ id: 'inactive' })}
           </p>
+          {userRole === 'Owner' && (
+            <>
+              <p>
+                <strong>{formatMessage({ id: 'ownerIntroduction' })}:</strong>{' '}
+                {currentUser.ownerIntroduction}
+              </p>
+              <p>
+                <strong>{formatMessage({ id: 'ownerAdditionalInfo' })}:</strong>{' '}
+                {currentUser.ownerAdditionalInfo}
+              </p>
+            </>
+          )}
           <Upload
             beforeUpload={async (file) => {
               await uploadAvatar(file);
-              return false; // Prevent default upload behavior
+              return false;
             }}
             showUploadList={false}
             accept="image/*"
@@ -218,6 +236,22 @@ const ProfilePage = () => {
               unCheckedChildren={formatMessage({ id: 'inactive' })}
             />
           </Form.Item>
+          {userRole === 'Owner' && (
+            <>
+              <Form.Item
+                name="ownerIntroduction"
+                label={formatMessage({ id: 'ownerIntroduction' })}
+              >
+                <Input.TextArea />
+              </Form.Item>
+              <Form.Item
+                name="ownerAdditionalInfo"
+                label={formatMessage({ id: 'ownerAdditionalInfo' })}
+              >
+                <Input.TextArea />
+              </Form.Item>
+            </>
+          )}
         </Form>
       </Modal>
     </>
