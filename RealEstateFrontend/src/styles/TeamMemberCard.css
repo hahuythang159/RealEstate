@@ -1,27 +1,76 @@
 .team-member-card {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    width: 250px;
-    text-align: center;
-    padding: 20px;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  width: 250px;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .member-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 15px;
+  width: 250px;
+  height: 260px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-bottom: 15px;
 }
 
 .member-info h3 {
-    font-size: 1.25rem;
-    margin: 10px 0;
-    color: #212529;
+  font-size: 1.25rem;
+  margin: 10px 0;
+  color: #212529;
 }
 
 .member-info p {
-    color: #6c757d;
-    font-size: 0.9rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.rating-info {
+  margin-top: 10px;
+}
+
+.rating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  color: #f39c12;
+}
+
+.star {
+  font-size: 18px;
+  margin: 0 2px;
+}
+
+.star.full {
+  color: #f39c12;
+}
+
+.star.empty {
+  color: #ddd;
+}
+
+.star.half {
+  color: #f1c40f;
+}
+.contact-icon1 {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.contact-icon1:hover {
+  transform: scale(1.1);
 }

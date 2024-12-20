@@ -310,5 +310,8 @@
   "submitButtonContact": "Gửi yêu cầu",
   "sendingMessage": "🎉 Chúc mừng! Yêu cầu của bạn đã được gửi thành công. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể!",
   "errorMessageContact": "😞 Rất tiếc! Gửi email không thành công, vui lòng thử lại!",
-  "formError": "Vui lòng kiểm tra lại thông tin đã nhập! Chúng tôi cần thông tin chính xác để hỗ trợ bạn."
+  "formError": "Vui lòng kiểm tra lại thông tin đã nhập! Chúng tôi cần thông tin chính xác để hỗ trợ bạn.",
+
+  "ownerIntroduction": "Thông tin giới thiệu",
+  "ownerAdditionalInfo": "Bổ sung"
 }

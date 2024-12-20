@@ -301,5 +301,8 @@
   "submitButtonContact": "Submit Request",
   "sendingMessage": "🎉 Congratulations! Your request has been successfully sent. We will support you as soon as possible!",
   "errorMessageContact": "😞 Sorry! Sending email failed, please try again!",
-  "formError": "Please check the information you entered! We need accurate information to assist you."
+  "formError": "Please check the information you entered! We need accurate information to assist you.",
+
+  "ownerIntroduction": "Introductory information",
+  "ownerAdditionalInfo": "Additional information"
 }
