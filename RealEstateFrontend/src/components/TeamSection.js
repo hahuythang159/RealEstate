@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import TeamMemberCard from './TeamMemberCard';
-import './TeamSection.css';
+import '../styles/TeamSection.css';
 
 const TeamSection = () => {
   const intl = useIntl();

@@ -7,7 +7,7 @@ import {
   ContactsOutlined,
   BellOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
@@ -15,6 +15,7 @@ const { Header } = Layout;
 
 const AppHeader = ({ logo, isDarkMode }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const role = localStorage.getItem('role');
   const userId = localStorage.getItem('userId');
   const [notifications, setNotifications] = useState([]);
@@ -122,6 +123,9 @@ const AppHeader = ({ logo, isDarkMode }) => {
       : '0 2px 10px rgba(0, 0, 0, 0.1)',
     transition: 'all 0.3s ease',
   };
+  if (location.pathname === '/login' || location.pathname === '/register') {
+    return null;
+  }
 
   return (
     <Header style={headerStyle}>

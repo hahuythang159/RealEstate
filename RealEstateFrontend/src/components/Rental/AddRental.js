@@ -32,7 +32,7 @@ function AddRental() {
   });
   const [loading, setLoading] = useState(false);
 
-  const intl = useIntl(); // Use intl for translations
+  const intl = useIntl();
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');

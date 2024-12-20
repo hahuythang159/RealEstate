@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { useIntl } from 'react-intl';  // Import useIntl
-import './Testimonials.css';
+import { useIntl } from 'react-intl';
+import '../styles/Testimonials.css';
 
 const testimonialsData = [
   {
@@ -48,7 +48,7 @@ const testimonialsData = [
 ];
 
 const Testimonials = () => {
-  const intl = useIntl();  // Sử dụng hook useIntl để lấy các chuỗi dịch
+  const intl = useIntl(); // Sử dụng hook useIntl để lấy các chuỗi dịch
   const testimonialsWrapperRef = useRef(null);
   const testimonialsRef = useRef([]);
 
@@ -79,9 +79,12 @@ const Testimonials = () => {
   return (
     <div className="testimonials-container">
       <div className="title-section">
-        <p>{intl.formatMessage({ id: 'testimonials_header' })}</p>  {/* Dịch header "Testimonials" */}
-        <h1>{intl.formatMessage({ id: 'testimonials_title' })}</h1>  {/* Dịch tiêu đề "Các khách hàng đã nói gì?" */}
-        <p>{intl.formatMessage({ id: 'testimonials_description' })}</p>  {/* Dịch mô tả */}
+        <p>{intl.formatMessage({ id: 'testimonials_header' })}</p>{' '}
+        {/* Dịch header "Testimonials" */}
+        <h1>{intl.formatMessage({ id: 'testimonials_title' })}</h1>{' '}
+        {/* Dịch tiêu đề "Các khách hàng đã nói gì?" */}
+        <p>{intl.formatMessage({ id: 'testimonials_description' })}</p>{' '}
+        {/* Dịch mô tả */}
       </div>
       <div className="testimonials-section">
         <div className="testimonials-wrapper" ref={testimonialsWrapperRef}>
@@ -97,7 +100,12 @@ const Testimonials = () => {
                   <img src={testimonial.image} alt={testimonial.name} />
                   <div>
                     <strong>{testimonial.name}</strong>
-                    <span>{intl.formatMessage({ id: `testimonial_position_${index + 1}` })}</span> {/* Dịch vị trí của từng khách hàng */}
+                    <span>
+                      {intl.formatMessage({
+                        id: `testimonial_position_${index + 1}`,
+                      })}
+                    </span>{' '}
+                    {/* Dịch vị trí của từng khách hàng */}
                   </div>
                 </div>
               </div>

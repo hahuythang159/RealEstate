@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import './TrustedCompanies.css';
+import '../styles/TrustedCompanies.css';
 
 const TrustedCompanies = () => {
   const navigate = useNavigate();
@@ -21,12 +21,8 @@ const TrustedCompanies = () => {
         />
       </Helmet>
       <div className="trusted-companies-content">
-        <h1>
-          {intl.formatMessage({ id: 'trusted_companies_title' })}
-        </h1>
-        <p>
-          {intl.formatMessage({ id: 'trusted_companies_description' })}
-        </p>
+        <h1>{intl.formatMessage({ id: 'trusted_companies_title' })}</h1>
+        <p>{intl.formatMessage({ id: 'trusted_companies_description' })}</p>
       </div>
       <div className="trusted-companies-button-container">
         <button className="visit-button" onClick={handleVisitClick}>

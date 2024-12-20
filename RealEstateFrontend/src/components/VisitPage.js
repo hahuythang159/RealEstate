@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import './VisitPage.css';
+import '../styles/VisitPage.css';
 import Footer from '../pages/Footer';
 
 const VisitPage = () => {

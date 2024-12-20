@@ -12,14 +12,13 @@ import Register from './pages/Register';
 import UserList from './users/UserList';
 import ProfilePage from './users/ProfilePage';
 import UserReview from './users/UserReview';
+import NotFound from './pages/NotFound';
 
 // Import các thành phần
 import AppHeader from './components/Header';
 import SocialLinks from './components/SocialLinks';
 import Favorites from './components/Favorite/FavoriteList';
 import './App.css';
-
-// Import các thành phần bất động sản
 import AddRental from './components/Rental/AddRental';
 import AddProperty from './components/Property/AddProperty';
 import PropertyDetail from './components/Property/PropertyDetail';
@@ -110,10 +109,6 @@ const App = () => {
             </Route>
             <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
               <Route path="/admin/users" element={<UserList />} />
-              {/* <Route
-                path="/admin/property-list"
-                element={<AwaitingApproval />}
-              /> */}
               <Route path="/admin/approved" element={<ApprovedRentals />} />
               <Route
                 path="/admin/canceled-rentals"
@@ -141,10 +136,7 @@ const App = () => {
             <Route path="/user/:userId" element={<UserReview />} />
             <Route path="/contact-us" element={<ContactForm />} />
 
-            <Route
-              path="*"
-              element={<Navigate to={role ? `/${role}` : '/login'} />}
-            />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <SocialLinks />
         </Router>

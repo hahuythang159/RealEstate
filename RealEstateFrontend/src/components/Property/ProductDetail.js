@@ -25,7 +25,6 @@ const PropertyDetail = () => {
   const [district, setDistrict] = useState(null);
   const [province, setProvince] = useState(null);
   const userId = localStorage.getItem('userId');
-  const [comments, setComments] = useState([]);
   const intl = useIntl();
 
   const fetchProperty = async () => {
@@ -36,15 +35,8 @@ const PropertyDetail = () => {
     form.setFieldsValue(data);
   };
 
-  const fetchComments = async () => {
-    const response = await fetch(`/api/comments/${id}`);
-    const data = await response.json();
-    setComments(data);
-  };
-
   useEffect(() => {
     fetchProperty();
-    fetchComments();
   }, [id, form]);
 
   useEffect(() => {
@@ -264,65 +256,6 @@ const PropertyDetail = () => {
               </Form.Item>
             </Form>
           )}
-
-          <h3>{intl.formatMessage({ id: 'comments' })}</h3>
-          <div>
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  style={{
-                    marginBottom: '20px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    <img
-                      src={`${baseUrl}${comment.avatarUrl}`}
-                      alt={comment.userName}
-                      width="40"
-                      height="40"
-                    />
-                    <div style={{ fontWeight: 'bold', marginRight: '10px' }}>
-                      {comment.userName}
-                    </div>
-                    <p
-                      style={{
-                        fontSize: '12px',
-                        color: 'gray',
-                        marginLeft: 'auto',
-                      }}
-                    >
-                      {dayjs(comment.createdAt).fromNow()}
-                    </p>
-                  </div>
-
-                  <div
-                    style={{
-                      backgroundColor: '#f1f1f1',
-                      padding: '12px',
-                      borderRadius: '8px',
-                      width: '100%',
-                      maxWidth: 'calc(100% - 60px)',
-                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-                    }}
-                  >
-                    {comment.content}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>{intl.formatMessage({ id: 'no_comments' })}</p>
-            )}
-          </div>
         </Card>
       ) : (
         <p>Loading...</p>

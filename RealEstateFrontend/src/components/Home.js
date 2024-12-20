@@ -8,7 +8,7 @@ import TeamSection from '../components/TeamSection';
 import Testimonials from '../components/Testimonials';
 import Footer from '../pages/Footer';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
-import './fadeInOut.css';
+import '../styles/fadeInOut.css';
 
 const Home = () => {
   const [properties, setProperties] = useState([]);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import './HeroSection.css';
+import '../styles/HeroSection.css';
 import Statistics from './Statistics';
 
 const HeroSection = () => {

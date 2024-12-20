@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-import './RegisterForm.css';
+import '../styles/RegisterForm.css';
 
 const { Title } = Typography;
 
@@ -219,9 +219,6 @@ const RegisterForm = () => {
                   </Select.Option>
                   <Select.Option value="Tenant">
                     {intl.formatMessage({ id: 'register.roleTenant' })}
-                  </Select.Option>
-                  <Select.Option value="Manager">
-                    {intl.formatMessage({ id: 'register.roleManager' })}
                   </Select.Option>
                 </Select>
               </Form.Item>

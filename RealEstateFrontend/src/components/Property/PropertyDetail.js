@@ -24,7 +24,6 @@ const PropertyDetail = () => {
   const userName = localStorage.getItem('userName');
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [commentId, setCommentId] = useState('');
   const [owner, setOwner] = useState(null);
 
   const intl = useIntl();
@@ -106,7 +105,6 @@ const PropertyDetail = () => {
       userId: userId,
       userName: userName,
       content: newComment,
-      commentId: commentId,
     };
 
     try {

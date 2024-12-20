@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { FormattedMessage, useIntl } from 'react-intl';
-import './Login.css';
+import '../styles/Login.css';
 
 const { Title } = Typography;
 

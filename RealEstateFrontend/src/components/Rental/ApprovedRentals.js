@@ -28,7 +28,6 @@ function ApprovedRentals() {
         }
         const data = await response.json();
 
-        // Lọc dữ liệu chỉ cho phép tenant và owner thấy rental của họ
         let filteredRentals = [];
         if (role === 'Manager') {
           filteredRentals = data;
