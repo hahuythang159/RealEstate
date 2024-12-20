@@ -20,8 +20,6 @@ public class RentalsController : ControllerBase
     private readonly RentalService _rentalService;
     private readonly IConfiguration _configuration;
 
-
-
     public RentalsController(RealEstateContext context, RentalService rentalService, IConfiguration configuration)
     {
         _context = context;
@@ -35,8 +33,8 @@ public class RentalsController : ControllerBase
     public async Task<ActionResult<IEnumerable<object>>> GetRentals()
     {
         var rentals = await _context.Rentals
-            .Include(r => r.Property) // Bao gồm Property để truy cập OwnerId
-            .Include(r => r.Tenant)   // Bao gồm Tenant nếu cần hiển thị thông tin Tenant
+            .Include(r => r.Property)
+            .Include(r => r.Tenant) 
             .Select(r => new
             {
                 r.Id,
@@ -82,14 +80,12 @@ public class RentalsController : ControllerBase
                 return NotFound(new { message = "Bất động sản không tồn tại." });
             }
 
-            // Kiểm tra tenant có tồn tại hay không
             var tenant = await _context.Users.FindAsync(rentalDto.TenantId);
             if (tenant == null)
             {
                 return NotFound(new { message = "Người thuê không tồn tại." });
             }
 
-            // Tạo rental mới
             var rental = new Rental
             {
                 PropertyId = rentalDto.PropertyId,
@@ -150,7 +146,6 @@ public class RentalsController : ControllerBase
 
     // DELETE: api/rentals/5
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Owner, Manager")]
     public async Task<IActionResult> DeleteRental(Guid id)
     {
         var rental = await _context.Rentals.FindAsync(id);
@@ -223,9 +218,9 @@ public class RentalsController : ControllerBase
     {
         var approvedRentals = await _context.Rentals
             .Where(r => r.Status == RentalStatus.Approved)
-            .Include(r => r.Property)  // Bao gồm thông tin Property
-            .ThenInclude(p => p.Owner) // Bao gồm thông tin Owner từ Property
-            .Include(r => r.Tenant)    // Bao gồm thông tin Tenant
+            .Include(r => r.Property)
+            .ThenInclude(p => p.Owner)
+            .Include(r => r.Tenant)
             .ToListAsync();
 
         if (!approvedRentals.Any())
@@ -236,11 +231,11 @@ public class RentalsController : ControllerBase
         var rentalsWithDetails = approvedRentals.Select(rental => new
         {
             rental.Id,
-            tenantName = rental.Tenant?.UserName,        // Lấy tên người thuê
-            tenantId = rental.Tenant?.Id,                // Lấy ID của tenant
-            propertyName = rental.Property?.Address,     // Lấy tên bất động sản
-            ownerId = rental.Property?.Owner?.Id,        // Lấy ID của chủ sở hữu
-            ownerName = rental.Property?.Owner?.UserName, // Lấy tên chủ sở hữu
+            tenantName = rental.Tenant?.UserName, 
+            tenantId = rental.Tenant?.Id,
+            propertyName = rental.Property?.Address, 
+            ownerId = rental.Property?.Owner?.Id,
+            ownerName = rental.Property?.Owner?.UserName,
             startDate = rental.StartDate,
             endDate = rental.EndDate,
             status = rental.Status.ToString(),

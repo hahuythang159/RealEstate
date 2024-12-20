@@ -69,28 +69,24 @@ public class NotificationsController : ControllerBase
 
         try
         {
-            // Lấy thông tin bất động sản
             var property = await _context.Properties.FindAsync(commentDto.PropertyId);
             if (property == null)
             {
                 return NotFound("Property not found.");
             }
 
-            // Lấy thông tin chủ sở hữu bất động sản
             var owner = await _context.Users.FindAsync(property.OwnerId);
             if (owner == null)
             {
                 return NotFound("Owner not found.");
             }
 
-            // Lấy thông tin người gửi bình luận
             var user = await _context.Users.FindAsync(commentDto.UserId);
             if (user == null)
             {
                 return NotFound("User not found.");
             }
 
-            // Tạo thông báo cho chủ sở hữu bất động sản
             var notification = new Notification
             {
                 UserId = owner.Id,
@@ -99,18 +95,15 @@ public class NotificationsController : ControllerBase
                 IsRead = false,
             };
 
-            // Thêm thông báo vào cơ sở dữ liệu
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
 
-            // Gửi thông báo đến chủ sở hữu thông qua SignalR
             await _hubContext.Clients.User(owner.Id.ToString()).SendAsync("ReceiveNotification", notification.Message);
 
             return Ok(notification);
         }
         catch (Exception ex)
         {
-            // Log lỗi và trả về thông báo lỗi
             return StatusCode(500, "Internal server error: " + ex.Message);
         }
     }

@@ -55,7 +55,6 @@ namespace RealEstateApi.Controllers
 
             try
             {
-                // Tạo bình luận mới
                 var comment = new Comment
                 {
                     PropertyId = commentDto.PropertyId,
@@ -69,7 +68,6 @@ namespace RealEstateApi.Controllers
 
                 var user = await _context.Users.FindAsync(comment.UserId);
 
-                // Chuẩn bị phản hồi cho client
                 var result = new CommentDto
                 {
                     Id = comment.Id,
@@ -95,7 +93,6 @@ namespace RealEstateApi.Controllers
                     return NotFound("Owner not found.");
                 }
 
-                // Tạo thông báo cho chủ sở hữu bất động sản
                 var notification = new Notification
                 {
                     UserId = owner.Id,
@@ -104,11 +101,9 @@ namespace RealEstateApi.Controllers
                     IsRead = false,
                 };
 
-                // Thêm thông báo vào cơ sở dữ liệu
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
 
-                // Gửi thông báo đến chủ sở hữu bất động sản qua SignalR
                 await _hubContext.Clients.User(owner.Id.ToString()).SendAsync("ReceiveNotification", notification);
 
                 return Ok(result);

@@ -87,6 +87,7 @@ public class ReviewsController : ControllerBase
         var reviews = await _context.Reviews
             .Where(r => r.TargetUserId == userId)
             .Include(r => r.Reviewer)
+            .Include(r => r.TargetUser)
             .Select(r => new
             {
                 r.Id,
@@ -94,7 +95,10 @@ public class ReviewsController : ControllerBase
                 r.Comment,
                 r.CreatedAt,
                 ReviewerName = r.Reviewer.UserName,
-                ReviewerAvatarUrl = r.Reviewer.AvatarUrl
+                ReviewerAvatarUrl = r.Reviewer.AvatarUrl,
+
+                OwnerIntroduction = r.TargetUser.Role == "Owner" ? r.TargetUser.OwnerIntroduction : null,
+                OwnerAdditionalInfo = r.TargetUser.Role == "Owner" ? r.TargetUser.OwnerAdditionalInfo : null
             })
             .ToListAsync();
 

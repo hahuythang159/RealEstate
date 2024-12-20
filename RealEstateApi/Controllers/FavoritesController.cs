@@ -52,20 +52,17 @@ public class FavoritesController : ControllerBase
             return BadRequest("Favorite cannot be null.");
         }
 
-        // Kiểm tra người dùng tồn tại
         var userExists = await _context.Users.AnyAsync(u => u.Id == favorite.UserId);
         if (!userExists)
         {
             return NotFound("User not found.");
         }
 
-        // Kiểm tra nếu người dùng đã yêu thích bất động sản này
         var existingFavorite = await _context.Favorites
             .FirstOrDefaultAsync(f => f.UserId == favorite.UserId && f.PropertyId == favorite.PropertyId);
 
         if (existingFavorite != null)
         {
-            // Nếu bất động sản đã có trong danh sách yêu thích, xóa nó
             _context.Favorites.Remove(existingFavorite);
             await _context.SaveChangesAsync();
             return Ok(new { message = "Đã bỏ khỏi danh sách yêu thích." });

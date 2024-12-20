@@ -142,7 +142,6 @@ public class PropertiesController : ControllerBase
     {
         try
         {
-            // Kiểm tra các lỗi validation
             if (!ModelState.IsValid)
 
             {
