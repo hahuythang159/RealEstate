@@ -35,14 +35,15 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    public string OwnerIntroduction { get; set; } = string.Empty;
+    public string OwnerAdditionalInfo { get; set; } = string.Empty;
+
 
     public virtual ICollection<Rental>? Rentals { get; set; }
     public virtual ICollection<Comment>? UserComments { get; set; }
     public virtual ICollection<Favorite>? UserFavorites { get; set; }
-    public virtual ICollection<Booking>? Bookings { get; set; }
     public virtual ICollection<Review> ReviewsWritten { get; set; } = new List<Review>();
     public virtual ICollection<Review> ReviewsReceived { get; set; } = new List<Review>();
-
 
     [JsonIgnore]
     public virtual ICollection<Property> Properties { get; set; } = new List<Property>();
