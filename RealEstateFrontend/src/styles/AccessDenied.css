@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f3b5ba;
+  color: #721c24;
+  text-align: center;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 1s infinite;
+}
+
+.title-ad {
+  font-size: 48px;
+  font-weight: bold;
+  color: #c82333;
+  text-transform: uppercase;
+  margin: 10px 0;
+  letter-spacing: 3px;
+}
+
+.message {
+  font-size: 20px;
+  color: #721c24;
+  font-weight: normal;
+  margin-top: 10px;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
