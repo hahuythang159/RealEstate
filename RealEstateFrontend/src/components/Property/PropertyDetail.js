@@ -233,7 +233,6 @@ const PropertyDetail = () => {
               marginBottom: '20px',
             }}
           >
-            {/* Property information */}
             <div style={{ flex: 3, paddingRight: '20px' }}>
               <h3>{property.title}</h3>
               <p>
@@ -287,7 +286,6 @@ const PropertyDetail = () => {
               </p>
             </div>
 
-            {/* Owner information */}
             {owner && (
               <div
                 style={{
@@ -320,7 +318,6 @@ const PropertyDetail = () => {
             </Button>
           )}
 
-          {/* Comments section */}
           <h3>{intl.formatMessage({ id: 'comments' })}</h3>
           <div
             style={{

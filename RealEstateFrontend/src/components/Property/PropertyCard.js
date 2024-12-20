@@ -36,7 +36,6 @@ const PropertyCard = ({ property, userId }) => {
     fetchFavoriteStatus();
   }, [userId, property.id]);
 
-  // Toggle trạng thái yêu thích
   const handleFavorite = async () => {
     const userId = localStorage.getItem('userId');
     try {

@@ -44,7 +44,6 @@ const AddProperty = () => {
   const intl = useIntl();
   const navigate = useNavigate();
 
-  // Fetch danh sách tỉnh từ API
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
       .then((response) => response.json())
@@ -54,7 +53,6 @@ const AddProperty = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  // Fetch danh sách huyện khi người dùng chọn tỉnh
   useEffect(() => {
     if (selectedCity) {
       fetch(`https://provinces.open-api.vn/api/p/${selectedCity}?depth=2`)
@@ -66,7 +64,6 @@ const AddProperty = () => {
     }
   }, [selectedCity]);
 
-  // Fetch danh sách xã/phường khi người dùng chọn huyện
   useEffect(() => {
     if (selectedDistrict) {
       fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`)
@@ -136,16 +133,13 @@ const AddProperty = () => {
       return;
     }
 
-    // Tạo FormData và thêm tất cả dữ liệu cùng file ảnh
     const formData = new FormData();
 
-    // Thêm các thuộc tính của Property vào FormData
     formData.append('Property.OwnerId', property.ownerId);
     formData.append('Property.ProvinceId', selectedCity);
     formData.append('Property.DistrictId', selectedDistrict);
     formData.append('Property.WardId', selectedWard);
 
-    // Thêm các trường dữ liệu khác vào formData
     Object.entries(values).forEach(([key, value]) => {
       formData.append(`Property.${key}`, value);
     });

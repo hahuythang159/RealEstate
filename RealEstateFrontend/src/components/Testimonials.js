@@ -48,7 +48,7 @@ const testimonialsData = [
 ];
 
 const Testimonials = () => {
-  const intl = useIntl(); // Sử dụng hook useIntl để lấy các chuỗi dịch
+  const intl = useIntl();
   const testimonialsWrapperRef = useRef(null);
   const testimonialsRef = useRef([]);
 
@@ -80,11 +80,8 @@ const Testimonials = () => {
     <div className="testimonials-container">
       <div className="title-section">
         <p>{intl.formatMessage({ id: 'testimonials_header' })}</p>{' '}
-        {/* Dịch header "Testimonials" */}
         <h1>{intl.formatMessage({ id: 'testimonials_title' })}</h1>{' '}
-        {/* Dịch tiêu đề "Các khách hàng đã nói gì?" */}
         <p>{intl.formatMessage({ id: 'testimonials_description' })}</p>{' '}
-        {/* Dịch mô tả */}
       </div>
       <div className="testimonials-section">
         <div className="testimonials-wrapper" ref={testimonialsWrapperRef}>
@@ -105,7 +102,6 @@ const Testimonials = () => {
                         id: `testimonial_position_${index + 1}`,
                       })}
                     </span>{' '}
-                    {/* Dịch vị trí của từng khách hàng */}
                   </div>
                 </div>
               </div>
