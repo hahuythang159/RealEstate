@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Form, Input, message, Carousel } from 'antd';
+import { Card, Button, Form, Input, message, Spin } from 'antd';
+import {
+  FaBed,
+  FaShower,
+  FaMapMarkerAlt,
+  FaDollarSign,
+  FaClipboard,
+} from 'react-icons/fa';
+
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useIntl } from 'react-intl';
@@ -25,7 +33,7 @@ const PropertyDetail = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [owner, setOwner] = useState(null);
-
+  const [activeImage, setActiveImage] = useState(0);
   const intl = useIntl();
 
   const fetchProperty = async () => {
@@ -42,6 +50,22 @@ const PropertyDetail = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const handleThumbnailClick = (index) => {
+    setActiveImage(index);
+  };
+  const formatPrice = (price) => {
+    let formattedPrice = '';
+
+    if (price >= 1000000) {
+      formattedPrice = `${(price / 1000000).toFixed(0)} triệu`;
+    } else if (price >= 1000) {
+      formattedPrice = `${(price / 1000).toFixed(0)} nghìn`;
+    } else {
+      formattedPrice = price;
+    }
+
+    return `${formattedPrice} / tháng`;
   };
 
   const fetchOwner = async (ownerId) => {
@@ -148,91 +172,166 @@ const PropertyDetail = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      {property ? (
-        <Card
-          title={intl.formatMessage({ id: 'property_detail' })}
-          bordered={true}
-          style={{ maxWidth: '600px', margin: 'auto' }}
-        >
-          <Carousel autoplay>
-            {images.map((image) => (
+      {loading ? (
+        <Spin tip={intl.formatMessage({ id: 'loading' })} />
+      ) : (
+        <Card bordered={true}>
+          <div
+            style={{
+              width: '100%',
+              height: '600px',
+              overflow: 'hidden',
+              borderRadius: '8px',
+              marginBottom: '20px',
+            }}
+          >
+            <img
+              src={`${baseUrl}${images[activeImage].imageUrl}`}
+              alt={intl.formatMessage({ id: 'property_image' })}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+
+          {/* Ảnh nhỏ phía dưới */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '10px',
+              flexWrap: 'wrap',
+            }}
+          >
+            {images.map((image, index) => (
               <img
                 key={image.id}
                 src={`${baseUrl}${image.imageUrl}`}
-                alt="Ảnh bất động sản"
-                style={{ width: '100%', height: '50px', objectFit: 'cover' }}
+                alt={intl.formatMessage({ id: 'property_thumbnail' })}
+                onClick={() => handleThumbnailClick(index)}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  objectFit: 'cover',
+                  border:
+                    activeImage === index
+                      ? '2px solid #1890ff'
+                      : '2px solid #ddd',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
               />
             ))}
-          </Carousel>
+          </div>
 
-          <h3>{property.title}</h3>
-          <p>
-            <strong>{intl.formatMessage({ id: 'price1' })}:</strong>{' '}
-            {property.price} VNĐ
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'area1' })}:</strong>{' '}
-            {property.area} m²
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'bedrooms1' })}:</strong>{' '}
-            {property.bedrooms}
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'bathrooms1' })}:</strong>{' '}
-            {property.bathrooms}
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'address1' })}:</strong>{' '}
-            {property.address}, {ward}, {district}, {province}
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'description1' })}:</strong>{' '}
-            {property.description}
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'property_type' })}:</strong>{' '}
-            {property.propertyType}
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'interior_condition' })}:</strong>{' '}
-            {property.interior}
-          </p>
-          <p>
-            <strong>{intl.formatMessage({ id: 'posted_date' })}:</strong>{' '}
-            {dayjs(property.postedDate).format('DD/MM/YYYY HH:mm')} (
-            {dayjs(property.postedDate).fromNow()})
-          </p>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: '20px',
+            }}
+          >
+            {/* Property information */}
+            <div style={{ flex: 3, paddingRight: '20px' }}>
+              <h3>{property.title}</h3>
+              <p>
+                <FaDollarSign style={{ marginRight: '8px' }} />
+                <strong>{intl.formatMessage({ id: 'price1' })}:</strong>{' '}
+                {formatPrice(property.price)}
+              </p>
+              <p>
+                <FaMapMarkerAlt style={{ marginRight: '8px' }} />
+                <strong>{intl.formatMessage({ id: 'area1' })}:</strong>{' '}
+                {property.area} m²
+              </p>
+              <p>
+                <FaBed style={{ marginRight: '8px' }} />
+                <strong>{intl.formatMessage({ id: 'bedrooms1' })}:</strong>{' '}
+                {property.bedrooms}
+              </p>
+              <p>
+                <FaShower style={{ marginRight: '8px' }} />
+                <strong>
+                  {intl.formatMessage({ id: 'bathrooms1' })}:
+                </strong>{' '}
+                {property.bathrooms}
+              </p>
+              <p>
+                <FaMapMarkerAlt style={{ marginRight: '8px' }} />
+                <strong>{intl.formatMessage({ id: 'address1' })}:</strong>{' '}
+                {property.address}, {ward}, {district}, {province}
+              </p>
+              <p>
+                <FaClipboard style={{ marginRight: '8px' }} />
+                <strong>
+                  {intl.formatMessage({ id: 'description1' })}:
+                </strong>{' '}
+                {property.description}
+              </p>
+              <p>
+                <strong>{intl.formatMessage({ id: 'property_type' })}:</strong>{' '}
+                {property.propertyType}
+              </p>
+              <p>
+                <strong>
+                  {intl.formatMessage({ id: 'interior_condition' })}:
+                </strong>{' '}
+                {property.interior}
+              </p>
+              <p>
+                <strong>{intl.formatMessage({ id: 'posted_date' })}:</strong>{' '}
+                {dayjs(property.postedDate).format('DD/MM/YYYY HH:mm')} (
+                {dayjs(property.postedDate).fromNow()})
+              </p>
+            </div>
 
-          {owner && (
-            <p>
-              <strong>{intl.formatMessage({ id: 'owner' })}:</strong>{' '}
-              {owner.userName}
-            </p>
-          )}
-
-          <div style={{ marginTop: '20px' }}>
-            {userRole === 'Tenant' && (
-              <Button type="primary" onClick={handleCreateRental}>
-                {intl.formatMessage({ id: 'create_rental' })}
-              </Button>
+            {/* Owner information */}
+            {owner && (
+              <div
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  borderLeft: '1px solid #ddd',
+                  paddingLeft: '20px',
+                }}
+              >
+                <img
+                  src={`${baseUrl}${owner.avatarUrl}`}
+                  alt={owner.userName}
+                  width="100"
+                  height="100"
+                  style={{ borderRadius: '50%', marginBottom: '10px' }}
+                  onClick={() => navigate(`/user/${owner.id}`)}
+                />
+                <p style={{ fontWeight: 'bold' }}>{owner.userName}</p>
+              </div>
             )}
           </div>
 
+          {userRole === 'Tenant' && (
+            <Button
+              type="primary"
+              onClick={handleCreateRental}
+              style={{ marginBottom: '20px' }}
+            >
+              {intl.formatMessage({ id: 'create_rental' })}
+            </Button>
+          )}
+
+          {/* Comments section */}
           <h3>{intl.formatMessage({ id: 'comments' })}</h3>
-          <div>
+          <div
+            style={{
+              maxHeight: '300px',
+              overflowY: 'auto',
+              marginBottom: '20px',
+            }}
+          >
             {comments.length > 0 ? (
               comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  id={comment.commentId}
-                  style={{
-                    marginBottom: '20px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                  }}
-                >
+                <div key={comment.id} style={{ marginBottom: '20px' }}>
                   <div
                     style={{
                       display: 'flex',
@@ -248,13 +347,7 @@ const PropertyDetail = () => {
                       style={{ borderRadius: '50%' }}
                       onClick={() => handleAvatarClick(comment.userId)}
                     />
-                    <div
-                      style={{
-                        fontWeight: 'bold',
-                        marginRight: '10px',
-                        marginLeft: '10px',
-                      }}
-                    >
+                    <div style={{ fontWeight: 'bold', marginLeft: '10px' }}>
                       {comment.userName}
                     </div>
                     <p
@@ -267,14 +360,11 @@ const PropertyDetail = () => {
                       {dayjs(comment.createdAt).fromNow()}
                     </p>
                   </div>
-
                   <div
                     style={{
                       backgroundColor: '#f1f1f1',
                       padding: '12px',
                       borderRadius: '8px',
-                      width: '100%',
-                      maxWidth: 'calc(100% - 60px)',
                       boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
                     }}
                   >
@@ -287,18 +377,14 @@ const PropertyDetail = () => {
             )}
           </div>
 
-          <Form
-            layout="inline"
-            onFinish={handleCommentSubmit}
-            style={{ marginTop: '20px' }}
-          >
-            <Form.Item>
+          <Form layout="inline" onFinish={handleCommentSubmit}>
+            <Form.Item style={{ flex: 1 }}>
               <Input.TextArea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder={intl.formatMessage({ id: 'comment_placeholder' })}
                 rows={2}
-                style={{ width: '400px' }}
+                style={{ width: '100%' }}
               />
             </Form.Item>
             <Form.Item>
@@ -308,8 +394,6 @@ const PropertyDetail = () => {
             </Form.Item>
           </Form>
         </Card>
-      ) : (
-        <p>{intl.formatMessage({ id: 'loading' })}</p>
       )}
     </div>
   );
