@@ -124,7 +124,6 @@ public class UsersController : ControllerBase
             .Include(u => u.UserComments)
             .Include(u => u.UserFavorites)
             .Include(u => u.ReviewsWritten)
-            .Include(u => u.Bookings)
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
@@ -134,7 +133,27 @@ public class UsersController : ControllerBase
 
         return Ok(user);
     }
+    [HttpGet("owners")]
+    public async Task<IActionResult> GetOwners()
+    {
+        var owners = await _context.Users
+            .Where(user => user.Role == "Owner")
+            .Select(user => new
+            {
+                user.Id,
+                user.UserName,
+                user.AvatarUrl,
+                user.PhoneNumber,
+                AverageRating = _context.Reviews
+                    .Where(review => review.TargetUserId == user.Id)
+                    .Average(review => (double?)review.Rating) ?? 0
+            })
+            .OrderByDescending(owner => owner.AverageRating)
+            .Take(3)
+            .ToListAsync();
 
+        return Ok(owners);
+    }
 
     // PUT: api/users/5
     [HttpPut("{id}")]
@@ -156,7 +175,16 @@ public class UsersController : ControllerBase
         existingUser.PhoneNumber = updatedUser.PhoneNumber;
         existingUser.Role = updatedUser.Role;
         existingUser.IsActive = updatedUser.IsActive;
-        existingUser.AvatarUrl = updatedUser.AvatarUrl;
+
+        if (!string.IsNullOrEmpty(updatedUser.AvatarUrl))
+        {
+            existingUser.AvatarUrl = updatedUser.AvatarUrl;
+        }
+        if (existingUser.Role == "Owner")
+        {
+            existingUser.OwnerIntroduction = updatedUser.OwnerIntroduction;
+            existingUser.OwnerAdditionalInfo = updatedUser.OwnerAdditionalInfo;
+        }
 
         _context.Entry(existingUser).State = EntityState.Modified;
 
@@ -207,31 +235,28 @@ public class UsersController : ControllerBase
             return NotFound("User not found.");
         }
 
-        // Kiểm tra loại file, kích thước, v.v...
         var fileExtension = Path.GetExtension(avatar.FileName);
         if (fileExtension != ".jpg" && fileExtension != ".png")
         {
             return BadRequest("Invalid file type. Only .jpg and .png are allowed.");
         }
 
-        // Tạo tên file duy nhất để tránh trùng lặp
         var fileName = Guid.NewGuid().ToString() + fileExtension;
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "avatars", fileName);
 
-        // Lưu tệp tin vào thư mục
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await avatar.CopyToAsync(stream);
         }
 
-        // Cập nhật đường dẫn avatar cho user
         user.AvatarUrl = $"/avatars/{fileName}";
 
         _context.Entry(user).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
-        return Ok(new { AvatarPath = user.AvatarUrl });
+        return Ok(new { AvatarUrl = user.AvatarUrl });
     }
+
 
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto googleDto)
