@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Filters from '../components/Filters';
 import PropertyList from '../components/PropertyList';
 import ImageCarousel from '../components/ImageCarousel';
@@ -26,6 +26,9 @@ const Home = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [interior, setInterior] = useState(null);
+  const [sort, setSort] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const propertiesListRef = useRef(null);
 
   const isImageCarouselVisible = useIntersectionObserver({
     target: '.image-carousel1',
@@ -100,6 +103,7 @@ const Home = () => {
       if (selectedDistrict) query.append('districtId', selectedDistrict);
       if (selectedWard) query.append('wardId', selectedWard);
       if (interior) query.append('interior', interior);
+      if (sort) query.append('sort', sort);
 
       const response = await fetch(`/api/properties?${query.toString()}`);
       const data = await response.json();
@@ -121,7 +125,32 @@ const Home = () => {
     selectedDistrict,
     selectedWard,
     interior,
+    sort,
   ]);
+
+  const handleSearch = async (term) => {
+    setSearchTerm(term);
+    try {
+      const response = await fetch(
+        `/api/properties/search?title=${encodeURIComponent(term)}`
+      );
+      const data = await response.json();
+      setProperties(data);
+
+      // Cuộn xuống danh sách bất động sản khi tìm kiếm
+      if (propertiesListRef.current) {
+        propertiesListRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (searchTerm === '') {
+      fetchProperties();
+    }
+  }, [searchTerm]);
 
   const paginatedProperties = properties.slice(
     (currentPage - 1) * pageSize,
@@ -148,7 +177,7 @@ const Home = () => {
       <div
         className={`hero-section1 ${isHeroSectionVisible ? 'fade-in' : 'fade-out'}`}
       >
-        <HeroSection />
+        <HeroSection onSearch={handleSearch} />
       </div>
       <div
         className={`team-section1 ${isTeamSectionVisible ? 'fade-in' : 'fade-out'}`}
@@ -170,16 +199,21 @@ const Home = () => {
         setBedrooms={setBedrooms}
         setBathrooms={setBathrooms}
         setInterior={setInterior}
+        setSort={setSort}
         handleFilterChange={fetchProperties}
       />
-      <PropertyList
-        properties={properties}
-        paginatedProperties={paginatedProperties}
-        total={total}
-        pageSize={pageSize}
-        currentPage={currentPage}
-        handlePageChange={handlePageChange}
-      />
+      <div ref={propertiesListRef}>
+        <PropertyList
+          ref={propertiesListRef}
+          properties={properties}
+          paginatedProperties={paginatedProperties}
+          total={total}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          handlePageChange={handlePageChange}
+        />
+      </div>
+
       <div
         className={`testimonials-section1 ${isTestimonialsVisible ? 'fade-in' : 'fade-out'}`}
       >

@@ -232,7 +232,7 @@
   "statistics_satisfied_customers_label": "Satisfied Customers",
   "statistics_verified_properties_label": "Verified Properties",
 
-  "team_section_header": "Team Member",
+  "team_section_header": "Top Owners",
   "team_section_title": "Meet the Awesome Property Owners",
   "team_section_description": "HomeMates helps you easily create a real estate trading website with features like Registration, Login, and Listing Real Estate.",
   "team_section_view_all": "View All Team",
@@ -304,5 +304,9 @@
   "formError": "Please check the information you entered! We need accurate information to assist you.",
 
   "ownerIntroduction": "Introductory information",
-  "ownerAdditionalInfo": "Additional information"
+  "ownerAdditionalInfo": "Additional information",
+
+  "select_sort_by_date": "Choose the post time",
+  "oldest_first": "Oldest first",
+  "newest_first": "Newest first"
 }

@@ -241,7 +241,7 @@
   "statistics_satisfied_customers_label": "Khách hàng hài lòng",
   "statistics_verified_properties_label": "Thuộc tính đã được xác minh",
 
-  "team_section_header": "Team Member",
+  "team_section_header": "Top Owners",
   "team_section_title": "Gặp gỡ các chủ bất động sản tuyệt vời",
   "team_section_description": "HomeMates giúp bạn dễ dàng tạo website giao dịch bất động sản. Với chức năng Đăng ký, Đăng nhập, Đăng tin bất động sản.",
   "team_section_view_all": "Xem tất cả các thành viên trong đội",
@@ -313,5 +313,9 @@
   "formError": "Vui lòng kiểm tra lại thông tin đã nhập! Chúng tôi cần thông tin chính xác để hỗ trợ bạn.",
 
   "ownerIntroduction": "Thông tin giới thiệu",
-  "ownerAdditionalInfo": "Bổ sung"
+  "ownerAdditionalInfo": "Bổ sung",
+
+  "select_sort_by_date": "Chọn thời gian đăng",
+  "oldest_first": "Cũ nhất",
+  "newest_first": "Mới nhất"
 }

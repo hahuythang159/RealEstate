@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Select, Button } from 'antd';
-import { ClearOutlined  } from '@ant-design/icons';
+import { ClearOutlined } from '@ant-design/icons';
 import { useIntl } from 'react-intl';
 
 const { Option } = Select;
@@ -20,7 +20,8 @@ const Filters = ({
   setBedrooms,
   setBathrooms,
   setInterior,
-  handleFilterChange
+  setSort,
+  handleFilterChange,
 }) => {
   const intl = useIntl();
   const handleClearFilters = () => {
@@ -32,8 +33,11 @@ const Filters = ({
     setBedrooms(null);
     setBathrooms(null);
     setInterior(null);
-
-    // Gọi lại hàm lọc (reload dữ liệu) sau khi reset bộ lọc
+    setSort(null);
+    handleFilterChange();
+  };
+  const handleSortChange = (value) => {
+    setSort(value);
     handleFilterChange();
   };
 
@@ -134,13 +138,42 @@ const Filters = ({
             }
           }}
         >
-          <Option value="below1">{intl.formatMessage({ id: 'below_1_million' })}</Option>
-          <Option value="1to2">{intl.formatMessage({ id: '1_to_2_million' })}</Option>
-          <Option value="2to4">{intl.formatMessage({ id: '2_to_4_million' })}</Option>
-          <Option value="4to6">{intl.formatMessage({ id: '4_to_6_million' })}</Option>
-          <Option value="6to8">{intl.formatMessage({ id: '6_to_8_million' })}</Option>
-          <Option value="8to10">{intl.formatMessage({ id: '8_to_10_million' })}</Option>
-          <Option value="above10">{intl.formatMessage({ id: 'above_10_million' })}</Option>
+          <Option value="below1">
+            {intl.formatMessage({ id: 'below_1_million' })}
+          </Option>
+          <Option value="1to2">
+            {intl.formatMessage({ id: '1_to_2_million' })}
+          </Option>
+          <Option value="2to4">
+            {intl.formatMessage({ id: '2_to_4_million' })}
+          </Option>
+          <Option value="4to6">
+            {intl.formatMessage({ id: '4_to_6_million' })}
+          </Option>
+          <Option value="6to8">
+            {intl.formatMessage({ id: '6_to_8_million' })}
+          </Option>
+          <Option value="8to10">
+            {intl.formatMessage({ id: '8_to_10_million' })}
+          </Option>
+          <Option value="above10">
+            {intl.formatMessage({ id: 'above_10_million' })}
+          </Option>
+        </Select>
+      </Col>
+
+      <Col xs={24} sm={12} md={6}>
+        <Select
+          placeholder={intl.formatMessage({ id: 'select_sort_by_date' })}
+          style={{ width: '100%' }}
+          onChange={(value) => setSort(value)}
+        >
+          <Option value="asc">
+            {intl.formatMessage({ id: 'oldest_first' })}
+          </Option>
+          <Option value="desc">
+            {intl.formatMessage({ id: 'newest_first' })}
+          </Option>
         </Select>
       </Col>
 
@@ -160,7 +193,9 @@ const Filters = ({
           <Option value={1}>{intl.formatMessage({ id: 'bedroom_1' })}</Option>
           <Option value={2}>{intl.formatMessage({ id: 'bedroom_2' })}</Option>
           <Option value={3}>{intl.formatMessage({ id: 'bedroom_3' })}</Option>
-          <Option value="above4">{intl.formatMessage({ id: 'bedroom_above_4' })}</Option>
+          <Option value="above4">
+            {intl.formatMessage({ id: 'bedroom_above_4' })}
+          </Option>
         </Select>
       </Col>
 
@@ -180,7 +215,9 @@ const Filters = ({
           <Option value={1}>{intl.formatMessage({ id: 'bathroom_1' })}</Option>
           <Option value={2}>{intl.formatMessage({ id: 'bathroom_2' })}</Option>
           <Option value={3}>{intl.formatMessage({ id: 'bathroom_3' })}</Option>
-          <Option value="above4">{intl.formatMessage({ id: 'bathroom_above_4' })}</Option>
+          <Option value="above4">
+            {intl.formatMessage({ id: 'bathroom_above_4' })}
+          </Option>
         </Select>
       </Col>
 
@@ -191,11 +228,17 @@ const Filters = ({
           style={{ width: '100%' }}
           onChange={(value) => setInterior(value)}
         >
-          <Option value="Nội thất cao cấp">{intl.formatMessage({ id: 'luxury_interior' })}</Option>
-          <Option value="Nội thất cơ bản">{intl.formatMessage({ id: 'basic_interior' })}</Option>
-          <Option value="Không có nội thất">{intl.formatMessage({ id: 'no_interior' })}</Option>
+          <Option value="Nội thất cao cấp">
+            {intl.formatMessage({ id: 'luxury_interior' })}
+          </Option>
+          <Option value="Nội thất cơ bản">
+            {intl.formatMessage({ id: 'basic_interior' })}
+          </Option>
+          <Option value="Không có nội thất">
+            {intl.formatMessage({ id: 'no_interior' })}
+          </Option>
         </Select>
-      </Col> 
+      </Col>
 
       {/* Áp dụng bộ lọc */}
       <Col xs={24} sm={12} md={6}>
