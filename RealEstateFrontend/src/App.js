@@ -109,7 +109,6 @@ const App = () => {
             </Route>
             <Route element={renderDashboard(ManagerDashboard, 'Manager')}>
               <Route path="/admin/users" element={<UserList />} />
-              <Route path="/admin/approved" element={<ApprovedRentals />} />
               <Route
                 path="/admin/canceled-rentals"
                 element={<CanceledRentals />}
