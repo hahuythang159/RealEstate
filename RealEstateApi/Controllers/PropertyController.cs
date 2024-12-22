@@ -29,8 +29,9 @@ public class PropertiesController : ControllerBase
     [FromQuery] int? provinceId,
     [FromQuery] int? districtId,
     [FromQuery] int? wardId,
-    [FromQuery] string? interior
-)
+    [FromQuery] string? interior,
+    [FromQuery] string? sort
+    )
     {
         var query = _context.Properties
             .Include(p => p.Province)
@@ -49,6 +50,29 @@ public class PropertiesController : ControllerBase
         if (districtId.HasValue) query = query.Where(p => p.DistrictId == districtId.Value);
         if (wardId.HasValue) query = query.Where(p => p.WardId == wardId.Value);
         if (!string.IsNullOrEmpty(interior)) query = query.Where(p => p.Interior == interior);
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            if (sort.ToLower() == "asc")
+            {
+                query = query.OrderBy(p => p.Price);
+            }
+            else if (sort.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(p => p.Price);
+            }
+        }
+        if (!string.IsNullOrEmpty(sort))
+        {
+            if (sort.ToLower() == "asc")
+            {
+                query = query.OrderBy(p => p.PostedDate);
+            }
+            else if (sort.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(p => p.PostedDate);
+            }
+        }
 
         var properties = await query.ToListAsync();
 
@@ -84,12 +108,60 @@ public class PropertiesController : ControllerBase
         return Ok(propertiesWithImages);
     }
 
+    // GET: api/properties/search
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Property>>> SearchProperties([FromQuery] string title)
+    {
+        if (string.IsNullOrEmpty(title))
+        {
+            return BadRequest("Title query parameter is required");
+        }
+
+        var properties = await _context.Properties
+    .Include(p => p.Province)
+    .Include(p => p.District)
+    .Include(p => p.Ward)
+    .Include(p => p.Rentals)
+    .Where(p => !p.Rentals.Any(r => r.Status == RentalStatus.Approved))
+    .Where(p => p.Title.ToLower().Contains(title.ToLower()))
+    .ToListAsync();
+
+        var propertyIds = properties.Select(p => p.Id).ToList();
+        var images = await _context.PropertyImages
+            .Where(pi => propertyIds.Contains(pi.PropertyId))
+            .ToListAsync();
+
+        var propertiesWithImages = properties.Select(p => new
+        {
+            p.Id,
+            p.Title,
+            p.Address,
+            p.Description,
+            p.Price,
+            p.OwnerId,
+            p.ProvinceId,
+            p.DistrictId,
+            p.WardId,
+            p.Bedrooms,
+            p.Bathrooms,
+            p.Area,
+            p.PropertyType,
+            p.Interior,
+            p.PostedDate,
+            p.IsHidden,
+            Province = p.Province?.Name,
+            District = p.District?.Name,
+            Ward = p.Ward?.Name,
+            Images = images.Where(i => i.PropertyId == p.Id)
+        });
+
+        return Ok(propertiesWithImages);
+    }
 
     // GET: api/properties/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Property>> GetProperty(Guid id)
     {
-        // Truy vấn bất động sản từ bảng Properties
         var property = await _context.Properties
             .Include(p => p.Province)
             .Include(p => p.District)
@@ -366,7 +438,7 @@ public class PropertiesController : ControllerBase
 
         return Ok(monthlyAveragePrices);
     }
-    
+
     // GET: api/properties/average-price-by-year
     [HttpGet("average-price-by-year")]
     public async Task<ActionResult<IEnumerable<YearlyAveragePrice>>> GetAveragePriceByYear()
